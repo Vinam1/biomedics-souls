@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /biomedics-souls/public/
+
+# enviar todas las peticiones al front controller
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]

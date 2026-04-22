@@ -1,0 +1,284 @@
+/* Admin Product Form - Diseño Simple y Bonito */
+
+.admin-product-form {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.admin-product-form .card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.admin-product-form .card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.09);
+    transform: translateY(-3px);
+}
+
+/* Header de cada sección con color sutil */
+.admin-product-form .card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 1.25rem 1.5rem;
+}
+
+.admin-product-form .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e2937;
+}
+
+/* Inputs y Selects elegantes */
+.admin-product-form .form-control,
+.admin-product-form .form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+}
+
+.admin-product-form .form-control:focus,
+.admin-product-form .form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    outline: none;
+}
+
+/* Botones de engranaje (simple y bonito) */
+.admin-product-form .btn-outline-secondary {
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+.admin-product-form .btn-outline-secondary:hover {
+    background-color: #f8fafc;
+    border-color: #6366f1;
+    color: #6366f1;
+}
+
+/* Accordion mejoras suaves */
+.admin-product-form .accordion-button {
+    background-color: #ffffff;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.admin-product-form .accordion-button:not(.collapsed) {
+    color: #6366f1;
+    background-color: #f8fafc;
+}
+
+.admin-product-form .accordion-button:focus {
+    box-shadow: none;
+}
+
+/* Chips de etiquetas, usos y beneficios */
+.admin-product-form .badge {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.admin-product-form .badge:hover {
+    background-color: #e0e7ff;
+    color: #6366f1;
+}
+
+/* Botón principal guardar */
+.admin-product-form .btn-gradient {
+    background: linear-gradient(90deg, #6366f1, #4f46e5);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.85rem 2.5rem;
+    border-radius: 16px;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+    transition: all 0.3s ease;
+}
+
+.admin-product-form .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+}
+
+/* Preview de imágenes */
+.admin-product-form #preview-container .card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.admin-product-form #preview-container .card:hover {
+    transform: scale(1.04);
+}
+
+.admin-product-form .image-manager {
+    border: 2px dashed #cbd5e1;
+    border-radius: 24px;
+    padding: 1.25rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.admin-product-form .image-empty-state {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: #eef2ff;
+    color: #475569;
+    text-align: center;
+}
+
+.admin-product-form .image-empty-state i {
+    font-size: 2rem;
+    color: #6366f1;
+}
+
+.admin-product-form .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.85rem;
+}
+
+.admin-product-form .image-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.07);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-product-form .image-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+    border-color: #a5b4fc;
+}
+
+.admin-product-form .image-card.is-dragging {
+    opacity: 0.45;
+    transform: scale(0.94);
+}
+
+.admin-product-form .image-card.is-drop-target {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    transform: translateY(-4px);
+}
+
+.admin-product-form .image-card__handle {
+    position: absolute;
+    top: 0.45rem;
+    left: 0.45rem;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.72);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+}
+
+.admin-product-form .image-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 2.6rem;
+    z-index: 2;
+    background: #4f46e5;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.admin-product-form .image-card__frame {
+    aspect-ratio: 1 / 1;
+    background: #e2e8f0;
+}
+
+.admin-product-form .image-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.admin-product-form .image-card__body {
+    padding: 0.65rem 0.75rem 0.75rem;
+}
+
+.admin-product-form .image-card__name {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-product-form .image-card__remove {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.45rem;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(127, 29, 29, 0.82);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    line-height: 1;
+    padding: 0;
+    z-index: 3;
+}
+
+.admin-product-form .image-card__remove:hover {
+    background: rgba(153, 27, 27, 0.96);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-product-form .card-body {
+        padding: 1.25rem;
+    }
+    
+    .admin-product-form .card-header {
+        padding: 1rem 1.25rem;
+    }
+}
+
+/* Pequeños detalles finales */
+.admin-product-form .form-label {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+
+.admin-product-form .text-muted {
+    color: #64748b !important;
+}
