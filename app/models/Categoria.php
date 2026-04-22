@@ -77,7 +77,7 @@ class Categoria extends BaseEntityModel
     public static function softDelete(int $id): bool
     {
         $db = Database::getInstance();
-        $stmt = $db->prepare("UPDATE categorias SET deleted_at = NOW() WHERE id = :id");
+        $stmt = $db->prepare("UPDATE categorias SET deleted_at = NOW() WHERE id = :id AND deleted_at IS NULL");
         return $stmt->execute(['id' => $id]);
     }
 

@@ -35,7 +35,7 @@ abstract class BaseEntityModel
 
     public static function create(string $nombre): int
     {
-        $existing = self::findByName($nombre);
+        $existing = static::findByName($nombre);
         if ($existing) {
             return (int) $existing['id'];
         }
@@ -70,7 +70,7 @@ abstract class BaseEntityModel
     public static function softDelete(int $id): bool
     {
         $db = Database::getInstance();
-        $stmt = $db->prepare("UPDATE " . static::$table . " SET deleted_at = NOW() WHERE id = :id");
+        $stmt = $db->prepare("UPDATE " . static::$table . " SET deleted_at = NOW() WHERE id = :id AND deleted_at IS NULL");
         return $stmt->execute(['id' => $id]);
     }
 

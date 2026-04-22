@@ -4,6 +4,7 @@ class PagoTransaccion
 {
     public static function create(int $pedidoId, int $clienteId, int $metodoPagoId, array $paymentResult, float $amount): int
     {
+        Database::ensurePaymentTransactionsTable();
         $db = Database::getInstance();
         $stmt = $db->prepare(
             'INSERT INTO pagos_transacciones (
@@ -31,6 +32,7 @@ class PagoTransaccion
 
     public static function latestByPedidoId(int $pedidoId): ?array
     {
+        Database::ensurePaymentTransactionsTable();
         $db = Database::getInstance();
         $stmt = $db->prepare(
             'SELECT * FROM pagos_transacciones WHERE pedido_id = :pedido_id ORDER BY created_at DESC, id DESC LIMIT 1'

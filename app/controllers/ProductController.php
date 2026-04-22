@@ -17,6 +17,17 @@ class ProductController extends Controller
         $badges = Etiqueta::forProduct($product['id']);
         $images = Producto::images($product['id']);
         $reviews = Resena::forProduct($product['id']);
+        $currentUser = $this->getCurrentUser();
+        $flashSuccess = $_SESSION['success'] ?? null;
+        $flashError = $_SESSION['error'] ?? null;
+        unset($_SESSION['success'], $_SESSION['error']);
+
+        $hasReviewed = false;
+        $canReview = false;
+        if ($currentUser) {
+            $hasReviewed = Resena::userHasReviewed((int) $currentUser['id'], (int) $product['id']);
+            $canReview = !$hasReviewed && Resena::canReview((int) $currentUser['id'], (int) $product['id']);
+        }
 
         $mappedProduct = [
             'id' => $product['id'],
@@ -42,7 +53,12 @@ class ProductController extends Controller
             'title' => htmlspecialchars($mappedProduct['name']),
             'product' => $mappedProduct,
             'badges' => $badges,
+            'images' => $images,
             'reviews' => $reviews,
+            'flashSuccess' => $flashSuccess,
+            'flashError' => $flashError,
+            'canReview' => $canReview,
+            'hasReviewed' => $hasReviewed,
         ]);
     }
 

@@ -3,7 +3,7 @@
 class Database
 {
     private static ?PDO $instance = null;
-    private static bool $schemaEnsured = false;
+    private static bool $paymentSchemaEnsured = false;
 
     public static function getInstance(): PDO
     {
@@ -22,15 +22,20 @@ class Database
             }
         }
 
-        if (!self::$schemaEnsured) {
-            self::ensureSchema(self::$instance);
-            self::$schemaEnsured = true;
-        }
-
         return self::$instance;
     }
 
-    private static function ensureSchema(PDO $db): void
+    public static function ensurePaymentTransactionsTable(): void
+    {
+        if (self::$paymentSchemaEnsured) {
+            return;
+        }
+
+        self::createPaymentTransactionsTable(self::getInstance());
+        self::$paymentSchemaEnsured = true;
+    }
+
+    private static function createPaymentTransactionsTable(PDO $db): void
     {
         $db->exec(
             "CREATE TABLE IF NOT EXISTS pagos_transacciones (

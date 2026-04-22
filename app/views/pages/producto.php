@@ -1,230 +1,196 @@
-﻿<?php
+<?php
+$title = $title ?? ($product['name'] ?? 'Producto');
+$galleryImages = array_values(array_filter($images ?? [], static fn ($image) => !empty($image['url_imagen'])));
+$mainImage = !empty($galleryImages)
+    ? asset_url('img/products/' . $galleryImages[0]['url_imagen'])
+    : (!empty($product['image']) ? $product['image'] : null);
+$displayPrice = (float) ($product['price'] ?? 0);
+?>
 
-class ProductService
-{
-    public function validateFormData(array $data, array $files = []): array
-    {
-        $errors = [];
+<div class="container py-5">
+    <nav class="breadcrumb-custom">
+        <a href="<?= site_url(); ?>">Inicio</a>
+        <span class="mx-2">/</span>
+        <a href="<?= site_url('catalogo'); ?>">Catálogo</a>
+        <?php if (!empty($product['category_slug']) && !empty($product['category'])): ?>
+            <span class="mx-2">/</span>
+            <a href="<?= site_url('category/' . $product['category_slug']); ?>"><?= htmlspecialchars($product['category']); ?></a>
+        <?php endif; ?>
+        <span class="mx-2">/</span>
+        <span><?= htmlspecialchars($product['name'] ?? 'Producto'); ?></span>
+    </nav>
 
-        if (empty(trim($data['nombre'] ?? ''))) {
-            $errors[] = 'El nombre del producto es obligatorio.';
-        }
+    <?php if (!empty($flashSuccess)): ?>
+        <div class="alert alert-success rounded-4"><?= htmlspecialchars($flashSuccess); ?></div>
+    <?php endif; ?>
+    <?php if (!empty($flashError)): ?>
+        <div class="alert alert-danger rounded-4"><?= htmlspecialchars($flashError); ?></div>
+    <?php endif; ?>
 
-        if (empty(trim($data['slug'] ?? ''))) {
-            $errors[] = 'El slug del producto es obligatorio.';
-        } elseif (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-            $errors[] = 'El slug solo puede contener letras minúsculas, números y guiones.';
-        }
+    <div class="row g-5 align-items-start">
+        <div class="col-lg-6">
+            <div class="section-card p-4">
+                <div class="rounded-4 overflow-hidden bg-white border mb-3">
+                    <?php if ($mainImage): ?>
+                        <img src="<?= htmlspecialchars($mainImage); ?>" alt="<?= htmlspecialchars($product['name'] ?? 'Producto'); ?>" class="img-fluid w-100" style="max-height: 520px; object-fit: cover;">
+                    <?php else: ?>
+                        <div class="d-flex align-items-center justify-content-center text-muted" style="height: 520px;">Sin imagen disponible</div>
+                    <?php endif; ?>
+                </div>
 
-        if (empty(trim($data['sku'] ?? ''))) {
-            $errors[] = 'El SKU del producto es obligatorio.';
-        }
+                <?php if (count($galleryImages) > 1): ?>
+                    <div class="d-flex flex-wrap gap-3">
+                        <?php foreach ($galleryImages as $image): ?>
+                            <img src="<?= htmlspecialchars(asset_url('img/products/' . $image['url_imagen'])); ?>" alt="<?= htmlspecialchars($product['name'] ?? 'Producto'); ?>" class="product-thumbnail">
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
 
-        if (!isset($data['precio']) || !is_numeric($data['precio']) || floatval($data['precio']) < 0) {
-            $errors[] = 'El precio debe ser un número positivo.';
-        }
+        <div class="col-lg-6">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <?php foreach ($badges ?? [] as $badge): ?>
+                    <span class="badge rounded-pill px-3 py-2" style="background: <?= htmlspecialchars($badge['color'] ?? '#3B82F6'); ?>20; color: <?= htmlspecialchars($badge['color'] ?? '#3B82F6'); ?>;">
+                        <?= htmlspecialchars($badge['nombre'] ?? 'Etiqueta'); ?>
+                    </span>
+                <?php endforeach; ?>
+                <?php if (!empty($product['category'])): ?>
+                    <span class="badge rounded-pill text-bg-light px-3 py-2"><?= htmlspecialchars($product['category']); ?></span>
+                <?php endif; ?>
+            </div>
 
-        if (!empty($data['precio_descuento']) && (!is_numeric($data['precio_descuento']) || floatval($data['precio_descuento']) < 0)) {
-            $errors[] = 'El precio de descuento debe ser un número positivo o estar vacío.';
-        }
+            <h1 class="display-5 fw-bold mb-3"><?= htmlspecialchars($product['name'] ?? 'Producto'); ?></h1>
 
-        if (!empty($data['precio_descuento']) && floatval($data['precio_descuento']) >= floatval($data['precio'])) {
-            $errors[] = 'El precio de descuento debe ser menor al precio regular.';
-        }
+            <div class="d-flex flex-wrap align-items-center gap-4 mb-4">
+                <div class="price-big mb-0">$<?= number_format($displayPrice, 2); ?></div>
+                <div class="text-warning fw-semibold">
+                    <?= str_repeat('★', (int) round((float) ($product['rating'] ?? 0))); ?>
+                    <span class="text-muted ms-2"><?= number_format((float) ($product['rating'] ?? 0), 1); ?> (<?= (int) ($product['reviews_count'] ?? 0); ?> reseñas)</span>
+                </div>
+            </div>
 
-        if (empty($data['categoria_id'])) {
-            $errors[] = 'La categoría es obligatoria.';
-        }
+            <?php if (!empty($product['short_description'])): ?>
+                <p class="lead text-muted mb-4"><?= htmlspecialchars($product['short_description']); ?></p>
+            <?php endif; ?>
 
-        if (empty($data['forma_id'])) {
-            $errors[] = 'La forma es obligatoria.';
-        }
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <?php if (!empty($product['content'])): ?>
+                    <div class="product-badge-info">
+                        <span class="label">Contenido</span>
+                        <span class="value"><?= htmlspecialchars($product['content']); ?></span>
+                    </div>
+                <?php endif; ?>
+                <?php if (!empty($product['sku'])): ?>
+                    <div class="product-badge-info">
+                        <span class="label">SKU</span>
+                        <span class="value"><?= htmlspecialchars($product['sku']); ?></span>
+                    </div>
+                <?php endif; ?>
+            </div>
 
-        if (!in_array($data['estatus'] ?? '', ['activo', 'inactivo', 'agotado'], true)) {
-            $errors[] = 'El estatus debe ser activo, inactivo o agotado.';
-        }
+            <?php if (!empty($product['benefits'])): ?>
+                <ul class="benefits-list">
+                    <?php foreach ($product['benefits'] as $benefit): ?>
+                        <li><i class="fas fa-circle-check"></i><?= htmlspecialchars($benefit); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
 
-        if (!empty($files['imagenes']['name'][0])) {
-            foreach ($files['imagenes']['name'] as $index => $fileName) {
-                $errorCode = $files['imagenes']['error'][$index] ?? UPLOAD_ERR_NO_FILE;
-                if ($errorCode === UPLOAD_ERR_NO_FILE) {
-                    continue;
-                }
-                if ($errorCode !== UPLOAD_ERR_OK) {
-                    $errors[] = 'No se pudo subir una de las imágenes seleccionadas.';
-                    continue;
-                }
-                $size = (int) ($files['imagenes']['size'][$index] ?? 0);
-                if ($size <= 0 || $size > MAX_UPLOAD_SIZE) {
-                    $errors[] = 'Cada imagen debe pesar máximo 5 MB.';
-                }
-            }
-        }
+            <form action="<?= site_url('carrito/agregar/' . (int) ($product['id'] ?? 0)); ?>" method="post" class="section-card p-4 mb-4">
+                <?= csrf_input(); ?>
+                <div class="qty-selector">
+                    <label for="quantity" class="fw-semibold mb-0">Cantidad</label>
+                    <input type="number" id="quantity" name="quantity" min="1" value="1" class="form-control rounded-4" style="max-width: 120px;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg px-5">Agregar al carrito</button>
+                <div class="guarantee-badge">
+                    <i class="fas fa-shield-heart text-success"></i>
+                    <span>Pago seguro y envío con seguimiento.</span>
+                </div>
+            </form>
 
-        $existingImageIds = array_values(array_filter(array_map('intval', $data['existing_image_ids'] ?? [])));
-        $hasNewImages     = !empty($files['imagenes']['name'][0]);
-        if (empty($existingImageIds) && !$hasNewImages) {
-            $errors[] = 'Debes conservar o cargar al menos una imagen para el producto.';
-        }
+            <div class="usage-box">
+                <h4>Modo de empleo</h4>
+                <p class="mb-0"><?= nl2br(htmlspecialchars($product['usage_instructions'] ?? 'Consulta a tu especialista antes de consumir este suplemento.')); ?></p>
+            </div>
+        </div>
+    </div>
 
-        return $errors;
-    }
+    <div class="row g-4 mt-4">
+        <div class="col-lg-7">
+            <div class="section-card p-4 h-100">
+                <ul class="nav info-tabs mb-4" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#descripcion" type="button">Descripción</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#resenas" type="button">Reseñas</button></li>
+                </ul>
 
-    public function prepareProductData(array $postData): array
-    {
-        $contenidoNetoValor = trim($postData['contenido_neto_valor'] ?? '');
-        $contenidoNetoUnidad = trim($postData['contenido_neto_unidad'] ?? 'mg');
-        $contenidoNeto = $contenidoNetoValor !== ''
-                ? str_replace(',', '.', $contenidoNetoValor) . ' ' . $contenidoNetoUnidad
-                : null;
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="descripcion">
+                        <p class="mb-4"><?= nl2br(htmlspecialchars($product['description'] ?? 'Sin descripción disponible.')); ?></p>
+                    </div>
+                    <div class="tab-pane fade" id="resenas">
+                        <?php if (!empty($reviews)): ?>
+                            <div class="vstack gap-3">
+                                <?php foreach ($reviews as $review): ?>
+                                    <div class="border rounded-4 p-3">
+                                        <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                            <div>
+                                                <strong><?= htmlspecialchars(trim(($review['nombre'] ?? '') . ' ' . ($review['apellidos'] ?? ''))); ?></strong>
+                                                <div class="text-warning small"><?= str_repeat('★', (int) ($review['calificacion'] ?? 0)); ?></div>
+                                            </div>
+                                            <small class="text-muted"><?= htmlspecialchars($review['created_at'] ?? ''); ?></small>
+                                        </div>
+                                        <?php if (!empty($review['titulo'])): ?>
+                                            <h6 class="mb-1"><?= htmlspecialchars($review['titulo']); ?></h6>
+                                        <?php endif; ?>
+                                        <p class="text-muted mb-0"><?= nl2br(htmlspecialchars($review['comentario'] ?? '')); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted mb-0">Aún no hay reseñas para este producto.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        return [
-                'nombre'             => trim($postData['nombre'] ?? ''),
-                'slug'               => trim($postData['slug'] ?? ''),
-                'sku'                => trim($postData['sku'] ?? ''),
-                'precio'             => floatval($postData['precio'] ?? 0),
-                'precio_descuento'   => !empty($postData['precio_descuento']) ? floatval($postData['precio_descuento']) : null,
-                'descripcion_corta'  => trim($postData['descripcion_corta'] ?? ''),
-                'descripcion_larga'  => trim($postData['descripcion_larga'] ?? ''),
-                'modo_empleo'        => trim($postData['modo_empleo'] ?? ''),
-                'usos'               => trim($postData['usos'] ?? ''),
-                'beneficios'         => trim($postData['beneficios'] ?? ''),
-                'contenido_neto'     => $contenidoNeto,
-            // BUG FIX: el input del formulario se llama 'cantidad_unidades', no 'cantidad_envase'
-                'cantidad_envase'    => trim($postData['cantidad_unidades'] ?? ''),
-                'destacado'          => isset($postData['destacado']) ? 1 : 0,
-                'categoria_id'       => $this->resolveCategoryId($postData),
-                'forma_id'           => $this->resolveFormId($postData),
-                'estatus'            => $postData['estatus'] ?? 'activo',
-                'existing_image_ids' => array_values(array_filter(array_map('intval', $postData['existing_image_ids'] ?? []))),
-                'image_order'        => array_values(array_filter(array_map('trim', $postData['image_order'] ?? []))),
-        ];
-    }
+        <div class="col-lg-5">
+            <div class="section-card p-4 h-100">
+                <h3 class="h4 fw-bold mb-3">Escribe una reseña</h3>
 
-    private function resolveCategoryId(array $postData): int
-    {
-        $categoriaId     = $postData['categoria_id'] ?? '';
-        $newCategoryName = trim($postData['new_category_name'] ?? '');
-
-        if (strpos($categoriaId, 'new-') === 0 && $newCategoryName !== '') {
-            return Categoria::create($newCategoryName);
-        }
-
-        return intval($categoriaId);
-    }
-
-    private function resolveFormId(array $postData): int
-    {
-        $formaId     = $postData['forma_id'] ?? '';
-        $newFormName = trim($postData['new_form_name'] ?? '');
-
-        if (strpos($formaId, 'new-') === 0 && $newFormName !== '') {
-            return Forma::create($newFormName);
-        }
-
-        return intval($formaId);
-    }
-
-    public function prepareRelationIds(array $postData): array
-    {
-        return [
-                'etiquetas' => $this->resolveRelationIds($postData['etiquetas'] ?? [], 'etiqueta'),
-        ];
-    }
-
-    private function resolveRelationIds(array $items, string $type): array
-    {
-        $ids = [];
-
-        foreach ($items as $item) {
-            if (is_numeric($item)) {
-                $ids[] = (int) $item;
-                continue;
-            }
-
-            if (strpos($item, 'new:') === 0) {
-                $name = trim(substr($item, 4));
-                if ($name === '') {
-                    continue;
-                }
-                if ($type === 'etiqueta') {
-                    $ids[] = Etiqueta::createWithColor($name);
-                }
-            }
-        }
-
-        return array_values(array_unique($ids));
-    }
-
-    public function buildRelationPayload(array $items, array $available): array
-    {
-        $payload = [];
-
-        foreach ($items as $item) {
-            if (strpos($item, 'new:') === 0) {
-                $label = trim(substr($item, 4));
-                if ($label !== '') {
-                    $payload[] = ['id' => $item, 'nombre' => $label];
-                }
-                continue;
-            }
-
-            if (is_numeric($item)) {
-                $id = (int) $item;
-                foreach ($available as $entry) {
-                    if (isset($entry['id']) && intval($entry['id']) === $id) {
-                        $payload[] = ['id' => $id, 'nombre' => $entry['nombre']];
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $payload;
-    }
-
-    public function getProductWithRelations(int $id): ?array
-    {
-        $product = Producto::findById($id);
-        if (!$product) {
-            return null;
-        }
-
-        $product['etiquetas'] = Etiqueta::forProduct($id);
-        $product['images']    = Producto::images($id);
-
-        return $product;
-    }
-
-    public function saveProduct(array $productData, array $relationIds, array $files = [], ?int $existingId = null): int
-    {
-        $db = Database::getInstance();
-        $db->beginTransaction();
-
-        try {
-            if ($existingId !== null) {
-                Producto::update($existingId, $productData);
-                $productId = $existingId;
-            } else {
-                $productId = Producto::create($productData);
-            }
-
-            Producto::syncEtiquetas($productId, $relationIds['etiquetas']);
-            Producto::syncImages($productId, $productData, $files['imagenes'] ?? []);
-
-            $db->commit();
-
-            return $productId;
-        } catch (Throwable $exception) {
-            if ($db->inTransaction()) {
-                $db->rollBack();
-            }
-
-            $message = $exception instanceof RuntimeException
-                    ? $exception->getMessage()
-                    : 'No fue posible guardar el producto. Intenta nuevamente.';
-
-            throw new RuntimeException($message, 0, $exception);
-        }
-    }
-}
+                <?php if (empty($currentUser)): ?>
+                    <p class="text-muted mb-3">Inicia sesión para compartir tu experiencia.</p>
+                    <a href="<?= site_url('auth/login'); ?>" class="btn btn-outline-primary">Iniciar sesión</a>
+                <?php elseif (!empty($hasReviewed)): ?>
+                    <div class="alert alert-info rounded-4 mb-0">Ya reseñaste este producto.</div>
+                <?php elseif (empty($canReview)): ?>
+                    <div class="alert alert-warning rounded-4 mb-0">Podrás reseñarlo cuando tengas un pedido entregado de este producto.</div>
+                <?php else: ?>
+                    <form method="post" action="<?= site_url('producto/' . ($product['slug'] ?? '') . '/review'); ?>" class="vstack gap-3">
+                        <?= csrf_input(); ?>
+                        <div>
+                            <label for="rating" class="form-label fw-semibold">Calificación</label>
+                            <select id="rating" name="rating" class="form-select rounded-4" required>
+                                <option value="">Selecciona una calificación</option>
+                                <?php for ($i = 5; $i >= 1; $i--): ?>
+                                    <option value="<?= $i; ?>"><?= $i; ?> estrella<?= $i > 1 ? 's' : ''; ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="title" class="form-label fw-semibold">Título</label>
+                            <input type="text" id="title" name="title" class="form-control rounded-4" maxlength="150" placeholder="Resume tu experiencia">
+                        </div>
+                        <div>
+                            <label for="comment" class="form-label fw-semibold">Comentario</label>
+                            <textarea id="comment" name="comment" class="form-control rounded-4" rows="5" placeholder="Cuéntanos cómo te fue con este producto"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Publicar reseña</button>
+                    </form>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>

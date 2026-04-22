@@ -63,7 +63,11 @@ class AdminProductController extends Controller
             $productData = $this->productService->prepareProductData($_POST);
             $relationIds = $this->productService->prepareRelationIds($_POST);
 
-            $validationErrors = $this->productService->validateFormData($productData, $_FILES);
+            $validationErrors = $this->productService->validateFormData(
+                $productData,
+                $_FILES,
+                $id !== null ? (int) $id : null
+            );
             if (!empty($validationErrors)) {
                 $error = implode(' ', $validationErrors);
             } else {

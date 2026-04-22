@@ -26,7 +26,8 @@ class Producto
         $stmt = $db->prepare(
             'SELECT p.id, p.nombre, p.slug, p.sku, p.precio, p.precio_descuento, p.descripcion_corta, p.descripcion_larga,
                     p.modo_empleo, p.usos, p.beneficios, p.contenido_neto, p.estatus, p.calificacion_promedio, p.total_resenas,
-                    c.nombre AS categoria_nombre, c.slug AS categoria_slug
+                    c.nombre AS categoria_nombre, c.slug AS categoria_slug,
+                    (SELECT url_imagen FROM productos_imagenes WHERE producto_id = p.id AND es_principal = 1 AND deleted_at IS NULL LIMIT 1) AS imagen_principal
              FROM productos p
              LEFT JOIN categorias c ON c.id = p.categoria_id
              WHERE p.slug = :slug AND p.deleted_at IS NULL
@@ -161,7 +162,8 @@ class Producto
         $stmt = $db->prepare(
             'SELECT p.id, p.nombre, p.slug, p.sku, p.precio, p.precio_descuento, p.descripcion_corta, p.descripcion_larga,
                     p.modo_empleo, p.usos, p.beneficios, p.contenido_neto, p.cantidad_envase, p.destacado, p.estatus, p.categoria_id, p.forma_id,
-                    c.nombre AS categoria_nombre, c.slug AS categoria_slug
+                    c.nombre AS categoria_nombre, c.slug AS categoria_slug,
+                    (SELECT url_imagen FROM productos_imagenes WHERE producto_id = p.id AND es_principal = 1 AND deleted_at IS NULL LIMIT 1) AS imagen_principal
              FROM productos p
              LEFT JOIN categorias c ON c.id = p.categoria_id
              WHERE p.id = :id AND p.deleted_at IS NULL
@@ -169,6 +171,47 @@ class Producto
         );
         $stmt->execute(['id' => $id]);
         return $stmt->fetch() ?: null;
+    }
+
+    public static function findBySku(string $sku): ?array
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare(
+            'SELECT id, sku, nombre
+             FROM productos
+             WHERE sku = :sku AND deleted_at IS NULL
+             LIMIT 1'
+        );
+        $stmt->execute(['sku' => $sku]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public static function findManyByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids), static fn ($id) => $id > 0)));
+        if (empty($ids)) {
+            return [];
+        }
+
+        $db = Database::getInstance();
+        $placeholders = implode(', ', array_fill(0, count($ids), '?'));
+        $stmt = $db->prepare(
+            "SELECT p.id, p.nombre, p.slug, p.sku, p.precio, p.precio_descuento, p.descripcion_corta, p.descripcion_larga,
+                    p.modo_empleo, p.usos, p.beneficios, p.contenido_neto, p.cantidad_envase, p.destacado, p.estatus, p.categoria_id, p.forma_id,
+                    c.nombre AS categoria_nombre, c.slug AS categoria_slug,
+                    (SELECT url_imagen FROM productos_imagenes WHERE producto_id = p.id AND es_principal = 1 AND deleted_at IS NULL LIMIT 1) AS imagen_principal
+             FROM productos p
+             LEFT JOIN categorias c ON c.id = p.categoria_id
+             WHERE p.deleted_at IS NULL AND p.id IN ($placeholders)"
+        );
+        $stmt->execute($ids);
+
+        $products = [];
+        foreach ($stmt->fetchAll() as $product) {
+            $products[(int) $product['id']] = $product;
+        }
+
+        return $products;
     }
 
     public static function create(array $data): int
@@ -469,7 +512,7 @@ class Producto
     public static function softDelete(int $id): bool
     {
         $db = Database::getInstance();
-        $stmt = $db->prepare('UPDATE productos SET deleted_at = NOW() WHERE id = :id');
+        $stmt = $db->prepare('UPDATE productos SET deleted_at = NOW() WHERE id = :id AND deleted_at IS NULL');
         return $stmt->execute(['id' => $id]);
     }
 }

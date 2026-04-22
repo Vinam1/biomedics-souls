@@ -72,6 +72,20 @@ abstract class BaseAttributeModel
         return (int)$result['total'];
     }
 
+    public static function countSearch(string $query = ''): int
+    {
+        if ($query === '') {
+            return static::count();
+        }
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare('SELECT COUNT(*) as total FROM ' . static::$table . ' WHERE deleted_at IS NULL AND nombre LIKE :query');
+        $stmt->execute(['query' => '%' . $query . '%']);
+        $result = $stmt->fetch();
+
+        return (int) ($result['total'] ?? 0);
+    }
+
     /**
      * Contar usos en productos
      */
@@ -110,7 +124,7 @@ abstract class BaseAttributeModel
         $params = ['id' => $id];
 
         foreach ($data as $key => $value) {
-            if (in_array($key, static::$fillable)) {
+            if (in_array($key, static::$fillable, true)) {
                 $fields[] = "$key = :$key";
                 $params[$key] = $value;
             }
@@ -120,7 +134,7 @@ abstract class BaseAttributeModel
             return false;
         }
 
-        $sql = 'UPDATE ' . static::$table . ' SET ' . implode(', ', $fields) . ' WHERE id = :id';
+        $sql = 'UPDATE ' . static::$table . ' SET ' . implode(', ', $fields) . ' WHERE id = :id AND deleted_at IS NULL';
         $stmt = $db->prepare($sql);
         return $stmt->execute($params);
     }
@@ -131,7 +145,7 @@ abstract class BaseAttributeModel
     public static function softDelete(int $id): bool
     {
         $db = Database::getInstance();
-        $stmt = $db->prepare('UPDATE ' . static::$table . ' SET deleted_at = NOW() WHERE id = :id');
+        $stmt = $db->prepare('UPDATE ' . static::$table . ' SET deleted_at = NOW() WHERE id = :id AND deleted_at IS NULL');
         return $stmt->execute(['id' => $id]);
     }
 

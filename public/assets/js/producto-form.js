@@ -1,9 +1,11 @@
 (function () {
     function boot() {
-        initImageManager();
         initCantidadEnvase();
+        initAutoSlug();
         initQuickAddModal();
         initTagHelpers();
+        initImageManager();
+        initFormValidation();
     }
 
     if (document.readyState === 'loading') {
@@ -20,13 +22,38 @@
             return;
         }
 
-        window.toggleCantidadEnvase = function () {
-            const nombre = formaSelect.options[formaSelect.selectedIndex]?.getAttribute('data-nombre') || '';
-            cantidadEnvaseGroup.style.display = ['Capsulas', 'Tabletas', 'Pildoras', 'Cápsulas', 'Píldoras'].includes(nombre) ? 'block' : 'none';
-        };
+        const trackedNames = ['capsulas', 'capsulas blandas', 'tabletas', 'pildoras', 'comprimidos'];
 
-        formaSelect.addEventListener('change', window.toggleCantidadEnvase);
-        window.toggleCantidadEnvase();
+        function toggleCantidadEnvase() {
+            const nombre = slugifyText(formaSelect.options[formaSelect.selectedIndex]?.getAttribute('data-nombre') || '');
+            const shouldShow = trackedNames.includes(nombre);
+            cantidadEnvaseGroup.style.display = shouldShow ? '' : 'none';
+        }
+
+        formaSelect.addEventListener('change', toggleCantidadEnvase);
+        toggleCantidadEnvase();
+    }
+
+    function initAutoSlug() {
+        const nameInput = document.getElementById('nombre');
+        const slugInput = document.getElementById('slug');
+
+        if (!nameInput || !slugInput) {
+            return;
+        }
+
+        let slugTouched = slugInput.value.trim() !== '';
+
+        slugInput.addEventListener('input', function () {
+            slugTouched = this.value.trim() !== '';
+            this.value = slugifyText(this.value);
+        });
+
+        nameInput.addEventListener('input', function () {
+            if (!slugTouched) {
+                slugInput.value = slugifyText(this.value);
+            }
+        });
     }
 
     function initQuickAddModal() {
@@ -34,7 +61,7 @@
         const saveButton = document.getElementById('save-attribute-btn');
         const nameInput = document.getElementById('attribute-name');
         const colorInput = document.getElementById('attribute-color');
-        const iconInput = document.getElementById('attribute-icon');
+        const quickAddForm = document.getElementById('quickAddForm');
 
         window.openQuickAddModal = function () {};
 
@@ -48,7 +75,7 @@
         window.openQuickAddModal = function (tipo) {
             currentAttributeType = tipo;
             document.getElementById('modal-attribute-type').value = tipo;
-            document.getElementById('quickAddForm')?.reset();
+            quickAddForm?.reset();
             document.getElementById('dynamic-fields')?.classList.remove('d-none');
             saveButton.disabled = true;
 
@@ -58,8 +85,6 @@
             }
 
             const colorField = document.getElementById('color-field');
-            const descriptionField = document.getElementById('description-field');
-            const iconField = document.getElementById('icon-field');
             const nameLabel = document.getElementById('name-label');
             if (nameLabel) {
                 nameLabel.textContent = 'Nombre de la etiqueta';
@@ -67,36 +92,27 @@
             if (colorField) {
                 colorField.style.display = 'block';
             }
-            if (descriptionField) {
-                descriptionField.style.display = 'none';
-            }
-            if (iconField) {
-                iconField.style.display = 'none';
-            }
 
             quickAddModal.show();
+            window.setTimeout(() => nameInput.focus(), 150);
         };
 
-        if (colorInput) {
-            colorInput.addEventListener('input', function () {
-                const colorText = document.getElementById('color-text');
-                if (colorText) {
-                    colorText.value = this.value;
-                }
-            });
-        }
-
-        if (iconInput) {
-            iconInput.addEventListener('input', function () {
-                const preview = document.getElementById('icon-preview');
-                if (preview) {
-                    preview.innerHTML = `<i class="fas ${this.value.trim()}"></i>`;
-                }
-            });
-        }
+        colorInput?.addEventListener('input', function () {
+            const colorText = document.getElementById('color-text');
+            if (colorText) {
+                colorText.value = this.value;
+            }
+        });
 
         nameInput.addEventListener('input', function () {
             saveButton.disabled = this.value.trim() === '';
+        });
+
+        quickAddForm?.addEventListener('submit', function (event) {
+            event.preventDefault();
+            if (!saveButton.disabled) {
+                saveButton.click();
+            }
         });
 
         saveButton.addEventListener('click', async function () {
@@ -133,7 +149,7 @@
                 showToast('Atributo creado y agregado correctamente', 'success');
             } catch (error) {
                 console.error(error);
-                showToast('Error de conexión', 'error');
+                showToast('Error de conexion', 'error');
             } finally {
                 this.disabled = false;
                 this.innerHTML = '<i class="fas fa-save me-2"></i>Crear y agregar';
@@ -166,7 +182,7 @@
             }
 
             if (container.querySelector(`input[name="etiquetas[]"][value="${value}"]`)) {
-                showToast('Este atributo ya está agregado', 'warning');
+                showToast('Este atributo ya esta agregado', 'warning');
                 return;
             }
 
@@ -186,13 +202,13 @@
         };
 
         const currentTags = Array.isArray(window.productoFormData?.currentTags) ? window.productoFormData.currentTags : [];
-        currentTags.forEach(item => {
+        currentTags.forEach((item) => {
             agregarNuevoTag('etiqueta', item.id || item, item.nombre || item);
         });
     }
 
     function initImageManager() {
-        const form = document.querySelector('.admin-product-form form');
+        const form = document.getElementById('product-form');
         const input = document.getElementById('imagenesInput');
         const previewContainer = document.getElementById('preview-container');
         const emptyState = document.getElementById('image-empty-state');
@@ -213,7 +229,7 @@
                 return;
             }
 
-            files.forEach(file => {
+            files.forEach((file) => {
                 const localId = createClientId();
                 state.newImages.push({
                     id: localId,
@@ -245,7 +261,7 @@
                 card.draggable = true;
                 card.dataset.imageId = String(image.id);
                 card.innerHTML = `
-                    <button type="button" class="image-card__remove" aria-label="Eliminar imagen">×</button>
+                    <button type="button" class="image-card__remove" aria-label="Eliminar imagen">&times;</button>
                     <div class="image-card__handle" title="Arrastra para reordenar"><i class="fas fa-grip-vertical"></i></div>
                     ${index === 0 ? '<span class="image-badge">Principal</span>' : ''}
                     <div class="image-card__frame">
@@ -270,9 +286,6 @@
                 card.addEventListener('dragover', function (event) {
                     event.preventDefault();
                     card.classList.add('is-drop-target');
-                    if (state.draggedId && state.draggedId !== String(image.id)) {
-                        moveImage(state.draggedId, String(image.id), true);
-                    }
                 });
 
                 card.addEventListener('dragleave', function () {
@@ -281,13 +294,12 @@
 
                 card.addEventListener('drop', function (event) {
                     event.preventDefault();
-                    const targetId = String(image.id);
-                    moveImage(state.draggedId, targetId, false);
+                    moveImage(state.draggedId, String(image.id));
                 });
 
                 card.addEventListener('dragend', function () {
                     state.draggedId = null;
-                    previewContainer.querySelectorAll('.image-card').forEach(node => {
+                    previewContainer.querySelectorAll('.image-card').forEach((node) => {
                         node.classList.remove('is-dragging', 'is-drop-target');
                     });
                 });
@@ -302,29 +314,25 @@
             syncHiddenInputs();
         }
 
-        function moveImage(sourceId, targetId, isLiveReorder) {
+        function moveImage(sourceId, targetId) {
             if (!sourceId || !targetId || sourceId === targetId) {
-                if (!isLiveReorder) {
-                    render();
-                }
+                render();
                 return;
             }
 
             const merged = getMergedImages();
-            const from = merged.findIndex(item => String(item.id) === String(sourceId));
-            const to = merged.findIndex(item => String(item.id) === String(targetId));
+            const from = merged.findIndex((item) => String(item.id) === String(sourceId));
+            const to = merged.findIndex((item) => String(item.id) === String(targetId));
             if (from === -1 || to === -1) {
-                if (!isLiveReorder) {
-                    render();
-                }
+                render();
                 return;
             }
 
             const [moved] = merged.splice(from, 1);
             merged.splice(to, 0, moved);
 
-            const existingIds = merged.filter(item => item.type === 'existing').map(item => String(item.id));
-            const newIds = merged.filter(item => item.type === 'new').map(item => String(item.id));
+            const existingIds = merged.filter((item) => item.type === 'existing').map((item) => String(item.id));
+            const newIds = merged.filter((item) => item.type === 'new').map((item) => String(item.id));
 
             state.existingImages.sort((a, b) => existingIds.indexOf(String(a.id)) - existingIds.indexOf(String(b.id)));
             state.newImages.sort((a, b) => newIds.indexOf(String(a.id)) - newIds.indexOf(String(b.id)));
@@ -335,13 +343,13 @@
 
         function removeImage(image) {
             if (image.type === 'existing') {
-                state.existingImages = state.existingImages.filter(item => String(item.id) !== String(image.id));
+                state.existingImages = state.existingImages.filter((item) => String(item.id) !== String(image.id));
             } else {
-                const target = state.newImages.find(item => String(item.id) === String(image.id));
+                const target = state.newImages.find((item) => String(item.id) === String(image.id));
                 if (target?.previewUrl) {
                     URL.revokeObjectURL(target.previewUrl);
                 }
-                state.newImages = state.newImages.filter(item => String(item.id) !== String(image.id));
+                state.newImages = state.newImages.filter((item) => String(item.id) !== String(image.id));
                 syncInputFiles();
             }
 
@@ -350,7 +358,7 @@
 
         function getMergedImages() {
             return [
-                ...state.existingImages.map(image => ({
+                ...state.existingImages.map((image) => ({
                     ...image,
                     type: 'existing',
                 })),
@@ -364,18 +372,18 @@
             }
 
             const dt = new DataTransfer();
-            state.newImages.forEach(image => dt.items.add(image.file));
+            state.newImages.forEach((image) => dt.items.add(image.file));
             input.files = dt.files;
         }
 
         function syncHiddenInputs() {
-            form.querySelectorAll('input[data-image-input="1"]').forEach(node => node.remove());
+            form.querySelectorAll('input[data-image-input="1"]').forEach((node) => node.remove());
 
-            getMergedImages().forEach(image => {
+            getMergedImages().forEach((image) => {
                 appendHidden('image_order[]', image.type === 'existing' ? `existing:${image.id}` : 'new');
             });
 
-            state.existingImages.forEach(image => {
+            state.existingImages.forEach((image) => {
                 appendHidden('existing_image_ids[]', String(image.id));
             });
         }
@@ -390,12 +398,63 @@
         }
     }
 
+    function initFormValidation() {
+        const form = document.getElementById('product-form');
+        const feedback = document.getElementById('form-feedback');
+        const precioInput = document.getElementById('precio');
+        const descuentoInput = document.getElementById('precio_descuento');
+        const slugInput = document.getElementById('slug');
+
+        if (!form || !feedback) {
+            return;
+        }
+
+        form.addEventListener('submit', function (event) {
+            const errors = [];
+            const precio = Number.parseFloat(precioInput?.value || '0');
+            const descuento = Number.parseFloat(descuentoInput?.value || '');
+            const slug = slugInput?.value.trim() || '';
+            const imagesCount = form.querySelectorAll('input[name="existing_image_ids[]"]').length + (document.getElementById('imagenesInput')?.files.length || 0);
+
+            if (!slug || slugifyText(slug) !== slug) {
+                errors.push('El slug solo puede contener letras minusculas, numeros y guiones.');
+            }
+
+            if (Number.isNaN(precio) || precio < 0) {
+                errors.push('El precio normal debe ser un numero valido.');
+            }
+
+            if (descuentoInput?.value && (Number.isNaN(descuento) || descuento < 0 || descuento >= precio)) {
+                errors.push('El precio con descuento debe ser menor al precio normal.');
+            }
+
+            if (imagesCount === 0) {
+                errors.push('Debes conservar o cargar al menos una imagen.');
+            }
+
+            if (!form.checkValidity()) {
+                errors.push('Completa los campos obligatorios antes de guardar.');
+            }
+
+            if (errors.length > 0) {
+                event.preventDefault();
+                feedback.innerHTML = `<strong>Revisa el formulario:</strong><br>${errors.map(escapeHtml).join('<br>')}`;
+                feedback.classList.remove('d-none');
+                feedback.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            feedback.classList.add('d-none');
+            feedback.innerHTML = '';
+        });
+    }
+
     function getExistingImages(previewContainer) {
         const source = Array.isArray(window.productoFormData?.currentImages) && window.productoFormData.currentImages.length > 0
             ? window.productoFormData.currentImages
             : safeParseJson(previewContainer.dataset.existingImages || '[]');
 
-        return (Array.isArray(source) ? source : []).map(image => ({
+        return (Array.isArray(source) ? source : []).map((image) => ({
             id: String(image.id),
             type: 'existing',
             name: image.filename || 'Imagen actual',
@@ -407,7 +466,7 @@
         try {
             return JSON.parse(raw);
         } catch (error) {
-            console.error('Error al leer imágenes existentes.', error);
+            console.error('Error al leer imagenes existentes.', error);
             return [];
         }
     }
@@ -427,7 +486,7 @@
             }
 
             select.innerHTML = `<option value="">Selecciona ${tipo}</option>`;
-            data.items.forEach(item => {
+            data.items.forEach((item) => {
                 const option = document.createElement('option');
                 option.value = item.id;
                 option.textContent = item.nombre;
@@ -436,6 +495,17 @@
         } catch (error) {
             console.error('Error updating select:', error);
         }
+    }
+
+    function slugifyText(value) {
+        return String(value)
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/[\s-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
     }
 
     function createClientId() {

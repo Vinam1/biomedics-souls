@@ -286,6 +286,20 @@ class Pedido
 
     public static function generateOrderNumber(): string
     {
-        return 'BS-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+        $db = Database::getInstance();
+        $today = date('Y-m-d');
+
+        $stmt = $db->prepare(
+            'INSERT INTO pedidos_secuencia (fecha, secuencia)
+             VALUES (:fecha, 1)
+             ON DUPLICATE KEY UPDATE secuencia = secuencia + 1'
+        );
+        $stmt->execute(['fecha' => $today]);
+
+        $sequenceStmt = $db->prepare('SELECT secuencia FROM pedidos_secuencia WHERE fecha = :fecha LIMIT 1');
+        $sequenceStmt->execute(['fecha' => $today]);
+        $sequence = (int) $sequenceStmt->fetchColumn();
+
+        return sprintf('BS-%s-%04d', date('Ymd'), $sequence);
     }
 }

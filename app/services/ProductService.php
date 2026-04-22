@@ -1,8 +1,8 @@
-﻿<?php
+<?php
 
 class ProductService
 {
-    public function validateFormData(array $data, array $files = []): array
+    public function validateFormData(array $data, array $files = [], ?int $existingId = null): array
     {
         $errors = [];
 
@@ -20,15 +20,25 @@ class ProductService
             $errors[] = 'El SKU del producto es obligatorio.';
         }
 
-        if (!isset($data['precio']) || !is_numeric($data['precio']) || floatval($data['precio']) < 0) {
+        $existingBySlug = !empty($data['slug']) ? Producto::findBySlug($data['slug']) : null;
+        if ($existingBySlug && (int) $existingBySlug['id'] !== $existingId) {
+            $errors[] = 'Ya existe un producto con ese slug.';
+        }
+
+        $existingBySku = !empty($data['sku']) ? Producto::findBySku($data['sku']) : null;
+        if ($existingBySku && (int) $existingBySku['id'] !== $existingId) {
+            $errors[] = 'Ya existe un producto con ese SKU.';
+        }
+
+        if (!isset($data['precio']) || !is_numeric($data['precio']) || (float) $data['precio'] < 0) {
             $errors[] = 'El precio debe ser un número positivo.';
         }
 
-        if (isset($data['precio_descuento']) && $data['precio_descuento'] !== '' && (!is_numeric($data['precio_descuento']) || floatval($data['precio_descuento']) < 0)) {
+        if (isset($data['precio_descuento']) && $data['precio_descuento'] !== '' && (!is_numeric($data['precio_descuento']) || (float) $data['precio_descuento'] < 0)) {
             $errors[] = 'El precio de descuento debe ser un número positivo o estar vacío.';
         }
 
-        if (isset($data['precio_descuento']) && $data['precio_descuento'] !== '' && floatval($data['precio_descuento']) >= floatval($data['precio'])) {
+        if (isset($data['precio_descuento']) && $data['precio_descuento'] !== '' && (float) $data['precio_descuento'] >= (float) $data['precio']) {
             $errors[] = 'El precio de descuento debe ser menor al precio regular.';
         }
 
@@ -77,20 +87,21 @@ class ProductService
         $contenidoNetoValor = trim($postData['contenido_neto_valor'] ?? '');
         $contenidoNetoUnidad = trim($postData['contenido_neto_unidad'] ?? 'mg');
         $contenidoNeto = $contenidoNetoValor !== '' ? str_replace(',', '.', $contenidoNetoValor) . ' ' . $contenidoNetoUnidad : null;
+        $cantidadEnvase = trim($postData['cantidad_unidades'] ?? ($postData['cantidad_envase'] ?? ''));
 
         return [
             'nombre' => trim($postData['nombre'] ?? ''),
-            'slug' => trim($postData['slug'] ?? ''),
+            'slug' => strtolower(trim($postData['slug'] ?? '')),
             'sku' => trim($postData['sku'] ?? ''),
-            'precio' => floatval($postData['precio'] ?? 0),
-            'precio_descuento' => !empty($postData['precio_descuento']) ? floatval($postData['precio_descuento']) : null,
+            'precio' => (float) ($postData['precio'] ?? 0),
+            'precio_descuento' => !empty($postData['precio_descuento']) ? (float) $postData['precio_descuento'] : null,
             'descripcion_corta' => trim($postData['descripcion_corta'] ?? ''),
             'descripcion_larga' => trim($postData['descripcion_larga'] ?? ''),
             'modo_empleo' => trim($postData['modo_empleo'] ?? ''),
             'usos' => trim($postData['usos'] ?? ''),
             'beneficios' => trim($postData['beneficios'] ?? ''),
             'contenido_neto' => $contenidoNeto,
-            'cantidad_envase' => trim($postData['cantidad_envase'] ?? ''),
+            'cantidad_envase' => $cantidadEnvase,
             'destacado' => isset($postData['destacado']) ? 1 : 0,
             'categoria_id' => $this->resolveCategoryId($postData),
             'forma_id' => $this->resolveFormId($postData),
@@ -109,7 +120,7 @@ class ProductService
             return Categoria::create($newCategoryName);
         }
 
-        return intval($categoriaId);
+        return (int) $categoriaId;
     }
 
     private function resolveFormId(array $postData): int
@@ -121,7 +132,7 @@ class ProductService
             return Forma::create($newFormName);
         }
 
-        return intval($formaId);
+        return (int) $formaId;
     }
 
     public function prepareRelationIds(array $postData): array
@@ -174,7 +185,7 @@ class ProductService
             if (is_numeric($item)) {
                 $id = (int) $item;
                 foreach ($available as $entry) {
-                    if (isset($entry['id']) && intval($entry['id']) === $id) {
+                    if (isset($entry['id']) && (int) $entry['id'] === $id) {
                         $payload[] = ['id' => $id, 'nombre' => $entry['nombre']];
                         break;
                     }
@@ -212,7 +223,6 @@ class ProductService
             }
 
             Producto::syncEtiquetas($productId, $relationIds['etiquetas']);
-
             Producto::syncImages($productId, $productData, $files['imagenes'] ?? []);
 
             $db->commit();
