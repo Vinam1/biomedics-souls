@@ -5,7 +5,7 @@ class Controller
     protected function view(string $view, array $data = []): void
     {
         $data['currentUser'] = $this->getCurrentUser();
-        $data['csrfToken'] = csrf_token();
+        $data['csrfToken']   = csrf_token();
         extract($data);
         $viewFile = APPROOT . '/views/' . $view . '.php';
         require APPROOT . '/views/layouts/main.php';
@@ -13,10 +13,18 @@ class Controller
 
     protected function getCurrentUser(): ?array
     {
-        static $user = null;
-        if ($user !== null) {
+        // BUG FIX: Use a sentinel value so we don't re-query the DB on every call
+        // when the user is not logged in.  Previously, static $user = null meant
+        // the "if ($user !== null)" guard was never hit for unauthenticated requests,
+        // causing a DB SELECT on every single getCurrentUser() call in the request.
+        static $resolved = false;
+        static $user     = null;
+
+        if ($resolved) {
             return $user;
         }
+
+        $resolved = true;
 
         if (empty($_SESSION['user_id'])) {
             return null;
@@ -67,7 +75,7 @@ class Controller
     {
         http_response_code($statusCode);
         $this->view('errors/generic', [
-            'title' => $title,
+            'title'   => $title,
             'message' => $message,
         ]);
     }

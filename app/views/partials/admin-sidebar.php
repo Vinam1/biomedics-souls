@@ -1,3 +1,12 @@
+<?php
+// Helper: returns 'active-admin' when the current URI exactly contains the given segment
+function sidebarActive(string $segment): string
+{
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    // Use word-boundary matching so '/admin/pedidos' doesn't match '/admin/pedido-detalle'
+    return preg_match('#' . preg_quote($segment, '#') . '(/|$|\?)#', $uri) ? 'active-admin' : '';
+}
+?>
 <aside class="admin-sidebar p-4 rounded-4 shadow-sm bg-dark position-sticky top-4"
        style="min-height: calc(100vh - 3rem);">
 
@@ -11,27 +20,29 @@
 
     <nav class="nav flex-column gap-2">
         <a href="<?= site_url('admin/dashboard'); ?>"
-           class="nav-link text-white px-3 py-2 rounded-4 <?= strpos($_SERVER['REQUEST_URI'], '/admin/dashboard') !== false ? 'active-admin' : ''; ?>">
+           class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/dashboard'); ?>">
             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
         </a>
 
         <a href="<?= site_url('admin/productos'); ?>"
-           class="nav-link text-white px-3 py-2 rounded-4 <?= strpos($_SERVER['REQUEST_URI'], '/admin/productos') !== false ? 'active-admin' : ''; ?>">
+           class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/productos'); ?>">
             <i class="fas fa-box me-2"></i> Productos
         </a>
 
         <a href="<?= site_url('admin/categorias'); ?>"
-           class="nav-link text-white px-3 py-2 rounded-4 <?= strpos($_SERVER['REQUEST_URI'], '/admin/categorias') !== false ? 'active-admin' : ''; ?>">
+           class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/categorias'); ?>">
             <i class="fas fa-folder me-2"></i> Categorías
         </a>
 
         <a href="<?= site_url('admin/atributos/etiquetas'); ?>"
-           class="nav-link text-white px-3 py-2 rounded-4 <?= strpos($_SERVER['REQUEST_URI'], '/admin/atributos/etiquetas') !== false ? 'active-admin' : ''; ?>">
+           class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/atributos'); ?>">
             <i class="fas fa-tags me-2"></i> Etiquetas
         </a>
 
+        <!-- BUG FIX: was using strpos which matched '/admin/pedido-detalle' too.
+             Now uses the sidebarActive helper with exact-boundary regex. -->
         <a href="<?= site_url('admin/pedidos'); ?>"
-           class="nav-link text-white px-3 py-2 rounded-4 <?= strpos($_SERVER['REQUEST_URI'], '/admin/pedidos') !== false ? 'active-admin' : ''; ?>">
+           class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/pedidos'); ?>">
             <i class="fas fa-shopping-cart me-2"></i> Pedidos
         </a>
     </nav>

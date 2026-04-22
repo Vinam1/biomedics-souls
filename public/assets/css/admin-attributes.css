@@ -1,26 +1,50 @@
 /* public/assets/css/admin-attributes.css */
 
+/* ── btn-gradient ────────────────────────────────────────────────────────────
+   Used in attribute / category admin forms. Was only defined in
+   admin-product-form.css, causing unstyled buttons on those pages.        */
+.btn-gradient {
+    background: linear-gradient(90deg, #6366f1, #4f46e5);
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-gradient:hover,
+.btn-gradient:focus {
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
 .admin-attributes .card {
     transition: all 0.3s ease;
 }
 
 .admin-attributes .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.10) !important;
 }
 
+/* ── Badges ─────────────────────────────────────────────────────────────── */
 .admin-attributes .badge {
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
 .admin-attributes .badge:hover {
     transform: scale(1.05);
 }
 
+/* ── Table ───────────────────────────────────────────────────────────────── */
 .admin-attributes .table-hover tbody tr:hover {
-    background-color: rgba(0,123,255,0.05);
+    background-color: rgba(0, 123, 255, 0.05);
 }
 
+/* ── Pagination ──────────────────────────────────────────────────────────── */
 .admin-attributes .pagination .page-link {
     border-radius: 8px !important;
     margin: 0 2px;
@@ -32,7 +56,7 @@
     border-color: var(--primary, #6366f1);
 }
 
-/* Modal personalizado */
+/* ── Modal ───────────────────────────────────────────────────────────────── */
 .modal-content {
     border-radius: 16px;
     border: none;
@@ -41,31 +65,31 @@
 .modal-header {
     border-radius: 16px 16px 0 0;
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-    color: white;
+    color: #ffffff;
 }
 
 .modal-header .btn-close {
     filter: invert(1);
 }
 
-/* Toast notifications */
+/* ── Toast ───────────────────────────────────────────────────────────────── */
 .toast-container {
     z-index: 1060;
 }
 
 .toast {
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Form controls */
+/* ── Form controls ───────────────────────────────────────────────────────── */
 .admin-attributes .form-control:focus,
 .admin-attributes .form-select:focus {
     border-color: #6366f1;
     box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
 }
 
-/* Icon preview */
+/* ── Icon preview ────────────────────────────────────────────────────────── */
 #icon-preview {
     width: 40px;
     height: 40px;
@@ -77,14 +101,14 @@
     border: 1px solid #dee2e6;
 }
 
-/* Color picker */
+/* ── Color picker ────────────────────────────────────────────────────────── */
 input[type="color"] {
     border-radius: 8px;
     border: 1px solid #dee2e6;
     cursor: pointer;
 }
 
-/* Responsive adjustments */
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
     .admin-attributes .d-flex.justify-content-between {
         flex-direction: column;
@@ -96,30 +120,20 @@ input[type="color"] {
     }
 }
 
-/* Loading states */
+/* ── Loading / disabled ──────────────────────────────────────────────────── */
 .btn:disabled {
     opacity: 0.6;
 }
 
-.btn:disabled .fas {
-    animation: spin 1s linear infinite;
-}
-
+/* ── Animations ──────────────────────────────────────────────────────────── */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 
-/* Success animations */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
 }
 
 .toast.show {

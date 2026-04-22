@@ -1,155 +1,230 @@
-﻿<div class="container py-5">
-    <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <?= htmlspecialchars($_SESSION['success']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['success']); ?>
-    <?php endif; ?>
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?= htmlspecialchars($_SESSION['error']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
+﻿<?php
 
-    <nav class="breadcrumb-custom">
-        <a href="<?= site_url('home'); ?>">Inicio</a> /
-        <a href="<?= site_url('catalogo'); ?>">Catálogo</a> /
-        <span><?= htmlspecialchars($product['name']); ?></span>
-    </nav>
+class ProductService
+{
+    public function validateFormData(array $data, array $files = []): array
+    {
+        $errors = [];
 
-    <div class="row g-5">
-        <div class="col-lg-5">
-            <div class="position-relative">
-                <?php if ($product['thumbnail']): ?>
-                    <img src="<?= $product['thumbnail']; ?>" alt="Thumbnail" class="product-thumbnail position-absolute top-0 start-0 m-3 shadow-sm" style="z-index: 2;">
-                <?php endif; ?>
+        if (empty(trim($data['nombre'] ?? ''))) {
+            $errors[] = 'El nombre del producto es obligatorio.';
+        }
 
-                <div class="bg-white rounded-5 p-5 d-flex align-items-center justify-content-center shadow-sm" style="min-height: 500px;">
-                    <?php if ($product['image']): ?>
-                        <img src="<?= $product['image']; ?>" alt="<?= htmlspecialchars($product['name']); ?>" class="img-fluid" style="max-height: 450px;">
-                    <?php else: ?>
-                        <div class="text-muted">Sin imagen del producto</div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
+        if (empty(trim($data['slug'] ?? ''))) {
+            $errors[] = 'El slug del producto es obligatorio.';
+        } elseif (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
+            $errors[] = 'El slug solo puede contener letras minúsculas, números y guiones.';
+        }
 
-        <div class="col-lg-7">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span class="fw-bold"><?= number_format($product['rating'], 1); ?></span>
-                <div class="text-warning">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <i class="fas fa-star<?= $i <= round($product['rating']) ? '' : '-o'; ?>"></i>
-                    <?php endfor; ?>
-                </div>
-                <span class="text-muted small">(<?= $product['reviews_count']; ?> reseñas)</span>
-            </div>
+        if (empty(trim($data['sku'] ?? ''))) {
+            $errors[] = 'El SKU del producto es obligatorio.';
+        }
 
-            <h1 class="display-5 fw-bold mb-2"><?= htmlspecialchars($product['name']); ?></h1>
-            <p class="lead text-muted mb-4"><?= htmlspecialchars($product['short_description']); ?></p>
-            <div class="price-big">$<?= number_format($product['price'], 2); ?></div>
+        if (!isset($data['precio']) || !is_numeric($data['precio']) || floatval($data['precio']) < 0) {
+            $errors[] = 'El precio debe ser un número positivo.';
+        }
 
-            <div class="d-flex flex-wrap gap-3 mb-4">
-                <div class="product-badge-info"><span class="label">Presentación</span><span class="value"><?= htmlspecialchars($product['presentation'] ?: 'N/A'); ?></span></div>
-                <div class="product-badge-info"><span class="label">Contenido</span><span class="value"><?= htmlspecialchars($product['content'] ?: 'N/A'); ?></span></div>
-                <div class="product-badge-info"><span class="label">Categoría</span><span class="value"><?= htmlspecialchars($product['category']); ?></span></div>
-            </div>
+        if (!empty($data['precio_descuento']) && (!is_numeric($data['precio_descuento']) || floatval($data['precio_descuento']) < 0)) {
+            $errors[] = 'El precio de descuento debe ser un número positivo o estar vacío.';
+        }
 
-            <div class="mb-4">
-                <h5 class="fw-bold mb-3">Beneficios Clave</h5>
-                <ul class="benefits-list">
-                    <?php if (!empty($product['benefits'])): ?>
-                        <?php foreach ($product['benefits'] as $benefit): ?>
-                            <li><i class="fas fa-check-circle"></i> <?= htmlspecialchars($benefit); ?></li>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <li><i class="fas fa-check-circle"></i> Calidad premium garantizada</li>
-                    <?php endif; ?>
-                </ul>
-            </div>
+        if (!empty($data['precio_descuento']) && floatval($data['precio_descuento']) >= floatval($data['precio'])) {
+            $errors[] = 'El precio de descuento debe ser menor al precio regular.';
+        }
 
-            <form action="<?= site_url('carrito/agregar/' . $product['id']); ?>" method="post" class="qty-selector">
-                <?= csrf_input(); ?>
-                <div class="d-flex align-items-center">
-                    <button type="button" class="qty-btn" onclick="updateQty(-1)"><i class="fas fa-minus"></i></button>
-                    <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control text-center mx-2" style="width: 60px; border-radius: 10px;">
-                    <button type="button" class="qty-btn" onclick="updateQty(1)"><i class="fas fa-plus"></i></button>
-                </div>
-                <button type="submit" id="add-to-cart-btn" class="btn btn-purple btn-lg flex-grow-1 py-3">Añadir al Carrito - $<?= number_format($product['price'], 2); ?></button>
-            </form>
+        if (empty($data['categoria_id'])) {
+            $errors[] = 'La categoría es obligatoria.';
+        }
 
-            <div class="d-flex flex-wrap gap-4 border-top pt-4 mt-2">
-                <div class="guarantee-badge"><i class="fas fa-shield-alt text-purple"></i><span>Garantía de 30 días</span></div>
-                <div class="guarantee-badge"><i class="fas fa-vial text-purple"></i><span>Testado por terceros</span></div>
-            </div>
-        </div>
-    </div>
+        if (empty($data['forma_id'])) {
+            $errors[] = 'La forma es obligatoria.';
+        }
 
-    <div class="mt-5 pt-5">
-        <ul class="nav nav-tabs info-tabs mb-4" id="productTabs" role="tablist">
-            <li class="nav-item" role="presentation"><button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Descripción</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="nutri-tab" data-bs-toggle="tab" data-bs-target="#nutri" type="button" role="tab">Info Nutricional</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reseñas (<?= count($reviews); ?>)</button></li>
-        </ul>
-        <div class="tab-content pb-5" id="productTabsContent">
-            <div class="tab-pane fade show active" id="desc" role="tabpanel">
-                <div class="row g-5">
-                    <div class="col-lg-7">
-                        <h3 class="fw-bold mb-4">Nuestra Filosofía de Calidad</h3>
-                        <div class="text-muted" style="line-height: 1.8;"><?= nl2br(htmlspecialchars($product['description'] ?: 'En Biomedics Souls, nos dedicamos a ofrecer suplementos de la más alta pureza y eficacia. Cada ingrediente es cuidadosamente seleccionado y validado científicamente.')); ?></div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="usage-box">
-                            <h4>Instrucciones de Uso</h4>
-                            <p class="mb-0 text-muted"><?= nl2br(htmlspecialchars($product['usage_instructions'] ?: 'Seguir las indicaciones del envase o consultar con su médico.')); ?></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="nutri" role="tabpanel">
-                <div class="bg-surface p-4 rounded-4"><h5 class="mb-3">Composición</h5><p class="text-muted">Información detallada sobre la composición del producto pronto disponible.</p></div>
-            </div>
-            <div class="tab-pane fade" id="reviews" role="tabpanel">
-                <div class="row"><div class="col-lg-8">
-                    <?php if (!empty($reviews)): ?>
-                        <?php foreach ($reviews as $review): ?>
-                            <div class="mb-4 pb-4 border-bottom">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h6 class="fw-bold mb-0"><?= htmlspecialchars($review['nombre'] . ' ' . $review['apellidos']); ?></h6>
-                                        <div class="text-warning small">
-                                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                <i class="fas fa-star<?= $i <= $review['calificacion'] ? '' : '-o'; ?>"></i>
-                                            <?php endfor; ?>
-                                        </div>
-                                    </div>
-                                    <small class="text-muted"><?= date('d/m/Y', strtotime($review['created_at'])); ?></small>
-                                </div>
-                                <p class="text-muted mb-0 small"><?= nl2br(htmlspecialchars($review['comentario'])); ?></p>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p class="text-muted">No hay reseñas todavía.</p>
-                    <?php endif; ?>
-                </div></div>
-            </div>
-        </div>
-    </div>
-</div>
+        if (!in_array($data['estatus'] ?? '', ['activo', 'inactivo', 'agotado'], true)) {
+            $errors[] = 'El estatus debe ser activo, inactivo o agotado.';
+        }
 
-<script>
-function updateQty(delta) {
-    const input = document.getElementById('quantity');
-    let val = parseInt(input.value || '1', 10) + delta;
-    if (val < 1) val = 1;
-    input.value = val;
+        if (!empty($files['imagenes']['name'][0])) {
+            foreach ($files['imagenes']['name'] as $index => $fileName) {
+                $errorCode = $files['imagenes']['error'][$index] ?? UPLOAD_ERR_NO_FILE;
+                if ($errorCode === UPLOAD_ERR_NO_FILE) {
+                    continue;
+                }
+                if ($errorCode !== UPLOAD_ERR_OK) {
+                    $errors[] = 'No se pudo subir una de las imágenes seleccionadas.';
+                    continue;
+                }
+                $size = (int) ($files['imagenes']['size'][$index] ?? 0);
+                if ($size <= 0 || $size > MAX_UPLOAD_SIZE) {
+                    $errors[] = 'Cada imagen debe pesar máximo 5 MB.';
+                }
+            }
+        }
 
-    const basePrice = <?= json_encode((float) $product['price']); ?>;
-    const btn = document.getElementById('add-to-cart-btn');
-    const total = (basePrice * val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    btn.innerHTML = `Añadir al Carrito - $${total}`;
+        $existingImageIds = array_values(array_filter(array_map('intval', $data['existing_image_ids'] ?? [])));
+        $hasNewImages     = !empty($files['imagenes']['name'][0]);
+        if (empty($existingImageIds) && !$hasNewImages) {
+            $errors[] = 'Debes conservar o cargar al menos una imagen para el producto.';
+        }
+
+        return $errors;
+    }
+
+    public function prepareProductData(array $postData): array
+    {
+        $contenidoNetoValor = trim($postData['contenido_neto_valor'] ?? '');
+        $contenidoNetoUnidad = trim($postData['contenido_neto_unidad'] ?? 'mg');
+        $contenidoNeto = $contenidoNetoValor !== ''
+                ? str_replace(',', '.', $contenidoNetoValor) . ' ' . $contenidoNetoUnidad
+                : null;
+
+        return [
+                'nombre'             => trim($postData['nombre'] ?? ''),
+                'slug'               => trim($postData['slug'] ?? ''),
+                'sku'                => trim($postData['sku'] ?? ''),
+                'precio'             => floatval($postData['precio'] ?? 0),
+                'precio_descuento'   => !empty($postData['precio_descuento']) ? floatval($postData['precio_descuento']) : null,
+                'descripcion_corta'  => trim($postData['descripcion_corta'] ?? ''),
+                'descripcion_larga'  => trim($postData['descripcion_larga'] ?? ''),
+                'modo_empleo'        => trim($postData['modo_empleo'] ?? ''),
+                'usos'               => trim($postData['usos'] ?? ''),
+                'beneficios'         => trim($postData['beneficios'] ?? ''),
+                'contenido_neto'     => $contenidoNeto,
+            // BUG FIX: el input del formulario se llama 'cantidad_unidades', no 'cantidad_envase'
+                'cantidad_envase'    => trim($postData['cantidad_unidades'] ?? ''),
+                'destacado'          => isset($postData['destacado']) ? 1 : 0,
+                'categoria_id'       => $this->resolveCategoryId($postData),
+                'forma_id'           => $this->resolveFormId($postData),
+                'estatus'            => $postData['estatus'] ?? 'activo',
+                'existing_image_ids' => array_values(array_filter(array_map('intval', $postData['existing_image_ids'] ?? []))),
+                'image_order'        => array_values(array_filter(array_map('trim', $postData['image_order'] ?? []))),
+        ];
+    }
+
+    private function resolveCategoryId(array $postData): int
+    {
+        $categoriaId     = $postData['categoria_id'] ?? '';
+        $newCategoryName = trim($postData['new_category_name'] ?? '');
+
+        if (strpos($categoriaId, 'new-') === 0 && $newCategoryName !== '') {
+            return Categoria::create($newCategoryName);
+        }
+
+        return intval($categoriaId);
+    }
+
+    private function resolveFormId(array $postData): int
+    {
+        $formaId     = $postData['forma_id'] ?? '';
+        $newFormName = trim($postData['new_form_name'] ?? '');
+
+        if (strpos($formaId, 'new-') === 0 && $newFormName !== '') {
+            return Forma::create($newFormName);
+        }
+
+        return intval($formaId);
+    }
+
+    public function prepareRelationIds(array $postData): array
+    {
+        return [
+                'etiquetas' => $this->resolveRelationIds($postData['etiquetas'] ?? [], 'etiqueta'),
+        ];
+    }
+
+    private function resolveRelationIds(array $items, string $type): array
+    {
+        $ids = [];
+
+        foreach ($items as $item) {
+            if (is_numeric($item)) {
+                $ids[] = (int) $item;
+                continue;
+            }
+
+            if (strpos($item, 'new:') === 0) {
+                $name = trim(substr($item, 4));
+                if ($name === '') {
+                    continue;
+                }
+                if ($type === 'etiqueta') {
+                    $ids[] = Etiqueta::createWithColor($name);
+                }
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    public function buildRelationPayload(array $items, array $available): array
+    {
+        $payload = [];
+
+        foreach ($items as $item) {
+            if (strpos($item, 'new:') === 0) {
+                $label = trim(substr($item, 4));
+                if ($label !== '') {
+                    $payload[] = ['id' => $item, 'nombre' => $label];
+                }
+                continue;
+            }
+
+            if (is_numeric($item)) {
+                $id = (int) $item;
+                foreach ($available as $entry) {
+                    if (isset($entry['id']) && intval($entry['id']) === $id) {
+                        $payload[] = ['id' => $id, 'nombre' => $entry['nombre']];
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $payload;
+    }
+
+    public function getProductWithRelations(int $id): ?array
+    {
+        $product = Producto::findById($id);
+        if (!$product) {
+            return null;
+        }
+
+        $product['etiquetas'] = Etiqueta::forProduct($id);
+        $product['images']    = Producto::images($id);
+
+        return $product;
+    }
+
+    public function saveProduct(array $productData, array $relationIds, array $files = [], ?int $existingId = null): int
+    {
+        $db = Database::getInstance();
+        $db->beginTransaction();
+
+        try {
+            if ($existingId !== null) {
+                Producto::update($existingId, $productData);
+                $productId = $existingId;
+            } else {
+                $productId = Producto::create($productData);
+            }
+
+            Producto::syncEtiquetas($productId, $relationIds['etiquetas']);
+            Producto::syncImages($productId, $productData, $files['imagenes'] ?? []);
+
+            $db->commit();
+
+            return $productId;
+        } catch (Throwable $exception) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+
+            $message = $exception instanceof RuntimeException
+                    ? $exception->getMessage()
+                    : 'No fue posible guardar el producto. Intenta nuevamente.';
+
+            throw new RuntimeException($message, 0, $exception);
+        }
+    }
 }
-</script>

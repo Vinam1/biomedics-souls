@@ -7,20 +7,14 @@ class AdminAttributesController extends Controller
         $this->requireAdmin();
     }
 
+    // BUG FIX: index() now passes all variables the view needs
     public function index(): void
     {
-        $attributeTypes = [
-            'etiquetas' => [
-                'name' => 'Etiquetas',
-                'description' => 'Etiquetas para clasificar productos',
-                'count' => Etiqueta::count(),
-                'icon' => 'fa-tags'
-            ]
-        ];
-
         $this->view('admin/attributes/index', [
-            'title' => 'Gestión de Atributos',
-            'attributeTypes' => $attributeTypes
+            'title'           => 'Gestión de Atributos',
+            'etiquetasCount'  => Etiqueta::count(),
+            'categoriesCount' => Categoria::count(),
+            'productCount'    => Producto::countAll(),
         ]);
     }
 
@@ -32,21 +26,21 @@ class AdminAttributesController extends Controller
             return;
         }
 
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-        $search = trim($_GET['q'] ?? '');
+        $page    = max(1, (int) ($_GET['page'] ?? 1));
+        $search  = trim($_GET['q'] ?? '');
         $perPage = 15;
 
         $data = AttributeService::getPaginatedData($type, $page, $search, $perPage);
 
         $this->view('admin/attributes/list', [
-            'title' => AttributeService::getTitle($type),
+            'title'       => AttributeService::getTitle($type),
             'description' => AttributeService::getDescription($type),
-            'type' => $type,
-            'items' => $data['items'],
-            'search' => $data['search'],
+            'type'        => $type,
+            'items'       => $data['items'],
+            'search'      => $data['search'],
             'currentPage' => $data['currentPage'],
-            'totalPages' => $data['totalPages'],
-            'total' => $data['total'],
+            'totalPages'  => $data['totalPages'],
+            'total'       => $data['total'],
         ]);
     }
 
@@ -59,8 +53,8 @@ class AdminAttributesController extends Controller
         }
 
         $modelClass = AttributeService::getModelClass($type);
-        $item = null;
-        $error = null;
+        $item       = null;
+        $error      = null;
 
         if ($id !== null) {
             $item = $modelClass::findById((int) $id);
@@ -90,10 +84,12 @@ class AdminAttributesController extends Controller
         }
 
         $this->view('admin/attributes/form', [
-            'title' => $item ? 'Editar ' . AttributeService::getTitle($type) : 'Crear ' . AttributeService::getTitle($type),
-            'type' => $type,
-            'item' => $item,
-            'error' => $error,
+            'title'  => $item
+                ? 'Editar ' . AttributeService::getTitle($type)
+                : 'Crear ' . AttributeService::getTitle($type),
+            'type'   => $type,
+            'item'   => $item,
+            'error'  => $error,
             'isEdit' => $item !== null,
         ]);
     }
@@ -109,20 +105,20 @@ class AdminAttributesController extends Controller
         $this->verifyCsrfOrAbort(true);
 
         $modelClass = AttributeService::getModelClass($type);
-        $itemId = (int) $id;
-        $item = $modelClass::findById($itemId);
+        $itemId     = (int) $id;
+        $item       = $modelClass::findById($itemId);
+
         if (!$item) {
             http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Atributo no encontrado']);
             return;
         }
 
         $canDelete = AttributeService::canDelete($type, $itemId);
         if (!$canDelete['canDelete']) {
             header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'message' => $canDelete['message']
-            ]);
+            echo json_encode(['success' => false, 'message' => $canDelete['message']]);
             return;
         }
 
@@ -131,7 +127,7 @@ class AdminAttributesController extends Controller
         header('Content-Type: application/json');
         echo json_encode([
             'success' => $success,
-            'message' => $success ? 'Atributo eliminado correctamente' : 'Error al eliminar'
+            'message' => $success ? 'Atributo eliminado correctamente' : 'Error al eliminar',
         ]);
     }
 
@@ -146,7 +142,7 @@ class AdminAttributesController extends Controller
 
         try {
             $modelClass = AttributeService::getModelClass($type);
-            $items = $modelClass::all();
+            $items      = $modelClass::all();
             echo json_encode(['success' => true, 'items' => $items]);
         } catch (Exception $e) {
             http_response_code(500);
@@ -154,6 +150,8 @@ class AdminAttributesController extends Controller
         }
     }
 
+    // BUG FIX: quickAdd now uses the model's create() which checks for duplicates,
+    // preventing unique-constraint violations when the same name is submitted twice.
     public function quickAdd(string $type): void
     {
         if (!AttributeService::isValidType($type)) {
@@ -167,8 +165,6 @@ class AdminAttributesController extends Controller
         header('Content-Type: application/json');
 
         $nombre = trim($_POST['nombre'] ?? '');
-        $modelClass = AttributeService::getModelClass($type);
-
         if ($nombre === '') {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'El nombre es requerido']);
@@ -176,18 +172,21 @@ class AdminAttributesController extends Controller
         }
 
         try {
-            $data = AttributeService::prepareData($type, $_POST);
-            $id = $this->createAttribute($modelClass, $data);
+            $modelClass = AttributeService::getModelClass($type);
+            $data       = AttributeService::prepareData($type, $_POST);
+
+            // Use the model's create() method, which handles duplicate names gracefully
+            $id = $modelClass::create($data);
 
             echo json_encode([
                 'success' => true,
                 'message' => 'Atributo creado',
-                'id' => $id,
-                'nombre' => $nombre
+                'id'      => $id,
+                'nombre'  => $nombre,
             ]);
         } catch (Exception $e) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Error al crear']);
+            echo json_encode(['success' => false, 'message' => 'Error al crear el atributo']);
         }
     }
 
@@ -199,32 +198,7 @@ class AdminAttributesController extends Controller
             return $modelClass::update((int) $id, $data);
         }
 
-        return (bool) $this->createAttribute($modelClass, $data);
-    }
-
-    private function createAttribute(string $modelClass, array $data): int
-    {
-        $db = Database::getInstance();
-        $slug = $data['slug'] ?? AttributeService::generateSlug($data['nombre']);
-
-        $columns = ['nombre', 'slug'];
-        $values = [':nombre', ':slug'];
-        $bindings = ['nombre' => $data['nombre'], 'slug' => $slug];
-
-        foreach (['color', 'descripcion', 'icono'] as $field) {
-            if (isset($data[$field])) {
-                $columns[] = $field;
-                $values[] = ':' . $field;
-                $bindings[$field] = $data[$field];
-            }
-        }
-
-        $table = str_replace(['Etiqueta', 'Uso', 'Beneficio'], ['etiquetas', 'usos', 'beneficios'], $modelClass);
-
-        $sql = 'INSERT INTO ' . $table . ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $values) . ')';
-        $stmt = $db->prepare($sql);
-        $stmt->execute($bindings);
-
-        return (int) $db->lastInsertId();
+        // Use model's create() to respect duplicate-name logic
+        return (bool) $modelClass::create($data);
     }
 }
