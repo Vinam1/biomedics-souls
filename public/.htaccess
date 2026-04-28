@@ -1,7 +1,20 @@
-RewriteEngine On
-RewriteBase /biomedics-souls/public/
+# .htaccess no es necesario ahora, el routing se hace en PHP
+# RewriteEngine On
+# RewriteBase /biomedics-souls/public/
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
 
-# enviar todas las peticiones al front controller
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+# Denegar acceso a archivos sensibles
+<Files ".env*">
+    Require all denied
+</Files>
+<Files "composer.*">
+    Require all denied
+</Files>
+<Files "*.log">
+    Require all denied
+</Files>
+
+# Deshabilitar listado de directorios
+Options -Indexes

@@ -38,7 +38,7 @@
         const nameInput = document.getElementById('nombre');
         const slugInput = document.getElementById('slug');
 
-        if (!nameInput || !slugInput) {
+        if (!nameInput || !slugInput || slugInput.readOnly) {
             return;
         }
 
