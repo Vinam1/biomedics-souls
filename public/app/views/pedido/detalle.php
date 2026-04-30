@@ -11,7 +11,7 @@ $transaction = $transaction ?? null;
             <p class="text-muted mb-0">Consulta los productos, el estado de pago y descarga tu ticket cuando lo necesites.</p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
-            <a href="<?= site_url('pedido/ticket/' . (int) ($order['id'] ?? 0)); ?>" target="_blank" class="btn btn-outline-dark">Abrir ticket PDF</a>
+            <a href="<?= site_url('pedido/ticket/' . (int) ($order['id'] ?? 0)); ?>" target="_blank" class="btn btn-outline-dark"><i class="bi bi-file-earmark-pdf me-2"></i>Abrir ticket PDF</a>
             <a href="<?= site_url('cuenta?tab=pedidos'); ?>" class="btn btn-outline-primary">Volver a mis pedidos</a>
         </div>
     </div>
@@ -20,7 +20,7 @@ $transaction = $transaction ?? null;
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">ArtÃ­culos comprados</h5>
+                    <h5 class="mb-3">Artículos comprados</h5>
                     <?php foreach ($items as $item): ?>
                         <div class="d-flex justify-content-between gap-3 py-3 border-bottom">
                             <div>

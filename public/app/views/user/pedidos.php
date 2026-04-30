@@ -2,14 +2,14 @@
 // views/user/pedidos.php
 ?>
 
-    <h2 class="fw-bold mb-4">Mis Pedidos</h2>
+<h2 class="fw-bold mb-4">Mis pedidos</h2>
 
 <?php if (empty($orders)): ?>
     <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
         <i class="fas fa-shopping-bag fs-1 text-muted mb-3"></i>
-        <h5 class="text-muted">AÃºn no has realizado ningÃºn pedido</h5>
-        <p class="text-muted mb-4">Cuando hagas tu primera compra, aparecerÃ¡ aquÃ­.</p>
-        <a href="<?= site_url('catalogo') ?>" class="btn btn-primary px-5">Ir al CatÃ¡logo</a>
+        <h5 class="text-muted">Aún no has realizado ningún pedido</h5>
+        <p class="text-muted mb-4">Cuando hagas tu primera compra, aparecerá aquí.</p>
+        <a href="<?= site_url('catalogo') ?>" class="btn btn-primary px-5">Ir al catálogo</a>
     </div>
 <?php else: ?>
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -17,12 +17,12 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                 <tr>
-                    <th class="ps-4">NÂº Pedido</th>
+                    <th class="ps-4">N.º pedido</th>
                     <th>Fecha</th>
                     <th>Productos</th>
                     <th class="text-end">Total</th>
                     <th class="text-center">Estado</th>
-                    <th class="text-end pe-4">AcciÃ³n</th>
+                    <th class="text-end pe-4">Acción</th>
                 </tr>
                 </thead>
                 <tbody>

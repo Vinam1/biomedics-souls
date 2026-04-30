@@ -3,22 +3,19 @@
 $isEdit = !empty($category);
 $title  = $isEdit ? 'Editar Categoría' : 'Nueva Categoría';
 $nombre = $isEdit ? htmlspecialchars($category['nombre'] ?? '') : '';
-$slug   = $isEdit ? htmlspecialchars($category['slug']   ?? '') : '';
+$slug   = $isEdit ? htmlspecialchars($category['slug'] ?? '') : '';
 ?>
 
 <div class="container py-5 admin-form" style="min-height: 100vh; background: #f8f9fa;">
     <div class="row justify-content-center">
         <div class="col-12 col-xl-8">
-
             <div class="card rounded-5 shadow-sm border-0">
                 <div class="card-body p-5">
-
-                    <!-- Encabezado -->
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-5">
                         <div class="d-flex align-items-center gap-3">
                             <a href="<?= site_url('admin/categorias'); ?>"
                                class="btn btn-outline-secondary rounded-4 d-flex align-items-center justify-content-center"
-                               style="width:52px; height:52px; font-size:1.5rem;">←</a>
+                               style="width:52px; height:52px; font-size:1.5rem;"><i class="bi bi-arrow-left"></i></a>
                             <div>
                                 <h1 class="h2 fw-bold mb-1"><?= htmlspecialchars($title); ?></h1>
                                 <p class="text-muted mb-0">Completa la información de la categoría</p>
@@ -44,13 +41,13 @@ $slug   = $isEdit ? htmlspecialchars($category['slug']   ?? '') : '';
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center gap-3 mb-4">
                                         <i class="fas fa-folder text-info fs-3"></i>
-                                        <h2 class="h5 fw-semibold mb-0">Información de la Categoría</h2>
+                                        <h2 class="h5 fw-semibold mb-0">Información de la categoría</h2>
                                     </div>
 
                                     <div class="row g-3">
                                         <div class="col-12">
                                             <label class="form-label fw-semibold">
-                                                Nombre de la Categoría <span class="text-danger">*</span>
+                                                Nombre de la categoría <span class="text-danger">*</span>
                                             </label>
                                             <input type="text" name="nombre" class="form-control rounded-4"
                                                    placeholder="Ej: Nootrópicos, Vitaminas, Adaptógenos"
@@ -76,7 +73,6 @@ $slug   = $isEdit ? htmlspecialchars($category['slug']   ?? '') : '';
                             </div>
                         </div>
 
-                        <!-- Acciones -->
                         <div class="col-12 text-end pt-3">
                             <a href="<?= site_url('admin/categorias'); ?>"
                                class="btn btn-lg btn-outline-secondary rounded-4 px-5 me-2">

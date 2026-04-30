@@ -9,13 +9,12 @@
     </div>
 </div>
 
-<!-- Stats Cards -->
 <div class="row g-4 mb-5">
     <div class="col-md-6 col-lg-3">
         <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <p class="text-muted mb-2 small">Pedidos Activos</p>
+                    <p class="text-muted mb-2 small">Pedidos activos</p>
                     <h2 class="fw-bold mb-0"><?= count($orders ?? []) ?></h2>
                 </div>
                 <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
@@ -29,7 +28,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <p class="text-muted mb-2 small">MÃ©todos de Pago</p>
+                    <p class="text-muted mb-2 small">Métodos de pago</p>
                     <h2 class="fw-bold mb-0"><?= count($paymentMethods ?? []) ?></h2>
                 </div>
                 <div class="bg-success bg-opacity-10 text-success rounded-3 p-3">
@@ -40,9 +39,8 @@
     </div>
 </div>
 
-<!-- Mi Panel de Control -->
-<h5 class="mb-3 fw-semibold">Mi Panel de Control</h5>
-<p class="text-muted mb-4">Accede rÃ¡pidamente a tus secciones mÃ¡s importantes.</p>
+<h5 class="mb-3 fw-semibold">Mi panel de control</h5>
+<p class="text-muted mb-4">Accede rápidamente a tus secciones más importantes.</p>
 
 <div class="row g-4">
     <div class="col-md-4">
@@ -63,8 +61,8 @@
                 <div class="bg-info bg-opacity-10 text-info rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                     <i class="fas fa-clipboard-list fs-3"></i>
                 </div>
-                <h6 class="fw-semibold">Resultados de mi Quiz</h6>
-                <p class="text-muted small mb-0">Ver tu fÃ³rmula personalizada</p>
+                <h6 class="fw-semibold">Resultados de mi quiz</h6>
+                <p class="text-muted small mb-0">Ver tu fórmula personalizada</p>
             </div>
         </a>
     </div>
@@ -76,17 +74,16 @@
                     <i class="fas fa-truck fs-3"></i>
                 </div>
                 <h6 class="fw-semibold">Rastrear mi pedido</h6>
-                <p class="text-muted small mb-0">Estado de tus envÃ­os</p>
+                <p class="text-muted small mb-0">Estado de tus envíos</p>
             </div>
         </a>
     </div>
 </div>
 
-<!-- Actividad Reciente -->
 <div class="mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-semibold">Actividad Reciente</h5>
-        <a href="?tab=pedidos" class="text-primary small fw-medium">Ver todo â†’</a>
+        <h5 class="fw-semibold">Actividad reciente</h5>
+        <a href="?tab=pedidos" class="text-primary small fw-medium">Ver todo <i class="bi bi-arrow-right"></i></a>
     </div>
 
     <?php if (empty($orders)): ?>
@@ -103,9 +100,9 @@
                             <small class="text-muted"><?= date('d/m/Y', strtotime($order['created_at'])) ?></small>
                         </div>
                         <div class="text-end">
-                        <span class="badge bg-<?= ($order['estado_pedido'] ?? '') === 'entregado' ? 'success' : 'warning' ?> px-3 py-1">
-                            <?= ucfirst($order['estado_pedido'] ?? 'Pendiente') ?>
-                        </span>
+                            <span class="badge bg-<?= ($order['estado_pedido'] ?? '') === 'entregado' ? 'success' : 'warning' ?> px-3 py-1">
+                                <?= ucfirst($order['estado_pedido'] ?? 'Pendiente') ?>
+                            </span>
                             <div class="mt-1 fw-bold">$<?= number_format($order['total'] ?? 0, 2) ?></div>
                         </div>
                     </div>

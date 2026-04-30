@@ -8,7 +8,7 @@
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
                     <div>
                         <h1 class="display-6 fw-bold mb-1">Pedido <?= htmlspecialchars($order['numero_pedido']); ?></h1>
-                        <p class="text-muted mb-0">InformaciÃ³n detallada del pedido.</p>
+                        <p class="text-muted mb-0">Información detallada del pedido.</p>
                     </div>
                     <a href="<?= site_url('admin/pedidos'); ?>" class="btn btn-outline-primary btn-lg">Volver a pedidos</a>
                 </div>
@@ -27,13 +27,13 @@
                             <h6 class="text-uppercase text-muted small mb-3">Resumen del pedido</h6>
                             <p class="mb-1"><strong>Total:</strong> $<?= number_format($order['total'], 2); ?></p>
                             <p class="text-muted mb-1"><strong>Subtotal:</strong> $<?= number_format($order['subtotal'], 2); ?></p>
-                            <p class="text-muted mb-0"><strong>EnvÃ­o:</strong> $<?= number_format($order['costo_envio'], 2); ?></p>
+                            <p class="text-muted mb-0"><strong>Envío:</strong> $<?= number_format($order['costo_envio'], 2); ?></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="section-surface rounded-4 p-4 mb-4">
-                    <h6 class="text-uppercase text-muted small mb-3">DirecciÃ³n de envÃ­o</h6>
+                    <h6 class="text-uppercase text-muted small mb-3">Dirección de envío</h6>
                     <p class="mb-1"><?= htmlspecialchars($order['direccion_nombre_completo'] ?? 'No disponible'); ?></p>
                     <p class="mb-1"><?= htmlspecialchars($order['direccion_calle'] ?? ''); ?> <?= htmlspecialchars($order['direccion_numero_exterior'] ?? ''); ?> <?= htmlspecialchars($order['direccion_numero_interior'] ?? ''); ?></p>
                     <p class="mb-1"><?= htmlspecialchars($order['direccion_colonia'] ?? ''); ?>, <?= htmlspecialchars($order['direccion_ciudad'] ?? ''); ?></p>

@@ -13,12 +13,25 @@ class PageController extends Controller
     public function catalog(): void
     {
         $categories = Categoria::all();
+        $filters = $this->catalogFilters();
+        $products = Producto::search($filters);
+
+        if ($this->wantsJson()) {
+            $html = $this->renderCatalogGridHtml($products);
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode([
+                'html' => $html,
+                'count' => count($products),
+            ]);
+            exit;
+        }
 
         $this->view('pages/catalogo', [
             'title' => 'Catálogo de Suplementos | Sensea',
-            'products' => Producto::allActive(),
+            'products' => $products,
             'categories' => $categories,
             'currentCategory' => null,
+            'filters' => $filters,
         ]);
     }
 
@@ -42,6 +55,11 @@ class PageController extends Controller
             'products' => $products,
             'categories' => $categories,
             'currentCategory' => $category,
+            'filters' => [
+                'query' => '',
+                'categoria_id' => (int) ($category['id'] ?? 0),
+                'sort' => 'updated_at_desc',
+            ],
         ]);
     }
 
@@ -126,5 +144,43 @@ class PageController extends Controller
             'editingAddress' => $editingAddress,
             'editingPaymentMethod' => $editingPaymentMethod,
         ]);
+    }
+
+    private function catalogFilters(): array
+    {
+        $sortMap = [
+            'recent' => 'updated_at_desc',
+            'price_asc' => 'precio_asc',
+            'price_desc' => 'precio_desc',
+            'name_asc' => 'nombre_asc',
+            'name_desc' => 'nombre_desc',
+        ];
+
+        $query = trim((string) ($_GET['q'] ?? ''));
+        $categoryId = (int) ($_GET['categoria'] ?? 0);
+        $sortKey = (string) ($_GET['sort'] ?? 'recent');
+
+        return [
+            'query' => $query,
+            'categoria_id' => $categoryId > 0 ? $categoryId : null,
+            'sort' => $sortMap[$sortKey] ?? 'updated_at_desc',
+        ];
+    }
+
+    private function wantsJson(): bool
+    {
+        if (($_GET['ajax'] ?? '') === '1') {
+            return true;
+        }
+
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        return is_string($accept) && str_contains($accept, 'application/json');
+    }
+
+    private function renderCatalogGridHtml(array $products): string
+    {
+        ob_start();
+        require APPROOT . '/views/pages/partials/catalog-product-grid.php';
+        return (string) ob_get_clean();
     }
 }

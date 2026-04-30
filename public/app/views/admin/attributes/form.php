@@ -1,34 +1,31 @@
 <?php
 // views/admin/attributes/form.php
 $typeConfig = [
-        'etiquetas' => ['singular' => 'Etiqueta', 'icon' => 'fa-tags',     'color' => 'text-warning'],
-        'usos'      => ['singular' => 'Uso',      'icon' => 'fa-lightbulb','color' => 'text-info'],
-        'beneficios'=> ['singular' => 'Beneficio','icon' => 'fa-heart',    'color' => 'text-danger'],
+    'etiquetas' => ['singular' => 'Etiqueta', 'icon' => 'fa-tags', 'color' => 'text-warning'],
+    'usos' => ['singular' => 'Uso', 'icon' => 'fa-lightbulb', 'color' => 'text-info'],
+    'beneficios' => ['singular' => 'Beneficio', 'icon' => 'fa-heart', 'color' => 'text-danger'],
 ];
 
 $config = $typeConfig[$type] ?? [];
 $isEdit = !empty($item);
 
-$nombre     = $isEdit ? htmlspecialchars($item['nombre'])           : '';
-$slug       = $isEdit ? htmlspecialchars($item['slug'])             : '';
-$color      = $isEdit ? htmlspecialchars($item['color'] ?? '#3B82F6') : '#3B82F6';
-$descripcion= $isEdit ? htmlspecialchars($item['descripcion'] ?? '') : '';
-$icono      = $isEdit ? htmlspecialchars($item['icono'] ?? 'fa-check') : 'fa-check';
+$nombre = $isEdit ? htmlspecialchars($item['nombre']) : '';
+$slug = $isEdit ? htmlspecialchars($item['slug']) : '';
+$color = $isEdit ? htmlspecialchars($item['color'] ?? '#3B82F6') : '#3B82F6';
+$descripcion = $isEdit ? htmlspecialchars($item['descripcion'] ?? '') : '';
+$icono = $isEdit ? htmlspecialchars($item['icono'] ?? 'fa-check') : 'fa-check';
 ?>
 
 <div class="container py-5 admin-form" style="min-height: 100vh; background: #f8f9fa;">
     <div class="row justify-content-center">
         <div class="col-12 col-xl-8">
-
             <div class="card rounded-5 shadow-sm border-0">
                 <div class="card-body p-5">
-
-                    <!-- Encabezado -->
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-5">
                         <div class="d-flex align-items-center gap-3">
                             <a href="<?= site_url("admin/atributos/$type"); ?>"
                                class="btn btn-outline-secondary rounded-4 d-flex align-items-center justify-content-center"
-                               style="width:52px; height:52px; font-size:1.5rem;">←</a>
+                               style="width:52px; height:52px; font-size:1.5rem;"><i class="bi bi-arrow-left"></i></a>
                             <div>
                                 <h1 class="h2 fw-bold mb-1"><?= htmlspecialchars($title); ?></h1>
                                 <p class="text-muted mb-0">Completa la información del <?= $config['singular'] ?? 'atributo'; ?></p>
@@ -49,7 +46,6 @@ $icono      = $isEdit ? htmlspecialchars($item['icono'] ?? 'fa-check') : 'fa-che
                     <form method="post" action="" class="row g-4">
                         <?= csrf_input(); ?>
 
-                        <!-- Información básica -->
                         <div class="col-12">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body p-4">
@@ -83,7 +79,6 @@ $icono      = $isEdit ? htmlspecialchars($item['icono'] ?? 'fa-check') : 'fa-che
                             </div>
                         </div>
 
-                        <!-- Color (solo etiquetas) -->
                         <?php if ($type === 'etiquetas'): ?>
                             <div class="col-12">
                                 <div class="card border-0 shadow-sm">
@@ -111,7 +106,6 @@ $icono      = $isEdit ? htmlspecialchars($item['icono'] ?? 'fa-check') : 'fa-che
                             </div>
                         <?php endif; ?>
 
-                        <!-- Descripción (usos / beneficios) -->
                         <?php if ($type === 'usos' || $type === 'beneficios'): ?>
                             <div class="col-12">
                                 <div class="card border-0 shadow-sm">
@@ -134,7 +128,6 @@ $icono      = $isEdit ? htmlspecialchars($item['icono'] ?? 'fa-check') : 'fa-che
                             </div>
                         <?php endif; ?>
 
-                        <!-- Ícono (beneficios) -->
                         <?php if ($type === 'beneficios'): ?>
                             <div class="col-12">
                                 <div class="card border-0 shadow-sm">
@@ -164,7 +157,6 @@ $icono      = $isEdit ? htmlspecialchars($item['icono'] ?? 'fa-check') : 'fa-che
                             </div>
                         <?php endif; ?>
 
-                        <!-- Acciones -->
                         <div class="col-12 text-end pt-3">
                             <a href="<?= site_url("admin/atributos/$type"); ?>"
                                class="btn btn-lg btn-outline-secondary rounded-4 px-5 me-2">

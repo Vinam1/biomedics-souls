@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $contenidoNetoValue = trim($product['contenido_neto'] ?? '');
 $contenidoNetoCantidad = '';
 $contenidoNetoUnidad = 'mg';
@@ -321,8 +321,8 @@ $isEdit = !empty($product['id']);
                                                    class="form-control rounded-4"
                                                    maxlength="100"
                                                    value="<?= htmlspecialchars($selectedStatus); ?>"
-                                                   placeholder="Ej: Agotado, PrÃ³ximamente, Preventa">
-                                            <small class="text-muted">Si escribes exactamente "agotado", el producto no podrÃ¡ agregarse al carrito.</small>
+                                                   placeholder="Ej: Agotado, Próximamente, Preventa">
+                                            <small class="text-muted">Si escribes exactamente "agotado", el producto no podrá agregarse al carrito.</small>
                                         </div>
 
                                         <div class="col-12 col-lg-6 d-flex align-items-center pt-4">

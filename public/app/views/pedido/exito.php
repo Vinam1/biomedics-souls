@@ -11,7 +11,7 @@ $isPaid = ($order['estado_pedido'] ?? '') === 'pagado';
             <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
                 <div>
                     <h1 class="h3 <?= $isPaid ? 'text-success' : 'text-warning'; ?> mb-2">
-                        <?= $isPaid ? 'Pago realizado con Ã©xito' : 'Pedido creado y pago pendiente'; ?>
+                        <?= $isPaid ? 'Pago realizado con éxito' : 'Pedido creado y pago pendiente'; ?>
                     </h1>
                     <p class="mb-0 text-muted">
                         Pedido <strong>#<?= htmlspecialchars($order['numero_pedido'] ?? ''); ?></strong>
@@ -20,7 +20,7 @@ $isPaid = ($order['estado_pedido'] ?? '') === 'pagado';
                 </div>
                 <?php if (!empty($order['id'])): ?>
                     <div class="d-flex gap-2 flex-wrap">
-                        <a href="<?= site_url('pedido/ticket/' . (int) $order['id']); ?>" target="_blank" class="btn btn-outline-dark">Abrir ticket PDF</a>
+                        <a href="<?= site_url('pedido/ticket/' . (int) $order['id']); ?>" target="_blank" class="btn btn-outline-dark"><i class="bi bi-file-earmark-pdf me-2"></i>Abrir ticket PDF</a>
                         <a href="<?= site_url('pedido/detalle/' . (int) $order['id']); ?>" class="btn btn-primary">Ver detalle</a>
                     </div>
                 <?php endif; ?>
@@ -43,7 +43,7 @@ $isPaid = ($order['estado_pedido'] ?? '') === 'pagado';
 
                 <div class="col-lg-6">
                     <div class="border rounded-4 p-4 h-100">
-                        <h5 class="mb-3">EnvÃ­o</h5>
+                        <h5 class="mb-3">Envío</h5>
                         <p class="mb-1 fw-semibold"><?= htmlspecialchars($order['direccion_nombre_completo'] ?? ''); ?></p>
                         <p class="mb-1 text-muted"><?= htmlspecialchars(($order['direccion_calle'] ?? '') . ' #' . ($order['direccion_numero_exterior'] ?? '')); ?></p>
                         <?php if (!empty($order['direccion_numero_interior'])): ?>
@@ -64,14 +64,14 @@ $isPaid = ($order['estado_pedido'] ?? '') === 'pagado';
                     <div class="d-flex justify-content-between gap-3 py-2 border-bottom">
                         <div>
                             <div class="fw-semibold"><?= htmlspecialchars($item['producto_nombre'] ?? ''); ?></div>
-                            <div class="small text-muted">SKU <?= htmlspecialchars($item['producto_sku'] ?? ''); ?> Â· <?= (int) ($item['cantidad'] ?? 0); ?> pieza(s)</div>
+                            <div class="small text-muted">SKU <?= htmlspecialchars($item['producto_sku'] ?? ''); ?> · <?= (int) ($item['cantidad'] ?? 0); ?> pieza(s)</div>
                         </div>
                         <div class="text-end fw-semibold">$<?= number_format((float) ($item['subtotal'] ?? 0), 2); ?></div>
                     </div>
                 <?php endforeach; ?>
 
                 <div class="d-flex justify-content-between mt-4"><span>Subtotal</span><strong>$<?= number_format((float) ($order['subtotal'] ?? 0), 2); ?></strong></div>
-                <div class="d-flex justify-content-between mt-2"><span>EnvÃ­o</span><strong>$<?= number_format((float) ($order['costo_envio'] ?? 0), 2); ?></strong></div>
+                <div class="d-flex justify-content-between mt-2"><span>Envío</span><strong>$<?= number_format((float) ($order['costo_envio'] ?? 0), 2); ?></strong></div>
                 <div class="d-flex justify-content-between mt-3 fs-5"><span>Total</span><strong>$<?= number_format((float) ($order['total'] ?? 0), 2); ?></strong></div>
             </div>
 

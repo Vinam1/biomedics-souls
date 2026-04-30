@@ -1,23 +1,24 @@
 <?php
-$title = 'Biomedcs Souls | Sensea - Suplementos Premium';
+$title = 'Biomedics Souls | Sensea - Suplementos Premium';
+$bodyClass = 'home-page';
 ?>
 
-<section class="hero-section d-flex align-items-center position-relative overflow-hidden" style="min-height: 720px;">
-    <div class="position-absolute top-0 start-0 w-100 h-100">
-        <img src="<?= asset_url('img/deco/hero-sensea.jpg'); ?>" alt="Biomedics Souls Sensea" class="img-fluid w-100 h-100 object-fit-cover" style="filter: brightness(0.85) contrast(1.05);">
-        <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient" style="background: linear-gradient(to right, rgba(248, 247, 255, 0.92), rgba(240, 234, 255, 0.75));"></div>
+<section class="home-hero position-relative overflow-hidden">
+    <div class="home-hero-media">
+        <img src="<?= asset_url('img/deco/hero-sensea.jpg'); ?>" alt="Biomedics Souls Sensea" class="w-100 h-100 object-fit-cover">
     </div>
+    <div class="home-hero-overlay"></div>
 
-    <div class="container hero-content position-relative z-3 py-5">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <div class="hero-panel p-5 rounded-5 shadow-sm bg-white bg-opacity-95">
-                    <span class="badge bg-primary bg-opacity-10 text-primary px-4 py-2 mb-4">Suplementos Premium</span>
-                    <h1 class="display-4 fw-bold mb-4 lh-1">Optimiza tu <span class="text-primary">cuerpo y mente</span></h1>
-                    <p class="lead text-muted mb-5" style="max-width: 520px;">Suplementos formulados con ingredientes de alta calidad para potenciar tu rendimiento diario, enfoque y recuperación.</p>
+    <div class="container position-relative z-2">
+        <div class="row min-vh-hero align-items-center">
+            <div class="col-lg-7 col-xl-6">
+                <div class="hero-copy">
+                    <span class="eyebrow-pill">Tu bienestar, nuestra prioridad</span>
+                    <h1 class="hero-title">Optimiza tu <span>cuerpo y mente</span></h1>
+                    <p class="hero-text">Suplementos formulados con ingredientes de alta calidad para potenciar tu rendimiento diario, enfoque y recuperaci&oacute;n.</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
-                        <a href="<?= site_url('catalogo'); ?>" class="btn btn-primary btn-lg px-5 rounded-4">Explorar Catálogo</a>
-                        <a href="<?= site_url('quiz'); ?>" class="btn btn-outline-primary btn-lg px-5 rounded-4">Descubre tu fórmula</a>
+                        <a href="<?= site_url('catalogo'); ?>" class="btn btn-brand btn-lg px-4">Explorar Cat&aacute;logo <i class="bi bi-arrow-right ms-2"></i></a>
+                        <a href="<?= site_url('quiz'); ?>" class="btn btn-soft btn-lg px-4">Descubre tu f&oacute;rmula</a>
                     </div>
                 </div>
             </div>
@@ -25,111 +26,176 @@ $title = 'Biomedcs Souls | Sensea - Suplementos Premium';
     </div>
 </section>
 
-<div class="container py-5">
-    <div class="row align-items-center g-5">
-        <div class="col-lg-7">
-            <h1 class="display-5 fw-bold mb-4">Biomedics Soul:<br><span class="text-primary">Transformando el Sector Salud con Ética e Innovación</span></h1>
-            <p class="lead text-muted mb-5">En Biomedics Soul, nos dedicamos a elevar los estándares del sector salud a través de soluciones integrales, éticas y de alta calidad. Nos especializamos en la consultoría y distribución de insumos médicos, con el firme propósito de mejorar el bienestar de los pacientes y facilitar la labor de los profesionales que los atienden.</p>
-            <div class="d-flex gap-4 mb-5">
-                <div class="flex-shrink-0"><div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3"><i class="fas fa-bolt fa-2x"></i></div></div>
-                <div>
-                    <h5 class="fw-semibold mb-2">Misión</h5>
-                    <p class="text-muted">Proveer soluciones médicas efectivas y confiables que garanticen seguridad, eficiencia y la total satisfacción de nuestros clientes. Nuestra excelencia operativa nos convierte en el aliado estratégico de hospitales, clínicas y laboratorios en todo México.</p>
-                </div>
-            </div>
-            <div class="d-flex gap-4">
-                <div class="flex-shrink-0"><div class="bg-info bg-opacity-10 text-info rounded-3 p-3"><i class="fas fa-globe fa-2x"></i></div></div>
-                <div>
-                    <h5 class="fw-semibold mb-2">Visión</h5>
-                    <p class="text-muted">Consolidarnos como líderes globales en el sector salud, siendo reconocidos por impulsar la certificación y competitividad de las instituciones médicas. Buscamos llevar nuestros estándares de calidad a mercados internacionales, transformando la salud a nivel mundial.</p>
-                </div>
-            </div>
+<section class="section-block">
+    <div class="container">
+        <div class="section-heading text-center mx-auto">
+            <h2>El est&aacute;ndar Biomedics Souls</h2>
+            <p>No hacemos suposiciones. Cada f&oacute;rmula est&aacute; dise&ntilde;ada para m&aacute;xima biodisponibilidad y efectividad.</p>
         </div>
 
-        <div class="col-lg-5">
-            <div class="rounded-4 overflow-hidden shadow-sm">
-                <img src="<?= asset_url('img/deco/mision-vision.jpg'); ?>" alt="Profesionales de la salud" class="img-fluid w-100">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <article class="soft-card h-100">
+                    <div class="icon-chip text-purple"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Pureza Garantizada</h3>
+                    <p>Ingredientes de la m&aacute;s alta calidad, testeados para asegurar cero contaminantes y m&aacute;xima seguridad.</p>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="soft-card h-100">
+                    <div class="icon-chip text-sky"><i class="fas fa-brain"></i></div>
+                    <h3>F&oacute;rmulas Sin&eacute;rgicas</h3>
+                    <p>Combinamos compuestos que trabajan juntos para multiplicar sus efectos en el organismo.</p>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="soft-card h-100">
+                    <div class="icon-chip text-teal"><i class="fas fa-wave-square"></i></div>
+                    <h3>Alta Biodisponibilidad</h3>
+                    <p>Utilizamos formas moleculares que tu cuerpo realmente puede absorber y utilizar.</p>
+                </article>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h2 class="h3 fw-bold">El estándar Biomedics Souls</h2>
-        <p class="text-muted">No hacemos suposiciones. Cada fórmula está diseñada para máxima biodisponibilidad y efectividad.</p>
-    </div>
+<section class="section-block">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="section-copy pe-lg-4">
+                    <h2 class="about-title">Biomedics Soul: <span>Transformando el Sector Salud</span> con &Eacute;tica e Innovaci&oacute;n</h2>
+                    <p class="section-lead">En Biomedics Soul, nos dedicamos a elevar los est&aacute;ndares del sector salud a trav&eacute;s de soluciones integrales, &eacute;ticas y de alta calidad. Nos especializamos en la consultor&iacute;a y distribuci&oacute;n de insumos m&eacute;dicos, con el firme prop&oacute;sito de mejorar el bienestar de los pacientes y facilitar la labor de los profesionales que los atienden.</p>
 
-    <div class="row g-4">
-        <div class="col-md-4"><div class="card border-0 shadow-sm h-100 p-4 text-center"><div class="mb-4"><i class="fas fa-shield-alt fa-3x text-primary"></i></div><h5 class="fw-semibold mb-3">Pureza Garantizada</h5><p class="text-muted">Ingredientes de la más alta calidad, testeados para asegurar cero contaminantes y máxima seguridad.</p></div></div>
-        <div class="col-md-4"><div class="card border-0 shadow-sm h-100 p-4 text-center"><div class="mb-4"><i class="fas fa-sync fa-3x text-primary"></i></div><h5 class="fw-semibold mb-3">Fórmulas Sinérgicas</h5><p class="text-muted">Combinamos compuestos que trabajan juntos para multiplicar sus efectos en el organismo.</p></div></div>
-        <div class="col-md-4"><div class="card border-0 shadow-sm h-100 p-4 text-center"><div class="mb-4"><i class="fas fa-chart-line fa-3x text-primary"></i></div><h5 class="fw-semibold mb-3">Alta Biodisponibilidad</h5><p class="text-muted">Utilizamos formas moleculares que tu cuerpo realmente puede absorber y utilizar.</p></div></div>
-    </div>
-</div>
+                    <div class="info-feature">
+                        <div class="icon-chip text-purple"><i class="fas fa-bolt"></i></div>
+                        <div>
+                            <h3>Misi&oacute;n</h3>
+                            <p>Proveer soluciones m&eacute;dicas efectivas y confiables que garanticen seguridad, eficiencia y la total satisfacci&oacute;n de nuestros clientes. Nuestra excelencia operativa nos convierte en el aliado estrat&eacute;gico de hospitales, cl&iacute;nicas y laboratorios en todo M&eacute;xico.</p>
+                        </div>
+                    </div>
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h2 class="h4 fw-bold">Lo que dicen nuestros clientes</h2>
-        <p class="text-muted">Miles de personas ya están transformando su vida con Biomedics Souls.</p>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-md-4"><div class="card border-0 shadow-sm p-4 h-100"><div class="d-flex mb-3"><img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-3" width="55" alt=""><div><strong>Dra. Elena Rodríguez</strong><br><small class="text-muted">Nutrióloga Clínica</small></div></div><p class="text-muted">"Como profesional, busco pureza y evidencia. Las fórmulas de Biomedics Souls son las únicas que recomiendo a mis pacientes por su alta biodisponibilidad."</p><div class="text-warning">★★★★★</div></div></div>
-        <div class="col-md-4"><div class="card border-0 shadow-sm p-4 h-100"><div class="d-flex mb-3"><img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-3" width="55" alt=""><div><strong>Carlos Méndez</strong><br><small class="text-muted">Atleta de Alto Rendimiento</small></div></div><p class="text-muted">"El enfoque y la recuperación que he logrado con Ashwagandha y Magnesio de esta marca han marcado un antes y un después en mi entrenamiento."</p><div class="text-warning">★★★★★</div></div></div>
-        <div class="col-md-4"><div class="card border-0 shadow-sm p-4 h-100"><div class="d-flex mb-3"><img src="https://randomuser.me/api/portraits/women/65.jpg" class="rounded-circle me-3" width="55" alt=""><div><strong>Sofía Valenzuela</strong><br><small class="text-muted">Emprendedora</small></div></div><p class="text-muted">"Buscaba algo para el estrés y la claridad mental. El servicio al cliente me guió perfectamente y los resultados fueron casi inmediatos."</p><div class="text-warning">★★★★★</div></div></div>
-    </div>
-</div>
-
-<div class="container py-5 bg-light rounded-5">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h2 class="h4 fw-bold">Fórmulas Destacadas</h2>
-            <p class="text-muted mb-0">Nuestros suplementos más avanzados para objetivos específicos.</p>
-        </div>
-        <a href="<?= site_url('catalogo'); ?>" class="text-primary fw-semibold">Ver todos →</a>
-    </div>
-
-    <?php if (!empty($featured)): ?>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
-            <?php foreach ($featured as $product): ?>
-                <?php
-                $statusLabel = trim((string) ($product['estatus'] ?? ''));
-                $isOutOfStock = Producto::isOutOfStockStatus($statusLabel);
-                ?>
-                <div class="col">
-                    <div class="product-card h-100 border-0 shadow-sm overflow-hidden rounded-4">
-                        <?php if (!empty($product['imagen_principal'])): ?>
-                            <img src="<?= asset_url('img/products/' . $product['imagen_principal']); ?>" class="card-img-top" alt="<?= htmlspecialchars($product['nombre']); ?>" style="height: 260px; object-fit: cover;">
-                        <?php endif; ?>
-                        <div class="p-4">
-                            <?php if ($statusLabel !== ''): ?>
-                                <div class="mb-2">
-                                    <span class="badge rounded-pill <?= $isOutOfStock ? 'text-bg-danger' : 'bg-light text-dark border'; ?>">
-                                        <?= htmlspecialchars($statusLabel); ?>
-                                    </span>
-                                </div>
-                            <?php endif; ?>
-                            <h5 class="fw-semibold mb-2"><?= htmlspecialchars($product['nombre']); ?></h5>
-                            <p class="text-muted small mb-3"><?= htmlspecialchars($product['descripcion_corta'] ?? 'Suplemento premium Sensea'); ?></p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="h5 fw-bold text-dark">$<?= number_format($product['precio_descuento'] ?? $product['precio'], 2); ?></div>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <a href="<?= site_url('producto/' . $product['slug']); ?>" class="btn btn-outline-primary btn-sm">Detalles</a>
-                                    <?php if ($isOutOfStock): ?>
-                                        <span class="small fw-semibold text-danger">Agotado</span>
-                                    <?php else: ?>
-                                        <form action="<?= site_url('carrito/agregar/' . $product['id']); ?>" method="post" class="d-inline">
-                                            <?= csrf_input(); ?>
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-cart-plus"></i></button>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+                    <div class="info-feature">
+                        <div class="icon-chip text-sky"><i class="fas fa-heartbeat"></i></div>
+                        <div>
+                            <h3>Visi&oacute;n</h3>
+                            <p>Consolidarnos como l&iacute;deres globales en el sector salud, siendo reconocidos por impulsar la certificaci&oacute;n y competitividad de las instituciones m&eacute;dicas. Buscamos llevar nuestros est&aacute;ndares de calidad a mercados internacionales, transformando la salud a nivel mundial.</p>
                         </div>
                     </div>
                 </div>
-            <?php endforeach; ?>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="about-visual">
+                    <img src="<?= asset_url('img/deco/mision-vision.jpg'); ?>" alt="Profesionales de la salud" class="img-fluid w-100">
+                </div>
+            </div>
         </div>
-    <?php endif; ?>
-</div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="container">
+        <div class="section-heading text-center mx-auto">
+            <h2>Lo que dicen nuestros clientes</h2>
+            <p>Miles de personas ya est&aacute;n transformando su vida con Biomedics Soul.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <article class="testimonial-card h-100">
+                    <div class="testimonial-avatar">ER</div>
+                    <div class="testimonial-stars" aria-label="5 estrellas">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <i class="bi bi-quote testimonial-quote-mark" aria-hidden="true"></i>
+                    <p class="testimonial-quote">&ldquo;Como profesional, busco pureza y evidencia. Las f&oacute;rmulas de Biomedics Soul son las &uacute;nicas que recomiendo a mis pacientes por su alta biodisponibilidad.&rdquo;</p>
+                    <h3>Dra. Elena Rodr&iacute;guez</h3>
+                    <span>Nutri&oacute;loga Cl&iacute;nica</span>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="testimonial-card h-100">
+                    <div class="testimonial-avatar">CM</div>
+                    <div class="testimonial-stars" aria-label="5 estrellas">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <i class="bi bi-quote testimonial-quote-mark" aria-hidden="true"></i>
+                    <p class="testimonial-quote">&ldquo;El enfoque y la recuperaci&oacute;n que he logrado con Ashwagandha y Magnesio de esta marca han marcado un antes y un despu&eacute;s en mi entrenamiento.&rdquo;</p>
+                    <h3>Carlos M&eacute;ndez</h3>
+                    <span>Atleta de Alto Rendimiento</span>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="testimonial-card h-100">
+                    <div class="testimonial-avatar">SV</div>
+                    <div class="testimonial-stars" aria-label="5 estrellas">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    </div>
+                    <i class="bi bi-quote testimonial-quote-mark" aria-hidden="true"></i>
+                    <p class="testimonial-quote">&ldquo;Buscaba algo para el estr&eacute;s y la claridad mental. El servicio al cliente me gui&oacute; perfectamente y los resultados fueron casi inmediatos.&rdquo;</p>
+                    <h3>Sof&iacute;a Valenzuela</h3>
+                    <span>Emprendedora</span>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-featured">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-5">
+            <div class="section-copy">
+                <h2>F&oacute;rmulas Destacadas</h2>
+                <p class="mb-0">Nuestros suplementos m&aacute;s avanzados para objetivos espec&iacute;ficos.</p>
+            </div>
+            <a href="<?= site_url('catalogo'); ?>" class="section-link">Ver todos <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <?php if (!empty($featured)): ?>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
+                <?php foreach ($featured as $product): ?>
+                    <?php
+                    $statusLabel = trim((string) ($product['estatus'] ?? ''));
+                    $isOutOfStock = Producto::isOutOfStockStatus($statusLabel);
+                    ?>
+                    <div class="col">
+                        <article class="product-card h-100">
+                            <div class="product-media">
+                                <?php if (!empty($product['imagen_principal'])): ?>
+                                    <img src="<?= asset_url('img/products/' . $product['imagen_principal']); ?>" class="card-img-top" alt="<?= htmlspecialchars($product['nombre']); ?>">
+                                <?php endif; ?>
+                                <?php if ($statusLabel !== ''): ?>
+                                    <span class="product-status <?= $isOutOfStock ? 'is-out' : ''; ?>"><?= htmlspecialchars($statusLabel); ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="product-content">
+                                <h3><?= htmlspecialchars($product['nombre']); ?></h3>
+                                <p><?= htmlspecialchars($product['descripcion_corta'] ?? 'Suplemento premium Sensea'); ?></p>
+                                <div class="product-meta">
+                                    <div class="price-stack">
+                                        <strong>$<?= number_format($product['precio_descuento'] ?? $product['precio'], 2); ?></strong>
+                                    </div>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <a href="<?= site_url('producto/' . $product['slug']); ?>" class="btn btn-soft btn-sm">Detalles</a>
+                                        <?php if ($isOutOfStock): ?>
+                                            <span class="product-out-text">Agotado</span>
+                                        <?php else: ?>
+                                            <form action="<?= site_url('carrito/agregar/' . $product['id']); ?>" method="post" class="d-inline">
+                                                <?= csrf_input(); ?>
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-cart btn-brand btn-sm" aria-label="Agregar al carrito">
+                                                    <i class="bi bi-cart3"></i>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>

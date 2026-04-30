@@ -5,7 +5,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h1 class="h4 fw-bold mb-2">Quiz interactivo</h1>
-                        <p class="text-muted mb-0">Responde una pregunta por pantalla y descubre cuÃ¡l es tu mejor ruta de bienestar.</p>
+                        <p class="text-muted mb-0">Responde una pregunta por pantalla y descubre cu&aacute;l es tu mejor ruta de bienestar.</p>
                     </div>
                     <span class="badge bg-primary bg-opacity-15 text-primary">Paso <span id="quiz-step">1</span> / 3</span>
                 </div>
@@ -23,16 +23,16 @@
 <script>
     const quizQuestions = [
         {
-            question: 'Â¿CuÃ¡l es tu prioridad de salud mÃ¡s importante ahora?',
-            options: ['Enfoque cognitivo', 'EnergÃ­a y vitalidad', 'RelajaciÃ³n y sueÃ±o', 'Soporte inmunolÃ³gico'],
+            question: '¿Cuál es tu prioridad de salud más importante ahora?',
+            options: ['Enfoque cognitivo', 'Energía y vitalidad', 'Relajación y sueño', 'Soporte inmunológico'],
         },
         {
-            question: 'Â¿Prefieres resultados rÃ¡pidos o un cambio gradual y sostenible?',
-            options: ['Resultados rÃ¡pidos', 'EvoluciÃ³n constante', 'Algo equilibrado', 'No lo sÃ© aÃºn'],
+            question: '¿Prefieres resultados rápidos o un cambio gradual y sostenible?',
+            options: ['Resultados rápidos', 'Evolución constante', 'Algo equilibrado', 'No lo sé aún'],
         },
         {
-            question: 'Â¿QuÃ© estilo de rutina te resulta mÃ¡s cÃ³modo?',
-            options: ['Una sola cÃ¡psula diaria', 'Dos dosis al dÃ­a', 'Batidos o mezclas', 'Ayuno intermitente'],
+            question: '¿Qué estilo de rutina te resulta más cómodo?',
+            options: ['Una sola cápsula diaria', 'Dos dosis al día', 'Batidos o mezclas', 'Ayuno intermitente'],
         },
     ];
 
@@ -83,15 +83,18 @@
     const renderResult = () => {
         progress.style.width = '100%';
         stepLabel.textContent = quizQuestions.length;
-        const selected = quizAnswers.join(' Â· ');
+        const selected = quizAnswers.join(' · ');
         content.innerHTML = `
             <div class="text-center mb-4">
                 <h2 class="h4 fw-bold">Resultados del quiz</h2>
                 <p class="text-muted">Gracias por responder. Tu perfil de bienestar queda asociado con:</p>
             </div>
             <div class="result-panel p-4 rounded-4 bg-surface border border-secondary-subtle mb-4">
-                <h3 class="h5 fw-semibold mb-3">Tu recomendaciÃ³n personalizada</h3>
-                <p class="mb-0">Basado en tus respuestas, los productos formulados para <strong>claridad mental suave</strong> y <strong>apoyo de energÃ­as sostenidas</strong> son los mÃ¡s adecuados para ti.</p>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <i class="bi bi-stars fs-3 text-primary"></i>
+                    <h3 class="h5 fw-semibold mb-0">Tu recomendación personalizada</h3>
+                </div>
+                <p class="mb-0">Basado en tus respuestas, los productos formulados para <strong>claridad mental suave</strong> y <strong>apoyo de energías sostenidas</strong> son los más adecuados para ti.</p>
             </div>
             <div class="d-grid gap-3">
                 <div class="card p-4 rounded-4 shadow-sm">

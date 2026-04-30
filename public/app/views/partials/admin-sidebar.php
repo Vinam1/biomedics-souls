@@ -1,9 +1,7 @@
 <?php
-// Helper: returns 'active-admin' when the current URI exactly contains the given segment
 function sidebarActive(string $segment): string
 {
     $uri = $_SERVER['REQUEST_URI'] ?? '';
-    // Use word-boundary matching so '/admin/pedidos' doesn't match '/admin/pedido-detalle'
     return preg_match('#' . preg_quote($segment, '#') . '(/|$|\?)#', $uri) ? 'active-admin' : '';
 }
 ?>
@@ -31,7 +29,7 @@ function sidebarActive(string $segment): string
 
         <a href="<?= site_url('admin/categorias'); ?>"
            class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/categorias'); ?>">
-            <i class="fas fa-folder me-2"></i> CategorÃ­as
+            <i class="fas fa-folder me-2"></i> Categorías
         </a>
 
         <a href="<?= site_url('admin/atributos/etiquetas'); ?>"
@@ -39,8 +37,6 @@ function sidebarActive(string $segment): string
             <i class="fas fa-tags me-2"></i> Etiquetas
         </a>
 
-        <!-- BUG FIX: was using strpos which matched '/admin/pedido-detalle' too.
-             Now uses the sidebarActive helper with exact-boundary regex. -->
         <a href="<?= site_url('admin/pedidos'); ?>"
            class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/pedidos'); ?>">
             <i class="fas fa-shopping-cart me-2"></i> Pedidos
@@ -49,6 +45,6 @@ function sidebarActive(string $segment): string
 
     <div class="mt-5 text-white-50 small">
         <p class="mb-1">Med-Tech Premium</p>
-        <p class="mb-0">DiseÃ±o enfocado en confianza, ciencia y bienestar.</p>
+        <p class="mb-0">Diseño enfocado en confianza, ciencia y bienestar.</p>
     </div>
 </aside>

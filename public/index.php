@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/app/config/config.php';
 bootstrap_security();
-session_start();
 send_security_headers();
 
 require_once APPROOT . '/core/Database.php';
