@@ -1,21 +1,22 @@
 <?php
 $title              = 'Catálogo de Suplementos | Biomedics Souls - Sensea';
+$filters            = $filters ?? [];
+$searchValue        = (string) ($filters['query'] ?? '');
 $selectedCategoryId = (int) ($filters['categoria_id'] ?? ($currentCategory['id'] ?? 0));
-$selectedSort       = match ($filters['sort'] ?? 'updated_at_desc') {
+
+// Compatibilidad PHP 7.4 - Reemplazo de 'match'
+$sortInput = (string) ($filters['sort'] ?? 'updated_at_desc');
+
+$sortMap = [
     'precio_asc'      => 'price_asc',
     'precio_desc'     => 'price_desc',
     'nombre_asc'      => 'name_asc',
     'nombre_desc'     => 'name_desc',
-    default           => 'recent',
-};
-$searchValue = (string) ($filters['query'] ?? '');
+    'updated_at_desc' => 'recent',
+];
 
-/*
- * Construimos la URL base para el fetch AJAX.
- * site_url('catalogo') puede devolver algo como:
- *   /public/index.php?url=catalogo
- * Necesitamos esa URL completa para que el JS la use directamente.
- */
+$selectedSort = isset($sortMap[$sortInput]) ? $sortMap[$sortInput] : 'recent';
+
 $ajaxEndpoint = site_url('catalogo');
 ?>
 
@@ -73,8 +74,7 @@ $ajaxEndpoint = site_url('catalogo');
     </div>
 
     <!-- Resultados -->
-    <div id="catalogResults"
-         data-endpoint="<?= htmlspecialchars($ajaxEndpoint); ?>">
+    <div id="catalogResults" data-endpoint="<?= htmlspecialchars($ajaxEndpoint); ?>">
         <?php require APPROOT . '/views/pages/partials/catalog-product-grid.php'; ?>
     </div>
 </div>
@@ -89,119 +89,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!results) return;
 
-    /*
-     * endpoint viene de PHP, por ejemplo:
-     *   /public/index.php?url=catalogo
-     * Lo convertimos a URL absoluta para poder añadir searchParams sin
-     * romper el parámetro "url" que ya trae.
-     */
     const rawEndpoint = results.dataset.endpoint;
     const endpointUrl = new URL(rawEndpoint, window.location.origin);
 
-    let activeRequest = null;
     let debounceTimer = null;
 
-    function setLoadingState(isLoading) {
-        results.classList.toggle('catalog-loading', isLoading);
-    }
-
     function buildFetchUrl() {
-        /*
-         * Clonamos la URL base para no mutar el objeto original en cada
-         * llamada. Así el parámetro "url=catalogo" siempre está presente.
-         */
         const url = new URL(endpointUrl.toString());
-
-        // Señal que indica al controlador que debe devolver JSON
         url.searchParams.set('ajax', '1');
 
         const query    = searchInput.value.trim();
         const category = categoryFilter.value;
         const sort     = sortFilter.value;
 
-        if (query)    url.searchParams.set('q',        query);
-        else          url.searchParams.delete('q');
-
+        if (query)    url.searchParams.set('q', query);
         if (category) url.searchParams.set('categoria', category);
-        else          url.searchParams.delete('categoria');
-
         if (sort && sort !== 'recent') url.searchParams.set('sort', sort);
-        else                           url.searchParams.delete('sort');
 
         return url.toString();
     }
 
-    function syncBrowserUrl() {
-        const url = new URL(window.location.href);
-
-        // Limpiamos los params de filtro anteriores
-        ['q', 'categoria', 'sort'].forEach(k => url.searchParams.delete(k));
-
-        const query    = searchInput.value.trim();
-        const category = categoryFilter.value;
-        const sort     = sortFilter.value;
-
-        if (query)              url.searchParams.set('q',        query);
-        if (category)           url.searchParams.set('categoria', category);
-        if (sort && sort !== 'recent') url.searchParams.set('sort', sort);
-
-        window.history.replaceState({}, '', url.toString());
-    }
-
     async function fetchCatalog() {
-        if (activeRequest) {
-            activeRequest.abort();
-        }
-
-        activeRequest = new AbortController();
-        setLoadingState(true);
-
         const fetchUrl = buildFetchUrl();
-
         try {
             const response = await fetch(fetchUrl, {
-                headers: { 'Accept': 'application/json' },
-                signal: activeRequest.signal,
+                headers: { 'Accept': 'application/json' }
             });
 
-            if (!response.ok) {
-                throw new Error('HTTP ' + response.status);
-            }
-
-            // Verificar que sea JSON antes de parsear
-            const contentType = response.headers.get('Content-Type') || '';
-            if (!contentType.includes('application/json')) {
-                const raw = await response.text();
-                console.error('[Catálogo AJAX] Respuesta no-JSON:', raw.substring(0, 600));
-                throw new Error('El servidor no devolvió JSON.');
-            }
+            if (!response.ok) throw new Error('HTTP ' + response.status);
 
             const payload = await response.json();
             results.innerHTML = payload.html ?? '';
-            syncBrowserUrl();
-
         } catch (err) {
-            if (err.name !== 'AbortError') {
-                console.error('[Catálogo AJAX] Error:', err);
-                results.innerHTML =
-                    '<p class="text-center text-danger py-5 mb-0">' +
-                    'No se pudieron cargar los productos. Intenta nuevamente.' +
-                    '</p>';
-            }
-        } finally {
-            setLoadingState(false);
+            console.error('Error cargando catálogo:', err);
+            results.innerHTML = '<p class="text-center text-danger py-5 mb-0">No se pudieron cargar los productos. Intenta nuevamente.</p>';
         }
     }
 
-    function queueFetch(delay = 0) {
-        window.clearTimeout(debounceTimer);
-        debounceTimer = window.setTimeout(fetchCatalog, delay);
+    function queueFetch() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(fetchCatalog, 300);
     }
 
-    // Eventos de filtros
-    searchInput.addEventListener('input',  () => queueFetch(280));
-    categoryFilter.addEventListener('change', () => queueFetch());
-    sortFilter.addEventListener('change',     () => queueFetch());
+    // Eventos
+    searchInput.addEventListener('input', queueFetch);
+    categoryFilter.addEventListener('change', queueFetch);
+    sortFilter.addEventListener('change', queueFetch);
 
     clearBtn.addEventListener('click', function () {
         searchInput.value    = '';

@@ -11,7 +11,8 @@ class PageController extends Controller
     }
 
     public function catalog(): void
-    {
+{
+    try {
         $categories = Categoria::all();
         $filters    = $this->catalogFilters();
         $products   = Producto::search($filters);
@@ -33,7 +34,18 @@ class PageController extends Controller
             'currentCategory' => null,
             'filters'         => $filters,
         ]);
+
+    } catch (Throwable $e) {
+        // Mostramos el error real en pantalla (solo para depuración)
+        echo "<h2>Error en catálogo</h2>";
+        echo "<strong>Mensaje:</strong> " . htmlspecialchars($e->getMessage()) . "<br><br>";
+        echo "<strong>Archivo:</strong> " . htmlspecialchars($e->getFile()) . " (línea " . $e->getLine() . ")<br><br>";
+        echo "<strong>Trace:</strong><pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+        
+        error_log("ERROR EN CATALOGO: " . $e->getMessage() . " | " . $e->getFile() . ":" . $e->getLine());
+        exit;
     }
+}
 
     public function category(string $slug): void
     {
@@ -41,9 +53,7 @@ class PageController extends Controller
 
         if (!$category) {
             http_response_code(404);
-            $this->view('errors/404', [
-                'title' => 'Categoría no encontrada',
-            ]);
+            $this->view('errors/404', ['title' => 'Categoría no encontrada']);
             return;
         }
 
@@ -56,9 +66,9 @@ class PageController extends Controller
             'categories'      => $categories,
             'currentCategory' => $category,
             'filters'         => [
-                'query'       => '',
-                'categoria_id'=> (int) ($category['id'] ?? 0),
-                'sort'        => 'updated_at_desc',
+                'query'        => '',
+                'categoria_id' => (int) ($category['id'] ?? 0),
+                'sort'         => 'updated_at_desc',
             ],
         ]);
     }
@@ -95,7 +105,7 @@ class PageController extends Controller
     public function quiz(): void
     {
         $this->view('pages/quiz', [
-            'title' => 'Descubre tu Fórmula | Biomedics Souls',
+            'title' => 'Descubre tu Fórmula | Biomedcs Souls',
         ]);
     }
 
@@ -108,48 +118,24 @@ class PageController extends Controller
             exit;
         }
 
-        $allowedTabs = ['dashboard', 'pedidos', 'pagos', 'direcciones', 'config'];
-        $tab         = $_GET['tab'] ?? 'dashboard';
-        if (!in_array($tab, $allowedTabs, true)) {
-            $tab = 'dashboard';
-        }
-
-        $orders        = Pedido::findByClienteId((int) $user['id']);
-        $reviews       = method_exists('Resena', 'findByUser') ? Resena::findByUser((int) $user['id']) : [];
-        $addresses     = Direccion::allByClienteId((int) $user['id']);
-        $paymentMethods= MetodoPago::allByClienteId((int) $user['id']);
-
-        $editingAddress = null;
-        if (isset($_GET['edit_address'])) {
-            $editingAddress = Direccion::findByIdForCliente((int) $_GET['edit_address'], (int) $user['id']);
-        }
-
-        $editingPaymentMethod = null;
-        if (isset($_GET['edit_payment'])) {
-            $editingPaymentMethod = MetodoPago::findByIdForCliente((int) $_GET['edit_payment'], (int) $user['id']);
-        }
-
-        $flash = $_SESSION['account_flash'] ?? null;
-        unset($_SESSION['account_flash']);
+        $tab = $_GET['tab'] ?? 'dashboard';
 
         $this->view('user/cuenta', [
-            'title'                => 'Mi Cuenta | Biomedics Souls',
-            'user'                 => $user,
-            'tab'                  => $tab,
-            'orders'               => $orders,
-            'addresses'            => $addresses,
-            'paymentMethods'       => $paymentMethods,
-            'reviews'              => $reviews,
-            'flash'                => $flash,
-            'editingAddress'       => $editingAddress,
-            'editingPaymentMethod' => $editingPaymentMethod,
+            'title'  => 'Mi Cuenta | Biomedics Souls',
+            'user'   => $user,
+            'tab'    => $tab,
+            'orders' => Pedido::findByClienteId((int) $user['id']),
         ]);
     }
 
-    // ─── Helpers privados ────────────────────────────────────────────────────
+    // ====================== HELPERS ======================
 
     private function catalogFilters(): array
     {
+        $query      = trim((string) ($_GET['q'] ?? ''));
+        $categoryId = (int) ($_GET['categoria'] ?? 0);
+        $sortInput  = (string) ($_GET['sort'] ?? 'recent');
+
         $sortMap = [
             'recent'     => 'updated_at_desc',
             'price_asc'  => 'precio_asc',
@@ -158,37 +144,29 @@ class PageController extends Controller
             'name_desc'  => 'nombre_desc',
         ];
 
-        $query      = trim((string) ($_GET['q']       ?? ''));
-        $categoryId = (int)         ($_GET['categoria'] ?? 0);
-        $sortKey    = (string)      ($_GET['sort']     ?? 'recent');
-
         return [
             'query'        => $query,
             'categoria_id' => $categoryId > 0 ? $categoryId : null,
-            'sort'         => $sortMap[$sortKey] ?? 'updated_at_desc',
+            'sort'         => $sortMap[$sortInput] ?? 'updated_at_desc',
         ];
     }
 
     private function wantsJson(): bool
-    {
-        // El parámetro ?ajax=1 es la señal principal usada por el JS del catálogo
-        if (($_GET['ajax'] ?? '') === '1') {
-            return true;
-        }
-
-        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
-        return is_string($accept) && str_contains($accept, 'application/json');
+{
+    if (($_GET['ajax'] ?? '') === '1') {
+        return true;
     }
 
-    /**
-     * Renderiza el partial del grid de productos en un buffer de salida.
-     * Se pasa $products explícitamente para que la variable esté disponible
-     * dentro del partial (require no hereda el scope del método llamante).
-     */
+    $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+    
+    // Versión compatible con PHP 7.4 y anteriores
+    return is_string($accept) && strpos($accept, 'application/json') !== false;
+}
+
     private function renderCatalogGridHtml(array $products): string
     {
         ob_start();
         require APPROOT . '/views/pages/partials/catalog-product-grid.php';
-        return (string) ob_get_clean();
+        return ob_get_clean();
     }
 }
