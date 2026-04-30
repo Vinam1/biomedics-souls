@@ -52,9 +52,9 @@ function bootstrap_security(): void
 
     session_set_cookie_params([
         'lifetime' => 0,
-        'path' => '/',
-        'domain' => '',
-        'secure' => $isHttps,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $isHttps,
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -73,7 +73,8 @@ function send_security_headers(): void
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
     }
 
-    // Permite las fuentes remotas usadas por Google Fonts, Bootstrap Icons y Font Awesome
+    // connect-src incluye jsdelivr.net para evitar los warnings de CSP
+    // con los sourcemaps de Bootstrap (.map) en desarrollo.
     header(
         "Content-Security-Policy: "
         . "default-src 'self'; "
@@ -81,7 +82,7 @@ function send_security_headers(): void
         . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
         . "font-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
         . "img-src 'self' data: https:; "
-        . "connect-src 'self';"
+        . "connect-src 'self' https://cdn.jsdelivr.net;"
     );
 }
 

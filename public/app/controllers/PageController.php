@@ -13,25 +13,25 @@ class PageController extends Controller
     public function catalog(): void
     {
         $categories = Categoria::all();
-        $filters = $this->catalogFilters();
-        $products = Producto::search($filters);
+        $filters    = $this->catalogFilters();
+        $products   = Producto::search($filters);
 
         if ($this->wantsJson()) {
             $html = $this->renderCatalogGridHtml($products);
             header('Content-Type: application/json; charset=UTF-8');
             echo json_encode([
-                'html' => $html,
+                'html'  => $html,
                 'count' => count($products),
             ]);
             exit;
         }
 
         $this->view('pages/catalogo', [
-            'title' => 'Catálogo de Suplementos | Sensea',
-            'products' => $products,
-            'categories' => $categories,
+            'title'           => 'Catálogo de Suplementos | Sensea',
+            'products'        => $products,
+            'categories'      => $categories,
             'currentCategory' => null,
-            'filters' => $filters,
+            'filters'         => $filters,
         ]);
     }
 
@@ -47,18 +47,18 @@ class PageController extends Controller
             return;
         }
 
-        $products = Producto::findByCategorySlug($slug);
+        $products   = Producto::findByCategorySlug($slug);
         $categories = Categoria::all();
 
         $this->view('pages/catalogo', [
-            'title' => 'Categoría: ' . htmlspecialchars($category['nombre']),
-            'products' => $products,
-            'categories' => $categories,
+            'title'           => 'Categoría: ' . htmlspecialchars($category['nombre']),
+            'products'        => $products,
+            'categories'      => $categories,
             'currentCategory' => $category,
-            'filters' => [
-                'query' => '',
-                'categoria_id' => (int) ($category['id'] ?? 0),
-                'sort' => 'updated_at_desc',
+            'filters'         => [
+                'query'       => '',
+                'categoria_id'=> (int) ($category['id'] ?? 0),
+                'sort'        => 'updated_at_desc',
             ],
         ]);
     }
@@ -87,7 +87,7 @@ class PageController extends Controller
         }
 
         $this->view('pages/contacto', [
-            'title' => 'Contáctanos | Biomedics Souls',
+            'title'   => 'Contáctanos | Biomedics Souls',
             'success' => $success,
         ]);
     }
@@ -109,15 +109,15 @@ class PageController extends Controller
         }
 
         $allowedTabs = ['dashboard', 'pedidos', 'pagos', 'direcciones', 'config'];
-        $tab = $_GET['tab'] ?? 'dashboard';
+        $tab         = $_GET['tab'] ?? 'dashboard';
         if (!in_array($tab, $allowedTabs, true)) {
             $tab = 'dashboard';
         }
 
-        $orders = Pedido::findByClienteId((int) $user['id']);
-        $reviews = method_exists('Resena', 'findByUser') ? Resena::findByUser((int) $user['id']) : [];
-        $addresses = Direccion::allByClienteId((int) $user['id']);
-        $paymentMethods = MetodoPago::allByClienteId((int) $user['id']);
+        $orders        = Pedido::findByClienteId((int) $user['id']);
+        $reviews       = method_exists('Resena', 'findByUser') ? Resena::findByUser((int) $user['id']) : [];
+        $addresses     = Direccion::allByClienteId((int) $user['id']);
+        $paymentMethods= MetodoPago::allByClienteId((int) $user['id']);
 
         $editingAddress = null;
         if (isset($_GET['edit_address'])) {
@@ -133,42 +133,45 @@ class PageController extends Controller
         unset($_SESSION['account_flash']);
 
         $this->view('user/cuenta', [
-            'title' => 'Mi Cuenta | Biomedics Souls',
-            'user' => $user,
-            'tab' => $tab,
-            'orders' => $orders,
-            'addresses' => $addresses,
-            'paymentMethods' => $paymentMethods,
-            'reviews' => $reviews,
-            'flash' => $flash,
-            'editingAddress' => $editingAddress,
+            'title'                => 'Mi Cuenta | Biomedics Souls',
+            'user'                 => $user,
+            'tab'                  => $tab,
+            'orders'               => $orders,
+            'addresses'            => $addresses,
+            'paymentMethods'       => $paymentMethods,
+            'reviews'              => $reviews,
+            'flash'                => $flash,
+            'editingAddress'       => $editingAddress,
             'editingPaymentMethod' => $editingPaymentMethod,
         ]);
     }
 
+    // ─── Helpers privados ────────────────────────────────────────────────────
+
     private function catalogFilters(): array
     {
         $sortMap = [
-            'recent' => 'updated_at_desc',
-            'price_asc' => 'precio_asc',
+            'recent'     => 'updated_at_desc',
+            'price_asc'  => 'precio_asc',
             'price_desc' => 'precio_desc',
-            'name_asc' => 'nombre_asc',
-            'name_desc' => 'nombre_desc',
+            'name_asc'   => 'nombre_asc',
+            'name_desc'  => 'nombre_desc',
         ];
 
-        $query = trim((string) ($_GET['q'] ?? ''));
-        $categoryId = (int) ($_GET['categoria'] ?? 0);
-        $sortKey = (string) ($_GET['sort'] ?? 'recent');
+        $query      = trim((string) ($_GET['q']       ?? ''));
+        $categoryId = (int)         ($_GET['categoria'] ?? 0);
+        $sortKey    = (string)      ($_GET['sort']     ?? 'recent');
 
         return [
-            'query' => $query,
+            'query'        => $query,
             'categoria_id' => $categoryId > 0 ? $categoryId : null,
-            'sort' => $sortMap[$sortKey] ?? 'updated_at_desc',
+            'sort'         => $sortMap[$sortKey] ?? 'updated_at_desc',
         ];
     }
 
     private function wantsJson(): bool
     {
+        // El parámetro ?ajax=1 es la señal principal usada por el JS del catálogo
         if (($_GET['ajax'] ?? '') === '1') {
             return true;
         }
@@ -177,6 +180,11 @@ class PageController extends Controller
         return is_string($accept) && str_contains($accept, 'application/json');
     }
 
+    /**
+     * Renderiza el partial del grid de productos en un buffer de salida.
+     * Se pasa $products explícitamente para que la variable esté disponible
+     * dentro del partial (require no hereda el scope del método llamante).
+     */
     private function renderCatalogGridHtml(array $products): string
     {
         ob_start();
