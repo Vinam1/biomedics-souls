@@ -2,9 +2,14 @@
 
 class PaymentGatewayService
 {
-    public static function process(array $paymentMethod, float $amount, string $orderNumber): array
+    public static function process(array $paymentMethod, float $amount, string $orderNumber, array $extra = []): array
     {
         $type = $paymentMethod['tipo'] ?? 'otro';
+
+        if ($type === 'mercado_pago' || ($type === 'tarjeta' && !empty($extra['card_token']))) {
+            return MercadoPagoService::processPayment($paymentMethod, $amount, $orderNumber, $extra);
+        }
+
         $gateway = self::resolveGateway($type);
         $reference = strtoupper($gateway) . '-' . date('YmdHis') . '-' . strtoupper(bin2hex(random_bytes(3)));
 

@@ -1,58 +1,86 @@
 # Biomedics Souls - Aplicación MVC en PHP
 
-Este proyecto es un sitio web básico construido con PHP, Bootstrap, JavaScript y una base de datos MySQL.
-La arquitectura está organizada en MVC (Modelos, Vistas y Controladores).
+Proyecto de tienda en línea construido con PHP, MySQL, Bootstrap y JavaScript usando una arquitectura MVC simple.
 
-## Cómo usarlo en XAMPP
+## Características principales
 
-1. Copia la carpeta `biomedics-souls` dentro de `C:\xampp\htdocs`.
-2. Importa el archivo `biomedics_souls.sql` en `phpMyAdmin` o desde la línea de comandos:
-   - `http://localhost/phpmyadmin`
-   - Importa el archivo y crea la base de datos `biomedics_souls`
-3. Abre el proyecto en el navegador:
-   - `http://localhost/biomedics-souls/public/`
+- Carrito de compras con resumen de pedido
+- Checkout con pago por Mercado Pago para tarjetas Visa/Mastercard
+- Tokenización de tarjeta en el cliente usando el SDK de Mercado Pago
+- Almacenamiento de resultados de pago y transacciones en la base de datos
+- Reseñas y valoraciones de productos en la página de detalle
+- Panel de administración para productos, pedidos y clientes
+- Gestión de direcciones y métodos de pago por usuario
 
-## Estructura de carpetas
+## Configuración
 
-- `public/` - Front controller, activos públicos y ruta base.
-- `app/core/` - Clases del núcleo: `App`, `Controller`, `Database`.
-- `app/controllers/` - Controladores que reciben las rutas.
-- `app/models/` - Modelos de datos para la base de datos.
-- `app/views/` - Vistas para mostrar la información.
-- `app/config/` - Configuración de base de datos y rutas.
+1. Copia la carpeta `biomedics-souls` a `C:\xampp\htdocs`.
+2. Importa `biomedics_souls.sql` en `phpMyAdmin` o desde la línea de comandos para crear la base de datos.
+3. Asegúrate de que la carpeta `public/` esté disponible en tu servidor local.
+4. Coloca las credenciales y claves en un archivo `.env` en la raíz del proyecto o ajusta `public/app/config/config.php`.
 
-## Rutas disponibles
+Variables clave compatibles:
 
-- `/` o `/home` - Página de inicio con hero y productos destacados.
-- `/catalogo` - Listado de productos en tarjetas.
-- `/producto/{slug}` o `/product/{slug}` - Página de detalle del producto.
-- `/carrito` - Tabla del carrito.
-- `/checkout` - Resumen de pedido con botón de Mercado Pago.
-- `/cuenta` - Dashboard de usuario con perfil y pedidos recientes.
-- `/ciencia` - Página de ciencia e investigación.
-- `/faq` - Preguntas frecuentes con acordeones.
-- `/contacto` - Formulario de contacto y tarjetas de soporte.
-- `/quiz` - Quiz interactivo con una pregunta por pantalla.
-- `/auth/login` - Inicio de sesión.
-- `/auth/register` - Registro de usuarios.
-- `/pedido/exito` - Página de pedido exitoso.
-- `/pedido/fallo` - Página de pago fallido.
-- `/admin/dashboard` - Panel de administración (acceso solo para admin).
-- `/admin/productos` - Gestión de productos.
-- `/admin/producto-form` - Crear nuevo producto.
-- `/admin/producto-form/{id}` - Editar producto existente.
-- `/admin/pedidos` - Ver pedidos.
-- `/admin/pedido-detalle/{id}` - Detalle de pedido.
-- Cualquier ruta no válida mostrará el error 404.
+- `DB_HOST`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
+- `MP_ACCESS_TOKEN`
+- `MP_PUBLIC_KEY`
+- `MP_BASE_URL` (opcional, por defecto `https://api.mercadopago.com`)
 
-## Ajustes importantes
+## Dependencias
 
-- Si tu aplicación está en otra carpeta o usas un host virtual, actualiza `RewriteBase` en `public/.htaccess`.
-- Verifica que los datos existan en la base de datos. Si no hay productos o categorías, la página mostrará un mensaje informativo.
+- PHP 8+ con `curl` habilitado
+- MySQL
+- XAMPP o servidor local equivalente
+
+## Uso en XAMPP
+
+1. Abre `http://localhost/phpmyadmin`.
+2. Importa `biomedics_souls.sql`.
+3. Navega a `http://localhost/biomedics-souls/public/`.
+
+## Estructura del proyecto
+
+- `public/` - Punto de entrada, activos públicos y archivos públicos.
+- `public/app/config/` - Configuración general y seguridad.
+- `public/app/core/` - Núcleo MVC: `App`, `Controller`, `Database`.
+- `public/app/controllers/` - Controladores del sitio.
+- `public/app/models/` - Modelos para la base de datos.
+- `public/app/services/` - Servicios reutilizables, incluida la integración con Mercado Pago.
+- `public/app/views/` - Plantillas de presentación.
+
+## Rutas principales
+
+- `/` o `/home` - Página principal.
+- `/catalogo` - Catálogo de productos.
+- `/producto/{slug}` - Detalle de producto y reseñas.
+- `/carrito` - Vista del carrito.
+- `/checkout` - Checkout y pago con Mercado Pago.
+- `/auth/login` - Iniciar sesión.
+- `/auth/register` - Registro de usuario.
+- `/pedido/exito` - Confirmación de pedido.
+- `/pedido/fallo` - Pago fallido.
+- `/cuenta` - Panel de usuario.
+- `/admin/dashboard` - Panel de administración.
+
+## Notas de implementación
+
+- El checkout carga el SDK de Mercado Pago desde `https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js`.
+- El backend procesa pagos con `public/app/services/MercadoPagoService.php`.
+- Los métodos de pago guardados pueden reutilizarse, y el flujo de tarjeta nueva usa tokenización segura.
+- Las reseñas de producto se muestran en cada página de producto y se almacenan con validación de texto.
+
+## Consideraciones
+
+- Si usas un host virtual, ajusta la ruta base en `public/.htaccess`.
+- Revisa que la clave pública de Mercado Pago (`MP_PUBLIC_KEY`) esté disponible para tokenizar la tarjeta en cliente.
+- Verifica que la clave de acceso (`MP_ACCESS_TOKEN`) funcione para el ambiente elegido.
 
 ## Próximos pasos
 
-- Agregar formulario de búsqueda
-- Añadir carrito y control de stock por etiquetas
-- Implementar administración de productos y etiquetas
-- Crear autenticación de usuarios
+- Extender administración de pagos y tarjetas guardadas.
+- Agregar soporte de cupones y descuentos.
+- Mejorar validación y mensajes de error en checkout.
+- Añadir pruebas unitarias y de integración.

@@ -26,10 +26,22 @@ class OrderController extends Controller
 
         $address = Direccion::findByIdForCliente($addressId, (int) $user['id']);
         $paymentMethod = MetodoPago::findByIdForCliente($paymentId, (int) $user['id']);
+        $checkout = $_SESSION['checkout'] ?? [];
 
         if (!$address) {
             header('Location: ' . site_url('checkout?step=1'));
             exit;
+        }
+
+        if (!$paymentMethod && !empty($checkout['payment_type']) && $checkout['payment_type'] === 'tarjeta') {
+            $paymentMethod = [
+                'id' => 0,
+                'tipo' => 'tarjeta',
+                'brand' => null,
+                'ultimo_cuatro' => null,
+                'tipo_tarjeta' => null,
+                'nickname' => 'Tarjeta de Crédito/Débito',
+            ];
         }
 
         if (!$paymentMethod) {
@@ -37,8 +49,19 @@ class OrderController extends Controller
             exit;
         }
 
+        $extra = [
+            'user' => $user,
+            'card_token' => trim($_POST['card_token'] ?? ''),
+            'card_brand' => trim($_POST['card_brand'] ?? ''),
+            'payment_method_id' => trim($_POST['payment_method_id'] ?? ''),
+            'cardholder_name' => trim($_POST['cardholder_name'] ?? ''),
+            'cardholder_email' => trim($_POST['cardholder_email'] ?? $user['email'] ?? ''),
+            'doc_type' => trim($_POST['doc_type'] ?? ''),
+            'doc_number' => trim($_POST['doc_number'] ?? ''),
+        ];
+
         $draftOrderNumber = Pedido::generateOrderNumber();
-        $paymentResult = PaymentGatewayService::process($paymentMethod, Cart::getTotal(), $draftOrderNumber);
+        $paymentResult = PaymentGatewayService::process($paymentMethod, Cart::getTotal(), $draftOrderNumber, $extra);
         $paymentResult['order_number'] = $draftOrderNumber;
 
         try {

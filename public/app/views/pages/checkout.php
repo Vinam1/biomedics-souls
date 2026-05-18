@@ -91,6 +91,16 @@ $step = $step ?? 1;
                                                     </div>
                                                 </label>
                                             <?php endforeach; ?>
+                                            <label class="checkout-choice <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === 0 ? 'is-active' : ''; ?>" data-animate="fade-up" data-animate-delay="<?= count($paymentMethods) * 70; ?>">
+                                                <input type="radio" name="payment_id" value="new_card" class="form-check-input mt-1" <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === 0 ? 'checked' : ''; ?>>
+                                                <div>
+                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                        <strong>Tarjeta de Crédito/Débito</strong>
+                                                        <span class="badge bg-success">Mercado Pago</span>
+                                                    </div>
+                                                    <div class="text-muted small">Visa y Mastercard, tokenizado con Mercado Pago.</div>
+                                                </div>
+                                            </label>
                                         </div>
                                         <div class="mt-4 d-flex gap-3 flex-wrap">
                                             <a href="<?= site_url('checkout?step=1'); ?>" class="btn btn-outline-secondary">Volver</a>
@@ -146,9 +156,58 @@ $step = $step ?? 1;
 
                                 <div class="mt-5 d-flex gap-3 flex-wrap">
                                     <a href="<?= site_url('checkout?step=2'); ?>" class="btn btn-outline-secondary">Volver</a>
-                                    <form method="post" action="<?= site_url('pedido/confirmar'); ?>" class="flex-grow-1">
+                                    <form id="order-confirm-form" method="post" action="<?= site_url('pedido/confirmar'); ?>" class="flex-grow-1">
                                         <?= csrf_input(); ?>
-                                        <button type="submit" class="btn btn-success btn-lg w-100 py-3">Confirmar y pagar</button>
+
+                                        <?php if (!empty($selectedPaymentMethod) && isset($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === 0 && $selectedPaymentMethod['tipo'] === 'tarjeta'): ?>
+                                            <input type="hidden" name="card_token" id="card_token" value="">
+                                            <input type="hidden" name="card_brand" id="card_brand" value="">
+                                            <input type="hidden" name="payment_method_id" id="payment_method_id" value="">
+
+                                            <div class="section-card p-4 mb-4 border rounded-4">
+                                                <h5 class="mb-3">Datos de la tarjeta</h5>
+                                                <p class="text-muted small mb-4">Las tarjetas Visa y Mastercard se procesarán con Mercado Pago.</p>
+                                                <div class="row g-3">
+                                                    <div class="col-12">
+                                                        <label for="cardholderName" class="form-label small fw-bold">Nombre del titular</label>
+                                                        <input type="text" id="cardholderName" name="cardholder_name" class="form-control rounded-4" required maxlength="80" placeholder="Nombre tal como aparece en la tarjeta">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="cardNumber" class="form-label small fw-bold">Número de tarjeta</label>
+                                                        <input type="text" id="cardNumber" name="card_number" data-checkout="cardNumber" class="form-control rounded-4" required maxlength="19" placeholder="0000 0000 0000 0000">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label for="cardExpirationMonth" class="form-label small fw-bold">Mes</label>
+                                                        <input type="text" id="cardExpirationMonth" name="card_expiration_month" data-checkout="cardExpirationMonth" class="form-control rounded-4" required maxlength="2" placeholder="MM">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label for="cardExpirationYear" class="form-label small fw-bold">Año</label>
+                                                        <input type="text" id="cardExpirationYear" name="card_expiration_year" data-checkout="cardExpirationYear" class="form-control rounded-4" required maxlength="2" placeholder="AA">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="securityCode" class="form-label small fw-bold">CVC</label>
+                                                        <input type="text" id="securityCode" name="security_code" data-checkout="securityCode" class="form-control rounded-4" required maxlength="4" placeholder="CVC">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="cardholderEmail" class="form-label small fw-bold">Correo del titular</label>
+                                                        <input type="email" id="cardholderEmail" name="cardholder_email" data-checkout="cardholderEmail" class="form-control rounded-4" required value="<?= htmlspecialchars($user['email'] ?? ''); ?>" placeholder="correo@dominio.com">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="docType" class="form-label small fw-bold">Tipo de documento</label>
+                                                        <input type="text" id="docType" name="doc_type" data-checkout="docType" class="form-control rounded-4" value="DNI" readonly>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="docNumber" class="form-label small fw-bold">Documento</label>
+                                                        <input type="text" id="docNumber" name="doc_number" data-checkout="docNumber" class="form-control rounded-4" required value="<?= htmlspecialchars(preg_replace('/\D+/', '', $user['telefono'] ?? '')); ?>" placeholder="Número de documento">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div id="mp-card-error" class="alert alert-danger d-none"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <button type="submit" id="checkout-submit" class="btn btn-success btn-lg w-100 py-3">Confirmar y pagar</button>
                                     </form>
                                 </div>
                             </div>
@@ -173,3 +232,59 @@ $step = $step ?? 1;
         </div>
     </div>
 </section>
+
+<?php if (!empty($mpPublicKey)): ?>
+<script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Mercadopago === 'undefined') {
+            return;
+        }
+
+        Mercadopago.setPublishableKey('<?= htmlspecialchars($mpPublicKey); ?>');
+
+        const form = document.getElementById('order-confirm-form');
+        const submitButton = document.getElementById('checkout-submit');
+        const cardTokenInput = document.getElementById('card_token');
+        const cardBrandInput = document.getElementById('card_brand');
+        const paymentMethodIdInput = document.getElementById('payment_method_id');
+        const cardError = document.getElementById('mp-card-error');
+
+        if (!form || !submitButton || !cardTokenInput) {
+            return;
+        }
+
+        form.addEventListener('submit', function (event) {
+            const shouldTokenize = !!document.querySelector('[name="card_number"]');
+            if (!shouldTokenize) {
+                return;
+            }
+
+            if (cardTokenInput.value.trim() !== '') {
+                return;
+            }
+
+            event.preventDefault();
+            cardError.classList.add('d-none');
+            cardError.textContent = '';
+
+            Mercadopago.createToken(form, function (status, response) {
+                if (status === 200 || status === 201) {
+                    cardTokenInput.value = response.id || '';
+                    cardBrandInput.value = (response.card && response.card.brand) ? response.card.brand : '';
+                    paymentMethodIdInput.value = response.payment_method_id || '';
+                    form.submit();
+                    return;
+                }
+
+                let message = 'Error al generar el token de pago. Revisa los datos de tu tarjeta e inténtalo de nuevo.';
+                if (response && response.cause && response.cause.length > 0) {
+                    message = response.cause.map(function (error) { return error.description; }).join(', ');
+                }
+                cardError.textContent = message;
+                cardError.classList.remove('d-none');
+            });
+        });
+    });
+</script>
+<?php endif; ?>

@@ -16,7 +16,9 @@ define('DB_USER', getenv('DB_USER') ?: 'amiptcnl_biomedics');
 define('DB_PASS', getenv('DB_PASS') ?: 'biomedics123456');
 define('GEMINI_API_KEY', 'AIzaSyBnLbOy56mgIpjnF9-CgUOUbtpwanfQJrQ');
 define('GEMINI_MODEL', 'gemini-2.5-flash');
-
+define('MP_ACCESS_TOKEN', getenv('MP_ACCESS_TOKEN') ?: '');
+define('MP_PUBLIC_KEY', getenv('MP_PUBLIC_KEY') ?: '');
+define('MP_BASE_URL', getenv('MP_BASE_URL') ?: 'https://api.mercadopago.com');
 // ==================== CONSTANTES DE LA APLICACION ====================
 define('APPROOT', dirname(__DIR__));
 define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024);
@@ -80,11 +82,11 @@ function send_security_headers(): void
     header(
         "Content-Security-Policy: "
         . "default-src 'self'; "
-        . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://secure.mlstatic.com; "
         . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
         . "font-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
         . "img-src 'self' data: blob: https:; "
-        . "connect-src 'self' https://cdn.jsdelivr.net;"
+        . "connect-src 'self' https://cdn.jsdelivr.net https://secure.mlstatic.com;"
     );
 }
 

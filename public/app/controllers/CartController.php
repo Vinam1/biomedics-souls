@@ -130,14 +130,23 @@ class CartController extends Controller
             }
 
             if ($step === 2) {
-                $paymentId = (int) ($_POST['payment_id'] ?? 0);
-                $selectedPaymentMethod = MetodoPago::findByIdForCliente($paymentId, (int) $user['id']);
+                $paymentId = trim($_POST['payment_id'] ?? '');
+
+                if ($paymentId === 'new_card') {
+                    $_SESSION['checkout']['payment_type'] = 'tarjeta';
+                    unset($_SESSION['checkout']['payment_id']);
+                    header('Location: ' . site_url('checkout?step=3'));
+                    exit;
+                }
+
+                $selectedPaymentMethod = MetodoPago::findByIdForCliente((int) $paymentId, (int) $user['id']);
                 if (!$selectedPaymentMethod) {
                     $this->renderError(422, 'Método de pago requerido', 'Selecciona un método de pago guardado antes de confirmar tu pedido.');
                     return;
                 }
 
                 $_SESSION['checkout']['payment_id'] = $selectedPaymentMethod['id'];
+                unset($_SESSION['checkout']['payment_type']);
                 header('Location: ' . site_url('checkout?step=3'));
                 exit;
             }
@@ -158,6 +167,18 @@ class CartController extends Controller
         if (!empty($_SESSION['checkout']['payment_id'])) {
             $selectedPaymentMethod = MetodoPago::findByIdForCliente((int) $_SESSION['checkout']['payment_id'], (int) $user['id']);
         }
+
+        if (!$selectedPaymentMethod && !empty($_SESSION['checkout']['payment_type']) && $_SESSION['checkout']['payment_type'] === 'tarjeta') {
+            $selectedPaymentMethod = [
+                'id' => 0,
+                'tipo' => 'tarjeta',
+                'brand' => null,
+                'ultimo_cuatro' => null,
+                'tipo_tarjeta' => null,
+                'nickname' => 'Tarjeta de Crédito/Débito',
+            ];
+        }
+
         if (!$selectedPaymentMethod && !empty($paymentMethods)) {
             $selectedPaymentMethod = MetodoPago::defaultForCliente((int) $user['id']);
             if ($selectedPaymentMethod) {
@@ -185,6 +206,7 @@ class CartController extends Controller
             'paymentMethods' => $paymentMethods,
             'selectedAddress' => $selectedAddress,
             'selectedPaymentMethod' => $selectedPaymentMethod,
+            'mpPublicKey' => MP_PUBLIC_KEY,
         ]);
     }
 
