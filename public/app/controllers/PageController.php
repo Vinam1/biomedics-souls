@@ -87,6 +87,13 @@ class PageController extends Controller
         ]);
     }
 
+    public function privacy(): void
+    {
+        $this->view('pages/privacidad', [
+            'title' => 'Política de Privacidad | Biomedics Souls',
+        ]);
+    }
+
     public function contact(): void
     {
         $success = null;

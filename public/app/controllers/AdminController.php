@@ -42,6 +42,39 @@ class AdminController extends Controller
         ]);
     }
 
+    public function clientes(): void
+    {
+        $this->view('admin/customers/index', [
+            'title' => 'Clientes - Admin',
+            'clients' => Usuario::adminClientList(),
+        ]);
+    }
+
+    public function clienteDetalle(string $id): void
+    {
+        $client = Usuario::findClientByIdForAdmin((int) $id);
+        if (!$client) {
+            http_response_code(404);
+            $this->view('errors/404', ['title' => 'Cliente no encontrado']);
+            return;
+        }
+
+        $orders = Pedido::findByClienteIdForAdmin((int) $id);
+        foreach ($orders as &$order) {
+            $order['items'] = Pedido::items((int) $order['id']);
+            $order['transaction'] = PagoTransaccion::latestByPedidoId((int) $order['id']);
+        }
+        unset($order);
+
+        $this->view('admin/customers/show', [
+            'title' => 'Perfil de cliente - ' . trim(($client['nombre'] ?? '') . ' ' . ($client['apellidos'] ?? '')),
+            'client' => $client,
+            'addresses' => Direccion::allByClienteId((int) $id),
+            'orders' => $orders,
+            'reviews' => Resena::findByClientForAdmin((int) $id),
+        ]);
+    }
+
     public function pedidoDetalle(string $id): void
     {
         $order = Pedido::findById((int) $id);
@@ -56,6 +89,29 @@ class AdminController extends Controller
             'order' => $order,
             'items' => Pedido::items((int) $id),
         ]);
+    }
+
+    public function pedidoTicket(string $id): void
+    {
+        $order = Pedido::findById((int) $id);
+
+        if (!$order) {
+            http_response_code(404);
+            echo 'Pedido no encontrado.';
+            return;
+        }
+
+        $pdf = TicketPdfService::render(
+            $order,
+            Pedido::items((int) $order['id']),
+            PagoTransaccion::latestByPedidoId((int) $order['id'])
+        );
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="ticket-' . $order['numero_pedido'] . '.pdf"');
+        header('Content-Length: ' . strlen($pdf));
+        echo $pdf;
+        exit;
     }
 
     public function categorias(): void

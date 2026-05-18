@@ -264,6 +264,27 @@ class Pedido
         return $stmt->fetchAll();
     }
 
+    public static function findByClienteIdForAdmin(int $clienteId): array
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare(
+            'SELECT p.id, p.numero_pedido, p.estado_pedido, p.total, p.subtotal, p.costo_envio, p.created_at,
+                    p.mp_status, p.mp_status_detail, p.direccion_nombre_completo, p.direccion_telefono,
+                    p.direccion_calle, p.direccion_numero_exterior, p.direccion_numero_interior,
+                    p.direccion_colonia, p.direccion_ciudad, p.direccion_estado, p.direccion_pais,
+                    p.direccion_codigo_postal, p.direccion_referencias,
+                    COUNT(pd.id) AS item_count
+             FROM pedidos p
+             LEFT JOIN pedidos_detalle pd ON pd.pedido_id = p.id
+             WHERE p.cliente_id = :clienteId
+               AND p.deleted_at IS NULL
+             GROUP BY p.id
+             ORDER BY p.created_at DESC, p.id DESC'
+        );
+        $stmt->execute(['clienteId' => $clienteId]);
+        return $stmt->fetchAll();
+    }
+
     public static function findByIdForCliente(int $id, int $clienteId): ?array
     {
         $db = Database::getInstance();

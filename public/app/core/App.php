@@ -62,6 +62,11 @@ class App
             return;
         }
 
+        if ($url[0] === 'privacidad') {
+            $this->callController('PageController', 'privacy');
+            return;
+        }
+
         if ($url[0] === 'contacto') {
             $this->callController('PageController', 'contact');
             return;
@@ -70,6 +75,17 @@ class App
         if ($url[0] === 'quiz') {
             $this->callController('PageController', 'quiz');
             return;
+        }
+
+        if ($url[0] === 'assistant' && isset($url[1])) {
+            if ($url[1] === 'chat') {
+                $this->callController('AssistantController', 'chat');
+                return;
+            }
+            if ($url[1] === 'reset') {
+                $this->callController('AssistantController', 'reset');
+                return;
+            }
         }
 
         if ($url[0] === 'cuenta') {
@@ -190,8 +206,23 @@ class App
                 return;
             }
 
+            if ($url[1] === 'clientes') {
+                $this->callController('AdminController', 'clientes');
+                return;
+            }
+
+            if ($url[1] === 'cliente-detalle' && isset($url[2])) {
+                $this->callController('AdminController', 'clienteDetalle', [$url[2]]);
+                return;
+            }
+
             if ($url[1] === 'pedido-detalle' && isset($url[2])) {
                 $this->callController('AdminController', 'pedidoDetalle', [$url[2]]);
+                return;
+            }
+
+            if ($url[1] === 'pedido-ticket' && isset($url[2])) {
+                $this->callController('AdminController', 'pedidoTicket', [$url[2]]);
                 return;
             }
 

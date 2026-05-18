@@ -144,6 +144,51 @@ class Producto
         return $stmt->fetchAll();
     }
 
+    public static function assistantRelevant(string $query, int $limit = 8): array
+    {
+        $db = Database::getInstance();
+        $limit = max(1, min($limit, 12));
+        $term = '%' . trim($query) . '%';
+
+        $sql = 'SELECT p.id, p.nombre, p.slug, p.sku, p.precio, p.precio_descuento, p.descripcion_corta, p.descripcion_larga,
+                       p.modo_empleo, p.usos, p.beneficios, p.contenido_neto, p.cantidad_envase, p.estatus,
+                       c.nombre AS categoria_nombre,
+                       pi.url_imagen AS imagen_principal
+                FROM productos p
+                LEFT JOIN categorias c ON c.id = p.categoria_id
+                LEFT JOIN productos_imagenes pi ON pi.producto_id = p.id AND pi.es_principal = 1 AND pi.deleted_at IS NULL
+                WHERE p.deleted_at IS NULL
+                  AND (
+                    p.nombre LIKE :query1
+                    OR p.descripcion_corta LIKE :query2
+                    OR p.descripcion_larga LIKE :query3
+                    OR p.usos LIKE :query4
+                    OR p.beneficios LIKE :query5
+                    OR c.nombre LIKE :query6
+                    OR p.sku LIKE :query7
+                  )
+                ORDER BY p.destacado DESC, p.updated_at DESC
+                LIMIT :limit';
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':query1', $term, PDO::PARAM_STR);
+        $stmt->bindValue(':query2', $term, PDO::PARAM_STR);
+        $stmt->bindValue(':query3', $term, PDO::PARAM_STR);
+        $stmt->bindValue(':query4', $term, PDO::PARAM_STR);
+        $stmt->bindValue(':query5', $term, PDO::PARAM_STR);
+        $stmt->bindValue(':query6', $term, PDO::PARAM_STR);
+        $stmt->bindValue(':query7', $term, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $products = $stmt->fetchAll();
+        if (!empty($products)) {
+            return $products;
+        }
+
+        return self::featured($limit);
+    }
+
     public static function search(array $filters = []): array
     {
         $cacheKey = md5(json_encode($filters));
@@ -389,7 +434,7 @@ class Producto
         $newIndex       = 0;
 
         foreach ($imageOrder as $entry) {
-            if (str_starts_with($entry, self::IMAGE_ORDER_PREFIX_EXISTING)) {
+            if (substr($entry, 0, self::IMAGE_ORDER_PREFIX_EXISTING_LEN) === self::IMAGE_ORDER_PREFIX_EXISTING) {
                 $imageId = (int) substr($entry, self::IMAGE_ORDER_PREFIX_EXISTING_LEN);
                 if (isset($existingById[$imageId])) {
                     $orderedEntries[] = ['kind' => 'existing', 'id' => $imageId];

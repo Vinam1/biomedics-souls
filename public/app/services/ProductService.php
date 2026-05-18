@@ -5,6 +5,10 @@ class ProductService
     public function validateFormData(array $data, array $files = [], ?int $existingId = null): array
     {
         $errors = [];
+        $existingImageIds = array_values(array_filter(array_map('intval', $data['existing_image_ids'] ?? [])));
+        $uploadedNames = isset($files['imagenes']['name']) && is_array($files['imagenes']['name'])
+            ? array_filter($files['imagenes']['name'], static fn($name) => trim((string) $name) !== '')
+            : [];
 
         if (empty(trim($data['nombre'] ?? ''))) {
             $errors[] = 'El nombre del producto es obligatorio.';
@@ -13,14 +17,13 @@ class ProductService
         if (empty(trim($data['slug'] ?? ''))) {
             $errors[] = 'El slug del producto es obligatorio.';
         } elseif (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
-            $errors[] = 'El slug solo puede contener letras minúsculas, números y guiones.';
+            $errors[] = 'El slug solo puede contener letras minusculas, numeros y guiones.';
         }
 
         if (empty(trim($data['sku'] ?? ''))) {
             $errors[] = 'El SKU del producto es obligatorio.';
         }
 
-        // Validación de duplicados
         if ($existingId === null) {
             if (Producto::findBySlug($data['slug'] ?? '')) {
                 $errors[] = 'Ya existe un producto con ese slug.';
@@ -30,41 +33,70 @@ class ProductService
             }
         } else {
             $existingBySlug = Producto::findBySlug($data['slug'] ?? '');
-            if ($existingBySlug && (int)$existingBySlug['id'] !== $existingId) {
+            if ($existingBySlug && (int) $existingBySlug['id'] !== $existingId) {
                 $errors[] = 'Ya existe un producto con ese slug.';
             }
+
             $existingBySku = Producto::findBySku($data['sku'] ?? '');
-            if ($existingBySku && (int)$existingBySku['id'] !== $existingId) {
+            if ($existingBySku && (int) $existingBySku['id'] !== $existingId) {
                 $errors[] = 'Ya existe un producto con ese SKU.';
             }
         }
 
-        if (!isset($data['precio']) || !is_numeric($data['precio']) || (float)$data['precio'] <= 0) {
+        if (!isset($data['precio']) || !is_numeric($data['precio']) || (float) $data['precio'] <= 0) {
             $errors[] = 'El precio debe ser mayor a cero.';
         }
 
-        if (!empty($data['precio_descuento']) && 
-            (!is_numeric($data['precio_descuento']) || (float)$data['precio_descuento'] < 0)) {
-            $errors[] = 'El precio de descuento debe ser un número positivo o estar vacío.';
+        if (
+            !empty($data['precio_descuento'])
+            && (!is_numeric($data['precio_descuento']) || (float) $data['precio_descuento'] < 0)
+        ) {
+            $errors[] = 'El precio de descuento debe ser un numero positivo o estar vacio.';
         }
 
-        if (!empty($data['precio_descuento']) && (float)$data['precio_descuento'] >= (float)($data['precio'] ?? 0)) {
+        if (!empty($data['precio_descuento']) && (float) $data['precio_descuento'] >= (float) ($data['precio'] ?? 0)) {
             $errors[] = 'El precio de descuento debe ser menor al precio regular.';
         }
 
         if (empty($data['categoria_id'])) {
-            $errors[] = 'La categoría es obligatoria.';
+            $errors[] = 'La categoria es obligatoria.';
         }
 
         if (empty($data['forma_id'])) {
-            $errors[] = 'La forma de presentación es obligatoria.';
+            $errors[] = 'La forma de presentacion es obligatoria.';
         }
 
-        // Validación básica de imágenes (solo si se suben)
-        if (!empty($files['imagenes']['name'][0])) {
-            foreach ($files['imagenes']['error'] as $err) {
+        if (count($existingImageIds) === 0 && count($uploadedNames) === 0) {
+            $errors[] = 'Debes conservar o cargar al menos una imagen del producto.';
+        }
+
+        if (!empty($uploadedNames)) {
+            foreach (($files['imagenes']['error'] ?? []) as $err) {
                 if ($err !== UPLOAD_ERR_OK && $err !== UPLOAD_ERR_NO_FILE) {
-                    $errors[] = 'Error al procesar una de las imágenes.';
+                    $errors[] = 'Error al procesar una de las imagenes.';
+                    break;
+                }
+            }
+
+            $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+            foreach (($files['imagenes']['tmp_name'] ?? []) as $index => $tmpName) {
+                $filename = $files['imagenes']['name'][$index] ?? '';
+                if (trim((string) $filename) === '' || !is_string($tmpName) || $tmpName === '') {
+                    continue;
+                }
+
+                $size = (int) ($files['imagenes']['size'][$index] ?? 0);
+                if ($size <= 0 || $size > MAX_UPLOAD_SIZE) {
+                    $maxMb = round(MAX_UPLOAD_SIZE / 1024 / 1024, 1);
+                    $errors[] = "Cada imagen debe pesar maximo {$maxMb} MB.";
+                    break;
+                }
+
+                $imageInfo = @getimagesize($tmpName);
+                $mimeType = is_array($imageInfo) ? (string) ($imageInfo['mime'] ?? '') : '';
+                if ($mimeType === '' || !in_array($mimeType, $allowedMimeTypes, true)) {
+                    $errors[] = 'Solo se aceptan imagenes JPG, PNG, WEBP o GIF.';
+                    break;
                 }
             }
         }
@@ -76,29 +108,29 @@ class ProductService
     {
         $contenidoNetoValor = trim($postData['contenido_neto_valor'] ?? '');
         $contenidoNetoUnidad = trim($postData['contenido_neto_unidad'] ?? 'mg');
-        $contenidoNeto = $contenidoNetoValor !== '' 
-            ? str_replace(',', '.', $contenidoNetoValor) . ' ' . $contenidoNetoUnidad 
+        $contenidoNeto = $contenidoNetoValor !== ''
+            ? str_replace(',', '.', $contenidoNetoValor) . ' ' . $contenidoNetoUnidad
             : null;
 
         return [
-            'nombre'            => trim($postData['nombre'] ?? ''),
-            'slug'              => strtolower(trim($postData['slug'] ?? '')),
-            'sku'               => trim($postData['sku'] ?? ''),
-            'precio'            => (float) ($postData['precio'] ?? 0),
-            'precio_descuento'  => !empty($postData['precio_descuento']) ? (float)$postData['precio_descuento'] : null,
+            'nombre' => trim($postData['nombre'] ?? ''),
+            'slug' => strtolower(trim($postData['slug'] ?? '')),
+            'sku' => trim($postData['sku'] ?? ''),
+            'precio' => (float) ($postData['precio'] ?? 0),
+            'precio_descuento' => !empty($postData['precio_descuento']) ? (float) $postData['precio_descuento'] : null,
             'descripcion_corta' => trim($postData['descripcion_corta'] ?? ''),
             'descripcion_larga' => trim($postData['descripcion_larga'] ?? ''),
-            'modo_empleo'       => trim($postData['modo_empleo'] ?? ''),
-            'usos'              => trim($postData['usos'] ?? ''),
-            'beneficios'        => trim($postData['beneficios'] ?? ''),
-            'contenido_neto'    => $contenidoNeto,
-            'cantidad_envase'   => trim($postData['cantidad_unidades'] ?? $postData['cantidad_envase'] ?? ''),
-            'destacado'         => isset($postData['destacado']) ? 1 : 0,
-            'categoria_id'      => $this->resolveCategoryId($postData),
-            'forma_id'          => $this->resolveFormId($postData),
-            'estatus'           => trim($postData['estatus'] ?? 'activo'),
-            'existing_image_ids'=> array_values(array_filter(array_map('intval', $postData['existing_image_ids'] ?? []))),
-            'image_order'       => array_values(array_filter(array_map('trim', $postData['image_order'] ?? []))),
+            'modo_empleo' => trim($postData['modo_empleo'] ?? ''),
+            'usos' => trim($postData['usos'] ?? ''),
+            'beneficios' => trim($postData['beneficios'] ?? ''),
+            'contenido_neto' => $contenidoNeto,
+            'cantidad_envase' => trim($postData['cantidad_unidades'] ?? $postData['cantidad_envase'] ?? ''),
+            'destacado' => isset($postData['destacado']) ? 1 : 0,
+            'categoria_id' => $this->resolveCategoryId($postData),
+            'forma_id' => $this->resolveFormId($postData),
+            'estatus' => trim($postData['estatus'] ?? 'activo'),
+            'existing_image_ids' => array_values(array_filter(array_map('intval', $postData['existing_image_ids'] ?? []))),
+            'image_order' => array_values(array_filter(array_map('trim', $postData['image_order'] ?? []))),
         ];
     }
 
@@ -141,6 +173,7 @@ class ProductService
                 $ids[] = (int) $item;
                 continue;
             }
+
             if (strpos($item, 'new:') === 0) {
                 $name = trim(substr($item, 4));
                 if ($name !== '' && $type === 'etiqueta') {
@@ -148,6 +181,7 @@ class ProductService
                 }
             }
         }
+
         return array_values(array_unique($ids));
     }
 
@@ -156,32 +190,32 @@ class ProductService
         $payload = [];
         foreach ($items as $item) {
             if (is_numeric($item)) {
-                $id = (int)$item;
+                $id = (int) $item;
                 foreach ($available as $entry) {
-                    if (isset($entry['id']) && (int)$entry['id'] === $id) {
+                    if (isset($entry['id']) && (int) $entry['id'] === $id) {
                         $payload[] = ['id' => $id, 'nombre' => $entry['nombre']];
                         break;
                     }
                 }
             }
         }
+
         return $payload;
     }
 
     public function getProductWithRelations(int $id): ?array
     {
         $product = Producto::findById($id);
-        if (!$product) return null;
+        if (!$product) {
+            return null;
+        }
 
         $product['etiquetas'] = Etiqueta::forProduct($id);
-        $product['images']    = Producto::images($id);
+        $product['images'] = Producto::images($id);
 
         return $product;
     }
 
-    /**
-     * MÉTODO CORREGIDO Y SIMPLIFICADO
-     */
     public function saveProduct(array $productData, array $relationIds, array $files = [], ?int $existingId = null): int
     {
         $db = Database::getInstance();
@@ -202,27 +236,21 @@ class ProductService
                 }
             }
 
-            // Sincronizar etiquetas
-            if (!empty($relationIds['etiquetas'])) {
-                Producto::syncEtiquetas($productId, $relationIds['etiquetas']);
-            }
-
-            // Temporalmente desactivamos imágenes para depurar
-            // Producto::syncImages($productId, $productData, $files['imagenes'] ?? []);
+            Producto::syncEtiquetas($productId, $relationIds['etiquetas'] ?? []);
+            Producto::syncImages($productId, $productData, $files['imagenes'] ?? []);
 
             $db->commit();
             return $productId;
-
         } catch (Throwable $e) {
             if ($db->inTransaction()) {
                 $db->rollBack();
             }
 
-            error_log("ERROR AL GUARDAR PRODUCTO: " . $e->getMessage());
-            error_log("Archivo: " . $e->getFile() . " | Línea: " . $e->getLine());
-            error_log("Datos: " . json_encode($productData, JSON_UNESCAPED_UNICODE));
+            error_log('ERROR AL GUARDAR PRODUCTO: ' . $e->getMessage());
+            error_log('Archivo: ' . $e->getFile() . ' | Linea: ' . $e->getLine());
+            error_log('Datos: ' . json_encode($productData, JSON_UNESCAPED_UNICODE));
 
-            throw new RuntimeException("Error al guardar el producto: " . $e->getMessage());
+            throw new RuntimeException('Error al guardar el producto: ' . $e->getMessage());
         }
     }
 

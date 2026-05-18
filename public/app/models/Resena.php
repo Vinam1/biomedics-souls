@@ -124,4 +124,20 @@ class Resena
         ]);
         return $stmt->fetchColumn() > 0;
     }
+
+    public static function findByClientForAdmin(int $userId): array
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare(
+            'SELECT r.id, r.calificacion, r.titulo, r.comentario, r.estatus, r.created_at,
+                    p.nombre AS producto_nombre, p.slug AS producto_slug
+             FROM resenas r
+             INNER JOIN productos p ON p.id = r.producto_id
+             WHERE r.cliente_id = :userId
+               AND r.deleted_at IS NULL
+             ORDER BY r.created_at DESC, r.id DESC'
+        );
+        $stmt->execute(['userId' => $userId]);
+        return $stmt->fetchAll();
+    }
 }

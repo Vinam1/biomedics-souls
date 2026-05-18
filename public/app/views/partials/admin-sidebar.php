@@ -41,6 +41,11 @@ function sidebarActive(string $segment): string
            class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/pedidos'); ?>">
             <i class="fas fa-shopping-cart me-2"></i> Pedidos
         </a>
+
+        <a href="<?= site_url('admin/clientes'); ?>"
+           class="nav-link text-white px-3 py-2 rounded-4 <?= sidebarActive('/admin/clientes'); ?> <?= sidebarActive('/admin/cliente-detalle'); ?>">
+            <i class="fas fa-users me-2"></i> Clientes
+        </a>
     </nav>
 
     <div class="mt-5 text-white-50 small">

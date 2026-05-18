@@ -346,7 +346,7 @@ $isEdit = !empty($product['id']);
                                             <p class="text-muted mb-0">
                                                 Puedes arrastrar para reordenar. La primera imagen se guardara como principal.
                                             </p>
-                                            <small class="text-muted">Formatos: JPG, PNG, WEBP, GIF. Maximo 5 MB por imagen.</small>
+                                            <small class="text-muted">Formatos: JPG, PNG, WEBP, GIF. Maximo 10 MB por imagen.</small>
                                         </div>
 
                                         <div id="image-manager" class="image-manager">

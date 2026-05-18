@@ -4,7 +4,10 @@ $bodyClass = 'home-page';
 ?>
 
 <section class="home-hero position-relative overflow-hidden">
-    <div class="home-hero-media">
+    <div class="home-hero-orb home-hero-orb-one"></div>
+    <div class="home-hero-orb home-hero-orb-two"></div>
+    <div class="home-hero-grid"></div>
+    <div class="home-hero-media" data-parallax>
         <img src="<?= asset_url('img/deco/hero-sensea.jpg'); ?>" alt="Biomedics Souls Sensea" class="w-100 h-100 object-fit-cover">
     </div>
     <div class="home-hero-overlay"></div>
@@ -12,13 +15,33 @@ $bodyClass = 'home-page';
     <div class="container position-relative z-2">
         <div class="row min-vh-hero align-items-center">
             <div class="col-lg-7 col-xl-6">
-                <div class="hero-copy">
+                <div class="hero-copy" data-animate="fade-up">
                     <span class="eyebrow-pill">Tu bienestar, nuestra prioridad</span>
                     <h1 class="hero-title">Optimiza tu <span>cuerpo y mente</span></h1>
                     <p class="hero-text">Suplementos formulados con ingredientes de alta calidad para potenciar tu rendimiento diario, enfoque y recuperaci&oacute;n.</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
                         <a href="<?= site_url('catalogo'); ?>" class="btn btn-brand btn-lg px-4">Explorar Cat&aacute;logo <i class="bi bi-arrow-right ms-2"></i></a>
                         <a href="<?= site_url('quiz'); ?>" class="btn btn-soft btn-lg px-4">Descubre tu f&oacute;rmula</a>
+                    </div>
+                    <div class="hero-metrics row g-3 mt-4">
+                        <div class="col-sm-4">
+                            <div class="hero-metric" data-animate="fade-up" data-animate-delay="100">
+                                <strong>+98%</strong>
+                                <span>Clientes satisfechos</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="hero-metric" data-animate="fade-up" data-animate-delay="180">
+                                <strong>Calidad</strong>
+                                <span>Ingredientes premium</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="hero-metric" data-animate="fade-up" data-animate-delay="260">
+                                <strong>24/7</strong>
+                                <span>Acompa&ntilde;amiento</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -28,28 +51,28 @@ $bodyClass = 'home-page';
 
 <section class="section-block">
     <div class="container">
-        <div class="section-heading text-center mx-auto">
+        <div class="section-heading text-center mx-auto" data-animate="fade-up">
             <h2>El est&aacute;ndar Biomedics Souls</h2>
             <p>No hacemos suposiciones. Cada f&oacute;rmula est&aacute; dise&ntilde;ada para m&aacute;xima biodisponibilidad y efectividad.</p>
         </div>
 
         <div class="row g-4">
             <div class="col-md-4">
-                <article class="soft-card h-100">
+                <article class="soft-card h-100" data-animate="fade-up">
                     <div class="icon-chip text-purple"><i class="fas fa-shield-alt"></i></div>
                     <h3>Pureza Garantizada</h3>
                     <p>Ingredientes de la m&aacute;s alta calidad, testeados para asegurar cero contaminantes y m&aacute;xima seguridad.</p>
                 </article>
             </div>
             <div class="col-md-4">
-                <article class="soft-card h-100">
+                <article class="soft-card h-100" data-animate="fade-up" data-animate-delay="120">
                     <div class="icon-chip text-sky"><i class="fas fa-brain"></i></div>
                     <h3>F&oacute;rmulas Sin&eacute;rgicas</h3>
                     <p>Combinamos compuestos que trabajan juntos para multiplicar sus efectos en el organismo.</p>
                 </article>
             </div>
             <div class="col-md-4">
-                <article class="soft-card h-100">
+                <article class="soft-card h-100" data-animate="fade-up" data-animate-delay="240">
                     <div class="icon-chip text-teal"><i class="fas fa-wave-square"></i></div>
                     <h3>Alta Biodisponibilidad</h3>
                     <p>Utilizamos formas moleculares que tu cuerpo realmente puede absorber y utilizar.</p>
@@ -63,11 +86,11 @@ $bodyClass = 'home-page';
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <div class="section-copy pe-lg-4">
+                <div class="section-copy pe-lg-4" data-animate="fade-right">
                     <h2 class="about-title">Biomedics Soul: <span>Transformando el Sector Salud</span> con &Eacute;tica e Innovaci&oacute;n</h2>
                     <p class="section-lead">En Biomedics Soul, nos dedicamos a elevar los est&aacute;ndares del sector salud a trav&eacute;s de soluciones integrales, &eacute;ticas y de alta calidad. Nos especializamos en la consultor&iacute;a y distribuci&oacute;n de insumos m&eacute;dicos, con el firme prop&oacute;sito de mejorar el bienestar de los pacientes y facilitar la labor de los profesionales que los atienden.</p>
 
-                    <div class="info-feature">
+                    <div class="info-feature" data-animate="fade-up" data-animate-delay="120">
                         <div class="icon-chip text-purple"><i class="fas fa-bolt"></i></div>
                         <div>
                             <h3>Misi&oacute;n</h3>
@@ -75,7 +98,7 @@ $bodyClass = 'home-page';
                         </div>
                     </div>
 
-                    <div class="info-feature">
+                    <div class="info-feature" data-animate="fade-up" data-animate-delay="220">
                         <div class="icon-chip text-sky"><i class="fas fa-heartbeat"></i></div>
                         <div>
                             <h3>Visi&oacute;n</h3>
@@ -86,7 +109,7 @@ $bodyClass = 'home-page';
             </div>
 
             <div class="col-lg-6">
-                <div class="about-visual">
+                <div class="about-visual" data-animate="zoom-in">
                     <img src="<?= asset_url('img/deco/mision-vision.jpg'); ?>" alt="Profesionales de la salud" class="img-fluid w-100">
                 </div>
             </div>
@@ -96,14 +119,14 @@ $bodyClass = 'home-page';
 
 <section class="section-block">
     <div class="container">
-        <div class="section-heading text-center mx-auto">
+        <div class="section-heading text-center mx-auto" data-animate="fade-up">
             <h2>Lo que dicen nuestros clientes</h2>
             <p>Miles de personas ya est&aacute;n transformando su vida con Biomedics Soul.</p>
         </div>
 
         <div class="row g-4">
             <div class="col-md-4">
-                <article class="testimonial-card h-100">
+                <article class="testimonial-card h-100" data-animate="fade-up">
                     <div class="testimonial-avatar">ER</div>
                     <div class="testimonial-stars" aria-label="5 estrellas">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
@@ -115,7 +138,7 @@ $bodyClass = 'home-page';
                 </article>
             </div>
             <div class="col-md-4">
-                <article class="testimonial-card h-100">
+                <article class="testimonial-card h-100" data-animate="fade-up" data-animate-delay="120">
                     <div class="testimonial-avatar">CM</div>
                     <div class="testimonial-stars" aria-label="5 estrellas">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
@@ -127,7 +150,7 @@ $bodyClass = 'home-page';
                 </article>
             </div>
             <div class="col-md-4">
-                <article class="testimonial-card h-100">
+                <article class="testimonial-card h-100" data-animate="fade-up" data-animate-delay="240">
                     <div class="testimonial-avatar">SV</div>
                     <div class="testimonial-stars" aria-label="5 estrellas">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
@@ -144,7 +167,7 @@ $bodyClass = 'home-page';
 
 <section class="section-block section-featured">
     <div class="container">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-5" data-animate="fade-up">
             <div class="section-copy">
                 <h2>F&oacute;rmulas Destacadas</h2>
                 <p class="mb-0">Nuestros suplementos m&aacute;s avanzados para objetivos espec&iacute;ficos.</p>
@@ -160,15 +183,15 @@ $bodyClass = 'home-page';
                     $isOutOfStock = Producto::isOutOfStockStatus($statusLabel);
                     ?>
                     <div class="col">
-                        <article class="product-card h-100">
-                            <div class="product-media">
+                        <article class="product-card product-card-clickable h-100" data-animate="fade-up" data-product-link="<?= site_url('producto/' . $product['slug']); ?>" tabindex="0" role="link" aria-label="Ver detalle de <?= htmlspecialchars($product['nombre']); ?>">
+                            <a href="<?= site_url('producto/' . $product['slug']); ?>" class="product-media d-block">
                                 <?php if (!empty($product['imagen_principal'])): ?>
                                     <img src="<?= asset_url('img/products/' . $product['imagen_principal']); ?>" class="card-img-top" alt="<?= htmlspecialchars($product['nombre']); ?>">
                                 <?php endif; ?>
                                 <?php if ($statusLabel !== ''): ?>
                                     <span class="product-status <?= $isOutOfStock ? 'is-out' : ''; ?>"><?= htmlspecialchars($statusLabel); ?></span>
                                 <?php endif; ?>
-                            </div>
+                            </a>
                             <div class="product-content">
                                 <h3><?= htmlspecialchars($product['nombre']); ?></h3>
                                 <p><?= htmlspecialchars($product['descripcion_corta'] ?? 'Suplemento premium Sensea'); ?></p>
@@ -176,8 +199,7 @@ $bodyClass = 'home-page';
                                     <div class="price-stack">
                                         <strong>$<?= number_format($product['precio_descuento'] ?? $product['precio'], 2); ?></strong>
                                     </div>
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <a href="<?= site_url('producto/' . $product['slug']); ?>" class="btn btn-soft btn-sm">Detalles</a>
+                                    <div class="d-flex gap-2 align-items-center product-card-actions">
                                         <?php if ($isOutOfStock): ?>
                                             <span class="product-out-text">Agotado</span>
                                         <?php else: ?>

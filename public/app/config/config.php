@@ -14,6 +14,8 @@ define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_NAME', getenv('DB_NAME') ?: 'amiptcnl_biomedics_souls');
 define('DB_USER', getenv('DB_USER') ?: 'amiptcnl_biomedics');
 define('DB_PASS', getenv('DB_PASS') ?: 'biomedics123456');
+define('GEMINI_API_KEY', 'AIzaSyBnLbOy56mgIpjnF9-CgUOUbtpwanfQJrQ');
+define('GEMINI_MODEL', 'gemini-2.5-flash');
 
 // ==================== CONSTANTES DE LA APLICACION ====================
 define('APPROOT', dirname(__DIR__));
@@ -81,7 +83,7 @@ function send_security_headers(): void
         . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
         . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
         . "font-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
-        . "img-src 'self' data: https:; "
+        . "img-src 'self' data: blob: https:; "
         . "connect-src 'self' https://cdn.jsdelivr.net;"
     );
 }
