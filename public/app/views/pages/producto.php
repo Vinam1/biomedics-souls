@@ -152,6 +152,14 @@ $categoryValue = trim((string) ($product['category'] ?? 'Herbales'));
                             <p class="mb-4 lh-lg"><?= nl2br(htmlspecialchars($product['description'] ?? 'Sin descripción disponible.')); ?></p>
                         </div>
                         <div class="tab-pane fade" id="resenas">
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <div>
+                                        <div class="fs-5 fw-semibold"><?= number_format($ratingValue, 1); ?> de 5</div>
+                                        <div class="text-muted small"><?= $reviewsCount; ?> reseña<?= $reviewsCount === 1 ? '' : 's'; ?></div>
+                                    </div>
+                                </div>
+                            </div>
                             <?php if (!empty($reviews)): ?>
                                 <div class="vstack gap-3">
                                     <?php foreach ($reviews as $review): ?>

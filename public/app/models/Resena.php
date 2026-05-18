@@ -80,8 +80,8 @@ class Resena
             'cliente_id'  => $data['cliente_id'],
             'producto_id' => $data['producto_id'],
             'calificacion'=> $data['calificacion'],
-            'titulo'      => $data['titulo'] ?? null,
-            'comentario'  => $data['comentario'] ?? null,
+            'titulo'      => trim((string) ($data['titulo'] ?? '')) ?: null,
+            'comentario'  => trim((string) ($data['comentario'] ?? '')) ?: null,
         ]);
     }
 

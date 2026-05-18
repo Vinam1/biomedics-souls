@@ -35,7 +35,7 @@ class ProductController extends Controller
             'slug' => $product['slug'],
             'price' => $product['precio_descuento'] ?: $product['precio'],
             'rating' => (float) ($product['calificacion_promedio'] ?: 0),
-            'reviews_count' => (int) ($product['total_resenas'] ?: 0),
+            'reviews_count' => count($reviews),
             'image' => !empty($images) ? asset_url('img/products/' . $images[0]['url_imagen']) : null,
             'thumbnail' => !empty($images) ? asset_url('img/products/' . $images[0]['url_imagen']) : null,
             'short_description' => $product['descripcion_corta'],
@@ -61,6 +61,7 @@ class ProductController extends Controller
             'flashError' => $flashError,
             'canReview' => $canReview,
             'hasReviewed' => $hasReviewed,
+            'currentUser' => $currentUser,
         ]);
     }
 
