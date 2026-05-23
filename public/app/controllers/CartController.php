@@ -46,9 +46,12 @@ class CartController extends Controller
         }
 
         Cart::add((int) $productId, $quantity);
+        $productName = trim((string) ($product['nombre'] ?? $product['name'] ?? 'Producto'));
         $_SESSION['cart_feedback'] = [
             'type' => 'success',
-            'message' => $quantity > 1 ? 'Productos agregados al carrito.' : 'Producto agregado al carrito.',
+            'message' => $quantity > 1
+                ? $productName . ' agregado al carrito (' . $quantity . ' unidades).'
+                : $productName . ' agregado al carrito.',
         ];
         header('Location: ' . $this->getRedirectBackUrl(site_url('carrito')));
         exit;

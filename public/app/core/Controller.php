@@ -6,6 +6,7 @@ class Controller
     {
         $data['currentUser'] = $this->getCurrentUser();
         $data['csrfToken']   = csrf_token();
+        $data['cartCount']   = Cart::getCount();
         extract($data);
         $viewFile = APPROOT . '/views/' . $view . '.php';
         require APPROOT . '/views/layouts/main.php';

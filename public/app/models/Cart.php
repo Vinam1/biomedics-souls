@@ -82,6 +82,16 @@ class Cart
         return $total;
     }
 
+    public static function getCount(): int
+    {
+        $count = 0;
+        foreach (($_SESSION['cart'] ?? []) as $quantity) {
+            $count += max(0, (int) $quantity);
+        }
+
+        return $count;
+    }
+
     public static function getOutOfStockItems(): array
     {
         return array_values(array_filter(self::getItems(), static function (array $item): bool {

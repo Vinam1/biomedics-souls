@@ -17,14 +17,30 @@
     ?>
     <?php require APPROOT . '/views/partials/header.php'; ?>
 
-    <main class="site-main">
-        <?php if (!empty($cartFeedback['message'])): ?>
-            <div class="container pt-4">
-                <div class="alert alert-<?= ($cartFeedback['type'] ?? 'success') === 'error' ? 'danger' : 'success'; ?> rounded-4 mb-0 alert-auto-close">
-                    <?= htmlspecialchars($cartFeedback['message']); ?>
+    <?php if (!empty($cartFeedback['message'])): ?>
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1085; margin-top: 5.5rem;">
+            <div
+                class="toast align-items-center border-0 shadow-lg"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+                data-cart-toast="true"
+                data-bs-delay="3200"
+            >
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <strong class="<?= ($cartFeedback['type'] ?? 'success') === 'error' ? 'text-danger' : 'text-success'; ?>">
+                            <?= ($cartFeedback['type'] ?? 'success') === 'error' ? 'No se pudo agregar' : 'Agregado al carrito'; ?>
+                        </strong>
+                        <div class="small text-muted mt-1"><?= htmlspecialchars($cartFeedback['message']); ?></div>
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
                 </div>
             </div>
-        <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <main class="site-main">
         <?php if (isset($viewFile) && file_exists($viewFile)): ?>
             <?php require $viewFile; ?>
         <?php else: ?>

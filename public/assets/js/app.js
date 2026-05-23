@@ -313,6 +313,11 @@ document.addEventListener('DOMContentLoaded', function () {
     window.initBiomedicsAnimations = initAnimations;
     window.initBiomedicsProductCards = initClickableProductCards;
 
+    const cartToast = document.querySelector('[data-cart-toast="true"]');
+    if (cartToast && window.bootstrap && typeof window.bootstrap.Toast === 'function') {
+        window.bootstrap.Toast.getOrCreateInstance(cartToast).show();
+    }
+
     const alerts = document.querySelectorAll('.alert-auto-close');
     alerts.forEach(function (alert) {
         setTimeout(function () {

@@ -65,7 +65,7 @@
                     <a class="cart-link position-relative" href="<?= site_url('carrito'); ?>" aria-label="Ir al carrito">
                         <i class="bi bi-cart3 fs-4"></i>
                         <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.75rem; padding: 2px 6px;">
-                            0
+                            <?= (int) ($cartCount ?? 0); ?>
                         </span>
                     </a>
                 </div>
