@@ -87,7 +87,7 @@ class OrderController extends Controller
         $order = $orderId > 0 ? Pedido::findByIdForCliente($orderId, (int) $user['id']) : null;
 
         if (!$order) {
-            header('Location: ' . site_url('cuenta?tab=pedidos'));
+            header('Location: ' . site_url('cuenta/pedidos'));
             exit;
         }
 

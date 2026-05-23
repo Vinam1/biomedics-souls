@@ -116,7 +116,7 @@ class PageController extends Controller
         ]);
     }
 
-    public function account(): void
+    public function account(string $tab = 'dashboard'): void
     {
         $user = $this->getCurrentUser();
 
@@ -125,13 +125,41 @@ class PageController extends Controller
             exit;
         }
 
-        $tab = $_GET['tab'] ?? 'dashboard';
+        $tab = in_array($tab, ['dashboard', 'pedidos', 'pagos', 'direcciones', 'resenas', 'config'], true)
+            ? $tab
+            : 'dashboard';
+
+        $orders = Pedido::findByClienteId((int) $user['id']);
+        $paymentMethods = MetodoPago::allByClienteId((int) $user['id']);
+        $addresses = Direccion::allByClienteId((int) $user['id']);
+        $reviews = Resena::findByUser((int) $user['id']);
+        $reviewableProducts = Resena::reviewableProductsForUser((int) $user['id']);
+
+        $editingAddress = null;
+        if ($tab === 'direcciones' && !empty($_GET['edit_address'])) {
+            $editingAddress = Direccion::findByIdForCliente((int) $_GET['edit_address'], (int) $user['id']);
+        }
+
+        $editingPayment = null;
+        if ($tab === 'pagos' && !empty($_GET['edit_payment'])) {
+            $editingPayment = MetodoPago::findByIdForCliente((int) $_GET['edit_payment'], (int) $user['id']);
+        }
+
+        $flash = $_SESSION['account_flash'] ?? null;
+        unset($_SESSION['account_flash']);
 
         $this->view('user/cuenta', [
-            'title'  => 'Mi Cuenta | Biomedics Souls',
-            'user'   => $user,
-            'tab'    => $tab,
-            'orders' => Pedido::findByClienteId((int) $user['id']),
+            'title' => 'Mi Cuenta | Biomedics Souls',
+            'user' => $user,
+            'tab' => $tab,
+            'orders' => $orders,
+            'paymentMethods' => $paymentMethods,
+            'addresses' => $addresses,
+            'reviews' => $reviews,
+            'reviewableProducts' => $reviewableProducts,
+            'editingAddress' => $editingAddress,
+            'editingPayment' => $editingPayment,
+            'flash' => $flash,
         ]);
     }
 

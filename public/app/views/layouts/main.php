@@ -11,9 +11,20 @@
     <link rel="stylesheet" href="<?= asset_url('css/styles.css'); ?>">
 </head>
 <body class="<?= isset($bodyClass) ? htmlspecialchars($bodyClass) : ''; ?>">
+    <?php
+    $cartFeedback = $_SESSION['cart_feedback'] ?? null;
+    unset($_SESSION['cart_feedback']);
+    ?>
     <?php require APPROOT . '/views/partials/header.php'; ?>
 
     <main class="site-main">
+        <?php if (!empty($cartFeedback['message'])): ?>
+            <div class="container pt-4">
+                <div class="alert alert-<?= ($cartFeedback['type'] ?? 'success') === 'error' ? 'danger' : 'success'; ?> rounded-4 mb-0 alert-auto-close">
+                    <?= htmlspecialchars($cartFeedback['message']); ?>
+                </div>
+            </div>
+        <?php endif; ?>
         <?php if (isset($viewFile) && file_exists($viewFile)): ?>
             <?php require $viewFile; ?>
         <?php else: ?>

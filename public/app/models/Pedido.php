@@ -2,6 +2,15 @@
 
 class Pedido
 {
+    public const STATUS_OPTIONS = [
+        'pendiente',
+        'pagado',
+        'en_preparacion',
+        'enviado',
+        'entregado',
+        'cancelado',
+    ];
+
     public static function createDirect(array $user, array $address, array $paymentMethod, array $cartItems, array $paymentResult, float $shippingCost = 0.0): int
     {
         $db = Database::getInstance();
@@ -322,5 +331,35 @@ class Pedido
         $sequence = (int) $sequenceStmt->fetchColumn();
 
         return sprintf('BS-%s-%04d', date('Ymd'), $sequence);
+    }
+
+    public static function updateStatus(int $orderId, string $status, ?int $changedByUserId = null): bool
+    {
+        if (!in_array($status, self::STATUS_OPTIONS, true)) {
+            return false;
+        }
+
+        $db = Database::getInstance();
+        if ($changedByUserId !== null) {
+            $currentUserStmt = $db->prepare('SET @current_user_id = :user_id');
+            $currentUserStmt->execute(['user_id' => $changedByUserId]);
+        }
+
+        $paidAtSql = $status === 'pagado'
+            ? 'pagado_at = COALESCE(pagado_at, NOW())'
+            : 'pagado_at = pagado_at';
+
+        $stmt = $db->prepare(
+            "UPDATE pedidos
+             SET estado_pedido = :status,
+                 $paidAtSql
+             WHERE id = :id
+               AND deleted_at IS NULL"
+        );
+
+        return $stmt->execute([
+            'id' => $orderId,
+            'status' => $status,
+        ]);
     }
 }

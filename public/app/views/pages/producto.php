@@ -213,7 +213,7 @@ $categoryValue = trim((string) ($product['category'] ?? 'Herbales'));
                         </p>
                     </div>
 
-                    <h3 class="h4 fw-bold mb-3">Escribe una reseña</h3>
+                    <h3 id="escribir-resena" class="h4 fw-bold mb-3">Escribe una reseña</h3>
                     <?php if (empty($currentUser)): ?>
                         <p class="text-muted mb-3 small">Inicia sesión para compartir tu experiencia.</p>
                         <a href="<?= site_url('auth/login'); ?>" class="btn btn-outline-primary w-100 rounded-pill">Iniciar sesión</a>

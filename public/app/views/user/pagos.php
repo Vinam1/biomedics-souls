@@ -1,109 +1,125 @@
-<?php
-// 1. Simulación de datos o configuración (esto podría venir de una base de datos más adelante)
-// El array de 15 artículos científicos
-$articulos = [
-        ["titulo" => "Biodisponibilidad de Compuestos Bioactivos", "imagen" => "https://images.unsplash.com/photo-1532187875605-2fe358a77e95?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo1.pdf"],
-        ["titulo" => "Impacto de los Nootrópicos en el Foco Mental", "imagen" => "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo2.pdf"],
-        ["titulo" => "Estudio Clínico sobre Regeneración Celular", "imagen" => "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo3.pdf"],
-        ["titulo" => "Optimización del Metabolismo Mitocondrial", "imagen" => "https://images.unsplash.com/photo-1581093450021-4a7360e9a6ad?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo4.pdf"],
-        ["titulo" => "Análisis de Pureza en Extractos Botánicos", "imagen" => "https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo5.pdf"],
-        ["titulo" => "Farmacocinética de Suplementos Premium", "imagen" => "https://images.unsplash.com/photo-1614935151651-0bea6508db6b?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo6.pdf"],
-        ["titulo" => "Neurotransmisores y Rendimiento Cognitivo", "imagen" => "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo7.pdf"],
-        ["titulo" => "Efectos de la Microdosificación de Nutrientes", "imagen" => "https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo8.pdf"],
-        ["titulo" => "Respaldo Científico de Biomedics Souls", "imagen" => "https://images.unsplash.com/photo-1579154236594-e1797646a675?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo9.pdf"],
-        ["titulo" => "Avances en la Salud Neurológica 2024", "imagen" => "https://images.unsplash.com/photo-1530210124550-912dc1381cb8?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo10.pdf"],
-        ["titulo" => "Certificaciones de Pureza y Estabilidad", "imagen" => "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo11.pdf"],
-        ["titulo" => "Mecanismos de Absorción Celular", "imagen" => "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo12.pdf"],
-        ["titulo" => "Energía Celular y ATP: Reporte Técnico", "imagen" => "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo13.pdf"],
-        ["titulo" => "Eficacia de Ingredientes Bioactivos", "imagen" => "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=800&q=80", "pdf" => "docs/articulo14.pdf"],
-        ["titulo" => "Futuro de la Nutrición Biomédica", "imagen" => "https://images.unsplash.com/photo-1581093448792-3b20a67baf0b?auto=format&fit=crop&w=1200&q=80", "pdf" => "docs/articulo15.pdf"],
+﻿<?php
+$editingPayment = $editingPayment ?? null;
+$paymentTypes = [
+    'tarjeta' => 'Tarjeta',
+    'mercado_pago' => 'Mercado Pago',
+    'spei' => 'SPEI',
+    'oxxo' => 'OXXO',
+    'transferencia' => 'Transferencia',
+    'otro' => 'Otro',
 ];
 ?>
 
-<!doctype html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Investigación y Avales · Biomedics Souls</title>
+<h2 class="fw-bold mb-4">Métodos de Pago</h2>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <?php if (empty($paymentMethods)): ?>
+                <div class="text-center py-5">
+                    <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 80px; height: 80px;"><i class="fas fa-credit-card fs-1 text-muted"></i></div>
+                    <h5 class="text-muted mb-2">Aún no tienes métodos de pago guardados</h5>
+                    <p class="text-muted mb-0">Agrega un método de pago usando el formulario de la derecha para que puedas usarlo en el checkout.</p>
+                </div>
+            <?php else: ?>
+                <div class="row g-4">
+                    <?php foreach ($paymentMethods as $method): ?>
+                        <div class="col-md-6">
+                            <div class="card border h-100 rounded-4 p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h6 class="fw-semibold mb-1"><?= htmlspecialchars(ucfirst(str_replace('_', ' ', $method['tipo']))); ?></h6>
+                                        <p class="text-muted small mb-0"><?= htmlspecialchars($method['nickname'] ?? 'Método de pago'); ?></p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-<?= !empty($method['es_predeterminado']) ? 'primary' : 'secondary' ?>"><?= !empty($method['es_predeterminado']) ? 'Predeterminado' : 'Guardado' ?></span>
+                                    </div>
+                                </div>
 
-    <link href="styles.css" rel="stylesheet">
+                                <?php if (!empty($method['brand']) || !empty($method['ultimo_cuatro'])): ?>
+                                    <p class="mb-1">
+                                        <?= !empty($method['brand']) ? htmlspecialchars($method['brand']) . ' ' : ''; ?>
+                                        <?= !empty($method['ultimo_cuatro']) ? '•••• ' . htmlspecialchars($method['ultimo_cuatro']) : ''; ?>
+                                    </p>
+                                <?php endif; ?>
 
-    <style>
-        /* Estilos adicionales para la cuadrícula de PDFs */
-        .pdf-icon-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #dc3545;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            z-index: 5;
-        }
-        .magazine-card {
-            transition: transform 0.3s ease;
-            text-decoration: none !important;
-        }
-        .magazine-card:hover {
-            transform: translateY(-10px);
-        }
-    </style>
-</head>
-<body>
+                                <?php if (!empty($method['tipo_tarjeta'])): ?>
+                                    <p class="text-muted small mb-3">Tarjeta de <?= htmlspecialchars($method['tipo_tarjeta']); ?></p>
+                                <?php endif; ?>
 
-<?php include 'header.php'; ?>
-
-<main class="container py-5">
-
-    <div class="row g-4 align-items-center mb-5">
-        <div class="col-lg-8">
-            <h1 class="display-4 fw-bold section-title">Ciencia con Alma</h1>
-            <p class="lead text-muted">
-                Nuestras fórmulas no son casualidad. Explora los estudios y la documentación técnica que respalda cada uno de nuestros suplementos.
-            </p>
+                                <div class="mt-4 pt-3 border-top d-flex gap-2">
+                                    <a href="<?= site_url('cuenta/pagos') . '&edit_payment=' . (int) $method['id']; ?>" class="btn btn-sm btn-outline-primary flex-fill">Editar</a>
+                                    <form method="post" action="<?= site_url('cuenta/pago-eliminar/' . (int) $method['id']); ?>" class="flex-fill">
+                                        <?= csrf_input(); ?>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100" onclick="return confirm('¿Eliminar este método de pago?')">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <div class="row g-4">
-        <?php foreach ($articulos as $index => $art): ?>
-            <div class="col-md-6 col-lg-4">
-                <a href="<?= $art['pdf']; ?>" target="_blank" class="magazine-card d-block rounded-panel overflow-hidden h-100">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 1.5rem;">
+            <h5 class="mb-4"><?= $editingPayment ? 'Editar método de pago' : 'Agregar método de pago'; ?></h5>
+            <?php if ($editingPayment): ?>
+                <div class="alert alert-info py-2 mb-4">Modifica los datos del método y guarda los cambios para actualizarlo.</div>
+            <?php endif; ?>
 
-                    <div class="magazine-graphic position-relative" style="height: 240px;">
-                        <img src="<?= $art['imagen']; ?>" alt="<?= $art['titulo']; ?>" class="w-100 h-100 object-fit-cover">
+            <form method="post" action="<?= site_url('cuenta/pago-guardar'); ?>">
+                <?= csrf_input(); ?>
+                <input type="hidden" name="payment_id" value="<?= (int) ($editingPayment['id'] ?? 0); ?>">
 
-                        <div class="pdf-icon-badge">
-                            <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
-                        </div>
+                <div class="mb-3">
+                    <label class="form-label">Tipo de pago</label>
+                    <select name="tipo" class="form-select" required>
+                        <?php foreach ($paymentTypes as $value => $label): ?>
+                            <option value="<?= $value ?>" <?= ($editingPayment['tipo'] ?? '') === $value ? 'selected' : '' ?>><?= $label ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-                        <div class="magazine-overlay p-3">
-                            <span class="badge bg-purple px-3">Estudio #<?= $index + 1; ?></span>
-                        </div>
+                <div class="mb-3">
+                    <label class="form-label">Alias</label>
+                    <input type="text" name="nickname" class="form-control rounded-3" value="<?= htmlspecialchars($editingPayment['nickname'] ?? '') ?>" placeholder="Ej. Tarjeta personal" required>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Marca</label>
+                        <input type="text" name="brand" class="form-control rounded-3" value="<?= htmlspecialchars($editingPayment['brand'] ?? '') ?>" placeholder="Ej. Visa">
                     </div>
-
-                    <div class="p-4 bg-white border-top">
-                        <h5 class="fw-bold text-dark mb-3"><?= $art['titulo']; ?></h5>
-                        <div class="d-flex align-items-center text-purple fw-semibold small">
-                            LEER DOCUMENTO COMPLETO <i class="bi bi-arrow-right ms-2"></i>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Últimos 4 dígitos</label>
+                        <input type="text" name="ultimo_cuatro" class="form-control rounded-3" value="<?= htmlspecialchars($editingPayment['ultimo_cuatro'] ?? '') ?>" pattern="[0-9]{4}" maxlength="4" placeholder="1234">
                     </div>
-                </a>
-            </div>
-        <?php endforeach; ?>
+                    <div class="col-md-6">
+                        <label class="form-label">Tipo de tarjeta</label>
+                        <select name="tipo_tarjeta" class="form-select">
+                            <option value="" <?= empty($editingPayment['tipo_tarjeta']) ? 'selected' : '' ?>>Selecciona</option>
+                            <option value="credito" <?= ($editingPayment['tipo_tarjeta'] ?? '') === 'credito' ? 'selected' : '' ?>>Crédito</option>
+                            <option value="debito" <?= ($editingPayment['tipo_tarjeta'] ?? '') === 'debito' ? 'selected' : '' ?>>Débito</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="es_predeterminado" id="es_predeterminado" <?= !empty($editingPayment['es_predeterminado']) ? 'checked' : '' ?> >
+                    <label class="form-check-label" for="es_predeterminado">Marcar como método predeterminado</label>
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" name="activo" id="activo" <?= $editingPayment === null || !empty($editingPayment['activo']) ? 'checked' : '' ?> >
+                    <label class="form-check-label" for="activo">Activo</label>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary flex-fill"><?= $editingPayment ? 'Actualizar método' : 'Guardar método'; ?></button>
+                    <?php if ($editingPayment): ?><a href="<?= site_url('cuenta/pagos'); ?>" class="btn btn-outline-secondary">Cancelar</a><?php endif; ?>
+                </div>
+            </form>
+        </div>
     </div>
-</main>
-
-<?php include __DIR__ . '/../partials/footer.php'; ?>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>

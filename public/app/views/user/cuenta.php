@@ -18,11 +18,12 @@ $tab = $tab ?? 'dashboard';
                 </div>
 
                 <nav class="nav flex-column gap-1">
-                    <a href="?tab=dashboard" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'dashboard' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
-                    <a href="?tab=pedidos" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'pedidos' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-shopping-bag"></i><span>Mis Pedidos</span></a>
-                    <a href="?tab=pagos" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'pagos' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-credit-card"></i><span>Métodos de Pago</span></a>
-                    <a href="?tab=direcciones" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'direcciones' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-map-marker-alt"></i><span>Mis Direcciones</span></a>
-                    <a href="?tab=config" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'config' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-cog"></i><span>Configuración</span></a>
+                    <a href="<?= site_url('cuenta'); ?>" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'dashboard' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+                    <a href="<?= site_url('cuenta/pedidos'); ?>" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'pedidos' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-shopping-bag"></i><span>Mis Pedidos</span></a>
+                    <a href="<?= site_url('cuenta/pagos'); ?>" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'pagos' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-credit-card"></i><span>Métodos de Pago</span></a>
+                    <a href="<?= site_url('cuenta/direcciones'); ?>" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'direcciones' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-map-marker-alt"></i><span>Mis Direcciones</span></a>
+                    <a href="<?= site_url('cuenta/resenas'); ?>" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'resenas' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-star"></i><span>Mis Reseñas</span></a>
+                    <a href="<?= site_url('cuenta/config'); ?>" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 <?= $tab === 'config' ? 'active bg-primary text-white' : 'text-dark' ?>"><i class="fas fa-cog"></i><span>Configuración</span></a>
                 </nav>
 
                 <hr class="my-4">
@@ -53,6 +54,8 @@ $tab = $tab ?? 'dashboard';
                 include __DIR__ . '/pagos.php';
             } elseif ($tab === 'direcciones') {
                 include __DIR__ . '/direcciones.php';
+            } elseif ($tab === 'resenas') {
+                include __DIR__ . '/resenas.php';
             } elseif ($tab === 'config') {
                 include __DIR__ . '/config.php';
             }

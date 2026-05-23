@@ -37,14 +37,20 @@ class CartController extends Controller
         }
 
         if (Producto::isOutOfStockStatus($product['estatus'] ?? null)) {
-            $_SESSION['error'] = 'Este producto está agotado y no se puede agregar al carrito.';
+            $_SESSION['cart_feedback'] = [
+                'type' => 'error',
+                'message' => 'Este producto esta agotado y no se puede agregar al carrito.',
+            ];
             header('Location: ' . $this->getRedirectBackUrl(site_url('producto/' . $product['slug'])));
             exit;
         }
 
         Cart::add((int) $productId, $quantity);
-        $_SESSION['success'] = 'Producto agregado al carrito.';
-        header('Location: ' . site_url('carrito'));
+        $_SESSION['cart_feedback'] = [
+            'type' => 'success',
+            'message' => $quantity > 1 ? 'Productos agregados al carrito.' : 'Producto agregado al carrito.',
+        ];
+        header('Location: ' . $this->getRedirectBackUrl(site_url('carrito')));
         exit;
     }
 
@@ -68,7 +74,7 @@ class CartController extends Controller
         $product = Producto::findById((int) $productId);
 
         if ($product && Producto::isOutOfStockStatus($product['estatus'] ?? null) && $quantity > $currentQuantity) {
-            $_SESSION['error'] = 'Este producto está agotado y no puedes aumentar su cantidad.';
+            $_SESSION['error'] = 'Este producto estÃ¡ agotado y no puedes aumentar su cantidad.';
             header('Location: ' . site_url('carrito'));
             exit;
         }
@@ -89,7 +95,7 @@ class CartController extends Controller
         if (!$user) {
             $_SESSION['account_flash'] = [
                 'type' => 'error',
-                'message' => 'Inicia sesión para usar tus datos guardados en el checkout.',
+                'message' => 'Inicia sesiÃ³n para usar tus datos guardados en el checkout.',
             ];
             header('Location: ' . site_url('auth/login'));
             exit;
@@ -102,7 +108,7 @@ class CartController extends Controller
         }
 
         if (!empty(Cart::getOutOfStockItems())) {
-            $_SESSION['error'] = 'Hay productos agotados en tu carrito. Elimínalos antes de continuar al checkout.';
+            $_SESSION['error'] = 'Hay productos agotados en tu carrito. ElimÃ­nalos antes de continuar al checkout.';
             header('Location: ' . site_url('carrito'));
             exit;
         }
@@ -120,7 +126,7 @@ class CartController extends Controller
                 $addressId = (int) ($_POST['address_id'] ?? 0);
                 $selectedAddress = Direccion::findByIdForCliente($addressId, (int) $user['id']);
                 if (!$selectedAddress) {
-                    $this->renderError(422, 'Dirección requerida', 'Selecciona una dirección guardada antes de continuar al pago.');
+                    $this->renderError(422, 'DirecciÃ³n requerida', 'Selecciona una direcciÃ³n guardada antes de continuar al pago.');
                     return;
                 }
 
@@ -141,7 +147,7 @@ class CartController extends Controller
 
                 $selectedPaymentMethod = MetodoPago::findByIdForCliente((int) $paymentId, (int) $user['id']);
                 if (!$selectedPaymentMethod) {
-                    $this->renderError(422, 'Método de pago requerido', 'Selecciona un método de pago guardado antes de confirmar tu pedido.');
+                    $this->renderError(422, 'MÃ©todo de pago requerido', 'Selecciona un mÃ©todo de pago guardado antes de confirmar tu pedido.');
                     return;
                 }
 
@@ -175,7 +181,7 @@ class CartController extends Controller
                 'brand' => null,
                 'ultimo_cuatro' => null,
                 'tipo_tarjeta' => null,
-                'nickname' => 'Tarjeta de Crédito/Débito',
+                'nickname' => 'Tarjeta de Credito/Debito',
             ];
         }
 

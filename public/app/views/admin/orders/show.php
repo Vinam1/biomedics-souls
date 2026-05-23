@@ -1,3 +1,9 @@
+<?php
+$flashSuccess = $_SESSION['success'] ?? null;
+$flashError = $_SESSION['error'] ?? null;
+unset($_SESSION['success'], $_SESSION['error']);
+?>
+
 <div class="container-fluid admin-panel py-5">
     <div class="row g-4">
         <div class="col-xl-3 d-none d-xl-block">
@@ -12,6 +18,13 @@
                     </div>
                     <a href="<?= site_url('admin/pedidos'); ?>" class="btn btn-outline-primary btn-lg">Volver a pedidos</a>
                 </div>
+
+                <?php if (!empty($flashSuccess)): ?>
+                    <div class="alert alert-success rounded-4"><?= htmlspecialchars($flashSuccess); ?></div>
+                <?php endif; ?>
+                <?php if (!empty($flashError)): ?>
+                    <div class="alert alert-danger rounded-4"><?= htmlspecialchars($flashError); ?></div>
+                <?php endif; ?>
 
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
@@ -30,6 +43,26 @@
                             <p class="text-muted mb-0"><strong>Envío:</strong> $<?= number_format($order['costo_envio'], 2); ?></p>
                         </div>
                     </div>
+                </div>
+
+                <div class="section-surface rounded-4 p-4 mb-4">
+                    <h6 class="text-uppercase text-muted small mb-3">Actualizar estatus</h6>
+                    <form method="post" action="<?= site_url('admin/pedido-estatus/' . (int) ($order['id'] ?? 0)); ?>" class="row g-3 align-items-end">
+                        <?= csrf_input(); ?>
+                        <div class="col-md-8 col-lg-5">
+                            <label class="form-label small fw-bold">Estatus del pedido</label>
+                            <select name="estado_pedido" class="form-select rounded-4">
+                                <?php foreach (Pedido::STATUS_OPTIONS as $statusOption): ?>
+                                    <option value="<?= htmlspecialchars($statusOption); ?>" <?= ($order['estado_pedido'] ?? '') === $statusOption ? 'selected' : ''; ?>>
+                                        <?= htmlspecialchars(ucfirst(str_replace('_', ' ', $statusOption))); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <button type="submit" class="btn btn-primary rounded-pill w-100">Guardar cambio</button>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="section-surface rounded-4 p-4 mb-4">

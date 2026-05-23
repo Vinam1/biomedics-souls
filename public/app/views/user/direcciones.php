@@ -32,7 +32,7 @@ $editingAddress = $editingAddress ?? null;
                                 <?php if (!empty($address['referencias'])): ?><p class="small text-muted mt-3 mb-0">Referencias: <?= htmlspecialchars($address['referencias']); ?></p><?php endif; ?>
 
                                 <div class="mt-4 pt-3 border-top d-flex gap-2">
-                                    <a href="<?= site_url('cuenta?tab=direcciones&edit_address=' . (int) $address['id']); ?>" class="btn btn-sm btn-outline-primary flex-fill">Editar</a>
+                                    <a href="<?= site_url('cuenta/direcciones') . '&edit_address=' . (int) $address['id']; ?>" class="btn btn-sm btn-outline-primary flex-fill">Editar</a>
                                     <form method="post" action="<?= site_url('cuenta/direccion-eliminar/' . (int) $address['id']); ?>" class="flex-fill">
                                         <?= csrf_input(); ?>
                                         <button type="submit" class="btn btn-sm btn-outline-danger w-100" onclick="return confirm('¿Eliminar esta dirección?')">Eliminar</button>
@@ -49,6 +49,9 @@ $editingAddress = $editingAddress ?? null;
     <div class="col-lg-5">
         <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 1.5rem;">
             <h5 class="mb-4"><?= $editingAddress ? 'Editar dirección' : 'Agregar dirección'; ?></h5>
+            <?php if ($editingAddress): ?>
+                <div class="alert alert-info py-2 mb-4">Estás editando la dirección existente. Modifica los campos y guarda los cambios.</div>
+            <?php endif; ?>
             <form method="post" action="<?= site_url('cuenta/direccion-guardar'); ?>">
                 <?= csrf_input(); ?>
                 <input type="hidden" name="address_id" value="<?= (int) ($editingAddress['id'] ?? 0); ?>">
@@ -66,7 +69,7 @@ $editingAddress = $editingAddress ?? null;
                 </div>
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-primary flex-fill"><?= $editingAddress ? 'Actualizar dirección' : 'Guardar dirección'; ?></button>
-                    <?php if ($editingAddress): ?><a href="<?= site_url('cuenta?tab=direcciones'); ?>" class="btn btn-outline-secondary">Cancelar</a><?php endif; ?>
+                    <?php if ($editingAddress): ?><a href="<?= site_url('cuenta/direcciones'); ?>" class="btn btn-outline-secondary">Cancelar</a><?php endif; ?>
                 </div>
             </form>
         </div>

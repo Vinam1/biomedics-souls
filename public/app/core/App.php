@@ -94,6 +94,11 @@ class App
                 return;
             }
 
+            if (in_array($url[1], ['dashboard', 'pedidos', 'pagos', 'direcciones', 'resenas', 'config'], true)) {
+                $this->callController('PageController', 'account', [$url[1]]);
+                return;
+            }
+
             if ($url[1] === 'perfil') {
                 $this->callController('AccountController', 'updateProfile');
                 return;
@@ -119,7 +124,7 @@ class App
                 return;
             }
 
-            $this->callController('PageController', 'account');
+            $this->callController('PageController', 'account', [$url[1]]);
             return;
         }
 
@@ -211,6 +216,11 @@ class App
                 return;
             }
 
+            if ($url[1] === 'resenas') {
+                $this->callController('AdminController', 'resenas');
+                return;
+            }
+
             if ($url[1] === 'cliente-detalle' && isset($url[2])) {
                 $this->callController('AdminController', 'clienteDetalle', [$url[2]]);
                 return;
@@ -223,6 +233,16 @@ class App
 
             if ($url[1] === 'pedido-ticket' && isset($url[2])) {
                 $this->callController('AdminController', 'pedidoTicket', [$url[2]]);
+                return;
+            }
+
+            if ($url[1] === 'pedido-estatus' && isset($url[2])) {
+                $this->callController('AdminController', 'pedidoEstatus', [$url[2]]);
+                return;
+            }
+
+            if ($url[1] === 'resena-estatus' && isset($url[2])) {
+                $this->callController('AdminController', 'resenaEstatus', [$url[2]]);
                 return;
             }
 

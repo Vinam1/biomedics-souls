@@ -151,7 +151,7 @@ class AccountController extends Controller
             'message' => $message,
         ];
 
-        header('Location: ' . site_url('cuenta?tab=' . $tab));
+        header('Location: ' . site_url('cuenta/' . rawurlencode($tab)));
         exit;
     }
 }

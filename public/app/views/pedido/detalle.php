@@ -12,7 +12,7 @@ $transaction = $transaction ?? null;
         </div>
         <div class="d-flex gap-2 flex-wrap">
             <a href="<?= site_url('pedido/ticket/' . (int) ($order['id'] ?? 0)); ?>" target="_blank" class="btn btn-outline-dark"><i class="bi bi-file-earmark-pdf me-2"></i>Abrir ticket PDF</a>
-            <a href="<?= site_url('cuenta?tab=pedidos'); ?>" class="btn btn-outline-primary">Volver a mis pedidos</a>
+            <a href="<?= site_url('cuenta/pedidos'); ?>" class="btn btn-outline-primary">Volver a mis pedidos</a>
         </div>
     </div>
 

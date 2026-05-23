@@ -76,7 +76,7 @@ $isPaid = ($order['estado_pedido'] ?? '') === 'pagado';
             </div>
 
             <div class="d-flex gap-2 flex-wrap mt-4">
-                <a href="<?= site_url('cuenta?tab=pedidos'); ?>" class="btn btn-outline-primary">Ir a mis pedidos</a>
+                <a href="<?= site_url('cuenta/pedidos'); ?>" class="btn btn-outline-primary">Ir a mis pedidos</a>
                 <a href="<?= site_url('catalogo'); ?>" class="btn btn-primary">Seguir comprando</a>
             </div>
         </div>

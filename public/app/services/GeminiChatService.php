@@ -20,10 +20,18 @@ class GeminiChatService
         return $this->apiKey !== '';
     }
 
+    public function generateChatResult(string $message, array $products, array $history = []): array
+    {
+        return [
+            'reply' => $this->generateReply($message, $products, $history),
+            'suggestions' => $this->buildFollowUpSuggestions($message, $products),
+        ];
+    }
+
     public function generateReply(string $message, array $products, array $history = []): string
     {
         if (!$this->isConfigured()) {
-            throw new RuntimeException('GEMINI_API_KEY no está configurada en el entorno.');
+            throw new RuntimeException('GEMINI_API_KEY no esta configurada en el entorno.');
         }
 
         $catalogContext = $this->buildCatalogContext($products);
@@ -56,9 +64,9 @@ class GeminiChatService
         $payload = [
             'contents' => $contents,
             'generationConfig' => [
-                'temperature' => 0.5,
+                'temperature' => 0.45,
                 'topP' => 0.9,
-                'maxOutputTokens' => 700,
+                'maxOutputTokens' => 800,
             ],
         ];
 
@@ -67,7 +75,7 @@ class GeminiChatService
         $text = trim((string) $text);
 
         if ($text === '') {
-            throw new RuntimeException('Gemini no devolvió una respuesta utilizable.');
+            throw new RuntimeException('Gemini no devolvio una respuesta utilizable.');
         }
 
         return $text;
@@ -77,15 +85,25 @@ class GeminiChatService
     {
         return <<<PROMPT
 Eres el asistente virtual de Biomedics Souls.
-Responde en español claro, amable y útil.
-Debes basarte principalmente en el catálogo proporcionado abajo.
-No inventes productos, precios, presentaciones, beneficios o disponibilidad que no estén en el contexto.
-Si no tienes suficiente información, dilo con honestidad.
-No des diagnósticos médicos ni sustituye consejo profesional.
-Cuando recomiendes productos, menciona nombres exactos del catálogo si aplican.
-Si el usuario pregunta por algo fuera del catálogo, responde brevemente y redirige hacia los productos o contacto.
+Responde en espanol claro, natural, breve y orientado a ayudar a comprar.
+Comportate como un asesor de productos, no como un chatbot generico.
+Debes basarte principalmente en el catalogo proporcionado abajo.
+No inventes productos, precios, presentaciones, beneficios, stock, promociones o disponibilidad que no esten en el contexto.
+Si no tienes suficiente informacion, dilo con honestidad.
+No des diagnosticos medicos ni sustituyas consejo profesional.
+Cuando recomiendes productos:
+- menciona nombres exactos del catalogo
+- explica en 1 o 2 lineas por que podrian encajar
+- si hay varias opciones, comparalas muy brevemente
+- evita listar demasiados productos si no hace falta
+Si el usuario es ambiguo, haz una sola pregunta de aclaracion corta.
+Si pregunta por precios, menciona el precio exacto del contexto si existe.
+Si pregunta por disponibilidad, usa solo el estatus del contexto.
+Si no encuentras productos relevantes, dilo y sugiere reformular la necesidad.
+Evita frases roboticas, disclaimers largos y relleno.
+No uses Markdown complejo; texto plano o listas cortas esta bien.
 
-CATÁLOGO DISPONIBLE:
+CATALOGO DISPONIBLE:
 {$catalogContext}
 
 PREGUNTA DEL USUARIO:
@@ -106,19 +124,55 @@ PROMPT;
                 : (float) ($product['precio'] ?? 0);
 
             $lines[] = sprintf(
-                "- %s | categoría: %s | precio: $%s | estatus: %s | presentación: %s | descripción corta: %s | beneficios: %s | modo de empleo: %s",
+                '- %s | categoria: %s | precio: $%s | estatus: %s | presentacion: %s | descripcion corta: %s | beneficios: %s | modo de empleo: %s',
                 trim((string) ($product['nombre'] ?? 'Producto sin nombre')),
                 trim((string) ($product['categoria_nombre'] ?? 'General')),
                 number_format($price, 2, '.', ''),
                 trim((string) ($product['estatus'] ?? 'activo')),
                 trim((string) ($product['contenido_neto'] ?? $product['cantidad_envase'] ?? 'No especificado')),
-                trim((string) ($product['descripcion_corta'] ?? 'Sin descripción corta')),
+                trim((string) ($product['descripcion_corta'] ?? 'Sin descripcion corta')),
                 trim((string) ($product['beneficios'] ?? 'No especificados')),
                 trim((string) ($product['modo_empleo'] ?? 'No especificado'))
             );
         }
 
         return implode("\n", $lines);
+    }
+
+    private function buildFollowUpSuggestions(string $message, array $products): array
+    {
+        $messageLower = function_exists('mb_strtolower')
+            ? mb_strtolower($message, 'UTF-8')
+            : strtolower($message);
+
+        $suggestions = [];
+
+        if (str_contains($messageLower, 'precio') || str_contains($messageLower, 'cuesta')) {
+            $suggestions[] = 'Cual me conviene mas por beneficios';
+            $suggestions[] = 'Muestrame otra opcion similar';
+        } elseif (str_contains($messageLower, 'energ') || str_contains($messageLower, 'cansancio')) {
+            $suggestions[] = 'Quiero comparar opciones para energia';
+            $suggestions[] = 'Cual es mejor para uso diario';
+        } elseif (str_contains($messageLower, 'enfoque') || str_contains($messageLower, 'concentr')) {
+            $suggestions[] = 'Comparame opciones para enfoque mental';
+            $suggestions[] = 'Cual recomiendas para estudiar o trabajar';
+        } elseif (str_contains($messageLower, 'estres') || str_contains($messageLower, 'estrés') || str_contains($messageLower, 'ansiedad')) {
+            $suggestions[] = 'Busco algo para calma y descanso';
+            $suggestions[] = 'Que opcion es mas suave para empezar';
+        }
+
+        foreach (array_slice($products, 0, 2) as $product) {
+            $name = trim((string) ($product['nombre'] ?? ''));
+            if ($name !== '') {
+                $suggestions[] = 'Cuentame mas sobre ' . $name;
+            }
+        }
+
+        $suggestions[] = 'Muestrame productos destacados';
+        $suggestions[] = 'Que opcion recomiendas segun mi objetivo';
+
+        $suggestions = array_values(array_unique(array_filter(array_map('trim', $suggestions))));
+        return array_slice($suggestions, 0, 4);
     }
 
     private function postJson(array $payload): array
@@ -174,7 +228,7 @@ PROMPT;
 
         $data = json_decode($raw, true);
         if (!is_array($data)) {
-            throw new RuntimeException('Gemini devolvió una respuesta inválida.');
+            throw new RuntimeException('Gemini devolvio una respuesta invalida.');
         }
 
         if ($httpCode >= 400) {

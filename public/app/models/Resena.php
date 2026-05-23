@@ -26,6 +26,22 @@ class Resena
         return $stmt->fetchAll();
     }
 
+    public static function allForAdmin(): array
+    {
+        $db = Database::getInstance();
+        $stmt = $db->query(
+            'SELECT r.id, r.calificacion, r.titulo, r.comentario, r.estatus, r.created_at,
+                    u.id AS cliente_id, u.nombre, u.apellidos, u.email,
+                    p.id AS producto_id, p.nombre AS producto_nombre, p.slug AS producto_slug
+             FROM resenas r
+             INNER JOIN usuarios u ON u.id = r.cliente_id
+             INNER JOIN productos p ON p.id = r.producto_id
+             WHERE r.deleted_at IS NULL
+             ORDER BY r.created_at DESC, r.id DESC'
+        );
+        return $stmt->fetchAll();
+    }
+
     /**
      * ReseÃ±as de un producto especÃ­fico (para pÃ¡gina de producto)
      */
@@ -53,12 +69,11 @@ class Resena
     {
         $db = Database::getInstance();
         $stmt = $db->prepare(
-            'SELECT r.id, r.calificacion, r.titulo, r.comentario, r.created_at,
+            'SELECT r.id, r.calificacion, r.titulo, r.comentario, r.estatus, r.created_at,
                     p.nombre as producto_nombre, p.slug as producto_slug
              FROM resenas r
              INNER JOIN productos p ON p.id = r.producto_id
              WHERE r.cliente_id = :userId 
-               AND r.estatus = "publicada" 
                AND r.deleted_at IS NULL
              ORDER BY r.created_at DESC'
         );
@@ -125,6 +140,31 @@ class Resena
         return $stmt->fetchColumn() > 0;
     }
 
+    public static function reviewableProductsForUser(int $userId): array
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare(
+            'SELECT p.id, p.nombre, p.slug, p.sku, p.calificacion_promedio,
+                    MAX(pe.created_at) AS ultima_compra_fecha
+             FROM pedidos pe
+             INNER JOIN pedidos_detalle pd ON pd.pedido_id = pe.id
+             INNER JOIN productos p ON p.id = pd.producto_id
+             LEFT JOIN resenas r
+                ON r.cliente_id = pe.cliente_id
+               AND r.producto_id = p.id
+               AND r.deleted_at IS NULL
+             WHERE pe.cliente_id = :userId
+               AND pe.estado_pedido = "entregado"
+               AND pe.deleted_at IS NULL
+               AND p.deleted_at IS NULL
+               AND r.id IS NULL
+             GROUP BY p.id, p.nombre, p.slug, p.sku, p.calificacion_promedio
+             ORDER BY ultima_compra_fecha DESC, p.nombre ASC'
+        );
+        $stmt->execute(['userId' => $userId]);
+        return $stmt->fetchAll();
+    }
+
     public static function findByClientForAdmin(int $userId): array
     {
         $db = Database::getInstance();
@@ -139,5 +179,26 @@ class Resena
         );
         $stmt->execute(['userId' => $userId]);
         return $stmt->fetchAll();
+    }
+
+    public static function updateStatus(int $id, string $status): bool
+    {
+        $allowed = ['publicada', 'eliminada'];
+        if (!in_array($status, $allowed, true)) {
+            return false;
+        }
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare(
+            'UPDATE resenas
+             SET estatus = :estatus
+             WHERE id = :id
+               AND deleted_at IS NULL'
+        );
+
+        return $stmt->execute([
+            'id' => $id,
+            'estatus' => $status,
+        ]);
     }
 }

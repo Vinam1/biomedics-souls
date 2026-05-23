@@ -93,11 +93,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const form = widget.querySelector('[data-assistant-form]');
         const input = widget.querySelector('[data-assistant-input]');
         const messages = widget.querySelector('[data-assistant-messages]');
-        const suggestions = widget.querySelectorAll('[data-suggestion]');
+        const suggestionsContainer = widget.querySelector('[data-assistant-suggestions]');
         const sendButton = widget.querySelector('[data-assistant-send]');
+        const typingIndicator = widget.querySelector('[data-assistant-typing]');
         const chatEndpoint = widget.dataset.chatEndpoint;
         const resetEndpoint = widget.dataset.resetEndpoint;
         const csrfToken = widget.dataset.csrfToken;
+        const storageKey = widget.dataset.storageKey || 'assistant-chat';
 
         function setOpen(open) {
             widget.classList.toggle('is-open', open);
@@ -112,6 +114,19 @@ document.addEventListener('DOMContentLoaded', function () {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function serializeMessages() {
+            const data = [];
+            messages.querySelectorAll('.assistant-message').forEach(function (node) {
+                const bubble = node.querySelector('.assistant-bubble');
+                if (!bubble) return;
+                data.push({
+                    role: node.classList.contains('assistant-message-user') ? 'user' : 'assistant',
+                    text: bubble.textContent || ''
+                });
+            });
+            sessionStorage.setItem(storageKey, JSON.stringify(data.slice(-12)));
         }
 
         function appendMessage(role, text, products) {
@@ -153,12 +168,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
             messages.appendChild(item);
             messages.scrollTop = messages.scrollHeight;
+            serializeMessages();
+        }
+
+        function restoreMessages() {
+            const raw = sessionStorage.getItem(storageKey);
+            if (!raw) return;
+
+            try {
+                const items = JSON.parse(raw);
+                if (!Array.isArray(items) || items.length === 0) return;
+                messages.innerHTML = '';
+                items.forEach(function (item) {
+                    appendMessage(item.role === 'user' ? 'user' : 'assistant', item.text || '');
+                });
+            } catch (error) {
+                sessionStorage.removeItem(storageKey);
+            }
+        }
+
+        function renderSuggestions(items) {
+            if (!suggestionsContainer) return;
+            const suggestions = Array.isArray(items) ? items.filter(Boolean).slice(0, 4) : [];
+            suggestionsContainer.innerHTML = '';
+
+            suggestions.forEach(function (text) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'assistant-suggestion-chip';
+                button.dataset.suggestion = text;
+                button.textContent = text;
+                button.addEventListener('click', function () {
+                    setOpen(true);
+                    sendMessage(text);
+                });
+                suggestionsContainer.appendChild(button);
+            });
         }
 
         function setLoading(loading) {
             widget.classList.toggle('is-loading', loading);
             sendButton.disabled = loading;
             input.disabled = loading;
+            if (typingIndicator) {
+                typingIndicator.hidden = !loading;
+            }
         }
 
         async function sendMessage(message) {
@@ -187,6 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 appendMessage('assistant', payload.reply || 'No se recibió respuesta.', payload.products || []);
+                renderSuggestions(payload.suggestions || []);
             } catch (error) {
                 appendMessage('assistant', error.message || 'Ocurrió un error inesperado.');
             } finally {
@@ -209,7 +264,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             messages.innerHTML = '';
+            sessionStorage.removeItem(storageKey);
             appendMessage('assistant', 'Listo, reinicié la conversación. Puedes volver a preguntarme por cualquier producto del catálogo.');
+            renderSuggestions([
+                'Quiero algo para energía y vitalidad',
+                '¿Qué producto recomiendas para enfoque mental?',
+                'Muéstrame productos destacados del catálogo'
+            ]);
         }
 
         toggle.addEventListener('click', function () {
@@ -222,13 +283,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         resetBtn.addEventListener('click', function () {
             resetChat();
-        });
-
-        suggestions.forEach(function (button) {
-            button.addEventListener('click', function () {
-                setOpen(true);
-                sendMessage(button.dataset.suggestion || '');
-            });
         });
 
         form.addEventListener('submit', function (event) {
@@ -247,6 +301,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 form.requestSubmit();
             }
         });
+
+        restoreMessages();
+        renderSuggestions([
+            'Quiero algo para energía y vitalidad',
+            '¿Qué producto recomiendas para enfoque mental?',
+            'Muéstrame productos destacados del catálogo'
+        ]);
     }
 
     window.initBiomedicsAnimations = initAnimations;

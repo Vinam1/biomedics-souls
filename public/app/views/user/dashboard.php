@@ -44,37 +44,37 @@
 
 <div class="row g-4">
     <div class="col-md-4">
-        <a href="<?= site_url('catalogo') ?>" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none h-100 hover-lift">
+        <a href="<?= site_url('cuenta/pedidos') ?>" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none h-100 hover-lift">
             <div class="text-center">
                 <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                     <i class="fas fa-shopping-cart fs-3"></i>
                 </div>
-                <h6 class="fw-semibold">Comprar de nuevo</h6>
-                <p class="text-muted small mb-0">Repite tus compras anteriores</p>
+                <h6 class="fw-semibold">Ver mis pedidos</h6>
+                <p class="text-muted small mb-0">Revisa tus compras recientes</p>
             </div>
         </a>
     </div>
 
     <div class="col-md-4">
-        <a href="<?= site_url('quiz') ?>" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none h-100 hover-lift">
+        <a href="<?= site_url('cuenta/pagos') ?>" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none h-100 hover-lift">
             <div class="text-center">
                 <div class="bg-info bg-opacity-10 text-info rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                    <i class="fas fa-clipboard-list fs-3"></i>
+                    <i class="fas fa-credit-card fs-3"></i>
                 </div>
-                <h6 class="fw-semibold">Resultados de mi quiz</h6>
-                <p class="text-muted small mb-0">Ver tu fórmula personalizada</p>
+                <h6 class="fw-semibold">Métodos de pago</h6>
+                <p class="text-muted small mb-0">Administra tus tarjetas guardadas</p>
             </div>
         </a>
     </div>
 
     <div class="col-md-4">
-        <a href="?tab=pedidos" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none h-100 hover-lift">
+        <a href="<?= site_url('cuenta/direcciones') ?>" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none h-100 hover-lift">
             <div class="text-center">
                 <div class="bg-success bg-opacity-10 text-success rounded-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                    <i class="fas fa-truck fs-3"></i>
+                    <i class="fas fa-map-marker-alt fs-3"></i>
                 </div>
-                <h6 class="fw-semibold">Rastrear mi pedido</h6>
-                <p class="text-muted small mb-0">Estado de tus envíos</p>
+                <h6 class="fw-semibold">Mis direcciones</h6>
+                <p class="text-muted small mb-0">Actualiza tu dirección de envío</p>
             </div>
         </a>
     </div>
@@ -83,7 +83,7 @@
 <div class="mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-semibold">Actividad reciente</h5>
-        <a href="?tab=pedidos" class="text-primary small fw-medium">Ver todo <i class="bi bi-arrow-right"></i></a>
+        <a href="<?= site_url('cuenta/pedidos') ?>" class="text-primary small fw-medium">Ver todo <i class="bi bi-arrow-right"></i></a>
     </div>
 
     <?php if (empty($orders)): ?>

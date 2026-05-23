@@ -11,7 +11,7 @@ $step = $step ?? 1;
                     <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                         <div class="step-item <?= $step >= 1 ? 'active' : ''; ?>">
                             <div class="step-circle">1</div>
-                            <span>Dirección</span>
+                            <span>Direccion</span>
                         </div>
                         <div class="step-item <?= $step >= 2 ? 'active' : ''; ?>">
                             <div class="step-circle">2</div>
@@ -30,14 +30,14 @@ $step = $step ?? 1;
                             <div class="section-card p-4 p-lg-5">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
                                     <div>
-                                        <h3 class="mb-1">Selecciona una dirección</h3>
-                                        <p class="text-muted mb-0">Usaremos tu teléfono de perfil: <strong><?= htmlspecialchars($user['telefono'] ?? 'Sin capturar'); ?></strong></p>
+                                        <h3 class="mb-1">Selecciona una direccion</h3>
+                                        <p class="text-muted mb-0">Usaremos tu telefono de perfil: <strong><?= htmlspecialchars($user['telefono'] ?? 'Sin capturar'); ?></strong></p>
                                     </div>
-                                    <a href="<?= site_url('cuenta?tab=direcciones'); ?>" class="btn btn-outline-primary">Administrar direcciones</a>
+                                    <a href="<?= site_url('cuenta/direcciones'); ?>" class="btn btn-outline-primary">Administrar direcciones</a>
                                 </div>
 
                                 <?php if (empty($addresses)): ?>
-                                    <div class="alert alert-warning rounded-4 mb-0">Primero guarda una dirección en tu cuenta para continuar con el checkout.</div>
+                                    <div class="alert alert-warning rounded-4 mb-0">Primero guarda una direccion en tu cuenta para continuar con el checkout.</div>
                                 <?php else: ?>
                                     <form method="post" action="<?= site_url('checkout?step=1'); ?>">
                                         <?= csrf_input(); ?>
@@ -65,18 +65,18 @@ $step = $step ?? 1;
                             <div class="section-card p-4 p-lg-5">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
                                     <div>
-                                        <h3 class="mb-1">Selecciona un método de pago</h3>
-                                        <p class="text-muted mb-0">Puedes administrarlos desde tu cuenta y reutilizarlos aquí.</p>
+                                        <h3 class="mb-1">Selecciona un metodo de pago</h3>
+                                        <p class="text-muted mb-0">Usa una tarjeta guardada o paga con una tarjeta nueva dentro de Mercado Pago.</p>
                                     </div>
-                                    <a href="<?= site_url('cuenta?tab=pagos'); ?>" class="btn btn-outline-primary">Administrar pagos</a>
+                                    <a href="<?= site_url('cuenta/pagos'); ?>" class="btn btn-outline-primary">Administrar pagos</a>
                                 </div>
 
-                                <?php if (empty($paymentMethods)): ?>
-                                    <div class="alert alert-warning rounded-4 mb-0">Primero guarda un método de pago en tu cuenta para continuar.</div>
-                                <?php else: ?>
-                                    <form method="post" action="<?= site_url('checkout?step=2'); ?>">
-                                        <?= csrf_input(); ?>
-                                        <div class="vstack gap-3">
+                                <form method="post" action="<?= site_url('checkout?step=2'); ?>">
+                                    <?= csrf_input(); ?>
+                                    <div class="vstack gap-3">
+                                        <?php if (empty($paymentMethods)): ?>
+                                            <div class="alert alert-info rounded-4 mb-1">Aun no tienes metodos guardados. Puedes continuar pagando con una tarjeta nueva.</div>
+                                        <?php else: ?>
                                             <?php foreach ($paymentMethods as $index => $method): ?>
                                                 <label class="checkout-choice <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === (int) $method['id'] ? 'is-active' : ''; ?>" data-animate="fade-up" data-animate-delay="<?= $index * 70; ?>">
                                                     <input type="radio" name="payment_id" value="<?= (int) $method['id']; ?>" class="form-check-input mt-1" <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === (int) $method['id'] ? 'checked' : ''; ?>>
@@ -86,28 +86,32 @@ $step = $step ?? 1;
                                                             <?php if (!empty($method['es_predeterminado'])): ?><span class="badge bg-primary">Predeterminado</span><?php endif; ?>
                                                         </div>
                                                         <?php if (!empty($method['nickname'])): ?><div class="small mb-1"><?= htmlspecialchars($method['nickname']); ?></div><?php endif; ?>
-                                                        <div class="text-muted small"><?= !empty($method['brand']) ? htmlspecialchars($method['brand']) . ' ' : ''; ?><?= !empty($method['ultimo_cuatro']) ? '•••• ' . htmlspecialchars($method['ultimo_cuatro']) : 'Sin dígitos registrados'; ?></div>
+                                                        <div class="text-muted small"><?= !empty($method['brand']) ? htmlspecialchars($method['brand']) . ' ' : ''; ?><?= !empty($method['ultimo_cuatro']) ? '**** ' . htmlspecialchars($method['ultimo_cuatro']) : 'Sin digitos registrados'; ?></div>
                                                         <?php if (!empty($method['tipo_tarjeta'])): ?><div class="text-muted small">Tarjeta de <?= htmlspecialchars($method['tipo_tarjeta']); ?></div><?php endif; ?>
                                                     </div>
                                                 </label>
                                             <?php endforeach; ?>
-                                            <label class="checkout-choice <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === 0 ? 'is-active' : ''; ?>" data-animate="fade-up" data-animate-delay="<?= count($paymentMethods) * 70; ?>">
-                                                <input type="radio" name="payment_id" value="new_card" class="form-check-input mt-1" <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === 0 ? 'checked' : ''; ?>>
-                                                <div>
-                                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                                        <strong>Tarjeta de Crédito/Débito</strong>
-                                                        <span class="badge bg-success">Mercado Pago</span>
-                                                    </div>
-                                                    <div class="text-muted small">Visa y Mastercard, tokenizado con Mercado Pago.</div>
+                                        <?php endif; ?>
+
+                                        <label class="checkout-choice <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === 0 ? 'is-active' : ''; ?>" data-animate="fade-up" data-animate-delay="<?= count($paymentMethods) * 70; ?>">
+                                            <input type="radio" name="payment_id" value="new_card" class="form-check-input mt-1" <?= !empty($selectedPaymentMethod['id']) && (int) $selectedPaymentMethod['id'] === 0 ? 'checked' : ''; ?>>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                                    <strong>Tarjeta nueva</strong>
+                                                    <span class="badge bg-success">Mercado Pago</span>
+                                                    <span class="badge bg-light text-dark border">Visa</span>
+                                                    <span class="badge bg-light text-dark border">Mastercard</span>
                                                 </div>
-                                            </label>
-                                        </div>
-                                        <div class="mt-4 d-flex gap-3 flex-wrap">
-                                            <a href="<?= site_url('checkout?step=1'); ?>" class="btn btn-outline-secondary">Volver</a>
-                                            <button type="submit" class="btn btn-primary btn-lg px-5">Continuar a confirmación</button>
-                                        </div>
-                                    </form>
-                                <?php endif; ?>
+                                                <div class="text-muted small">Capturas tus datos en el siguiente paso y se tokenizan de forma segura antes de procesar el cobro.</div>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="mt-4 d-flex gap-3 flex-wrap">
+                                        <a href="<?= site_url('checkout?step=1'); ?>" class="btn btn-outline-secondary">Volver</a>
+                                        <button type="submit" class="btn btn-primary btn-lg px-5">Continuar a confirmacion</button>
+                                    </div>
+                                </form>
                             </div>
                         <?php elseif ($step === 3): ?>
                             <div class="section-card p-4 p-lg-5">
@@ -115,7 +119,7 @@ $step = $step ?? 1;
 
                                 <div class="row g-4 mb-4">
                                     <div class="col-md-6">
-                                        <h6 class="mb-2">Dirección de envío</h6>
+                                        <h6 class="mb-2">Direccion de envio</h6>
                                         <?php if (!empty($selectedAddress)): ?>
                                             <p class="text-muted mb-0">
                                                 <?= htmlspecialchars($user['nombre'] . ' ' . $user['apellidos']); ?><br>
@@ -127,12 +131,12 @@ $step = $step ?? 1;
                                         <?php endif; ?>
                                     </div>
                                     <div class="col-md-6">
-                                        <h6 class="mb-2">Método de pago</h6>
+                                        <h6 class="mb-2">Metodo de pago</h6>
                                         <?php if (!empty($selectedPaymentMethod)): ?>
                                             <p class="text-muted mb-0">
                                                 <?= htmlspecialchars(ucfirst(str_replace('_', ' ', $selectedPaymentMethod['tipo']))); ?><br>
                                                 <?= !empty($selectedPaymentMethod['nickname']) ? htmlspecialchars($selectedPaymentMethod['nickname']) . '<br>' : ''; ?>
-                                                <?= !empty($selectedPaymentMethod['brand']) ? htmlspecialchars($selectedPaymentMethod['brand']) . ' ' : ''; ?><?= !empty($selectedPaymentMethod['ultimo_cuatro']) ? '•••• ' . htmlspecialchars($selectedPaymentMethod['ultimo_cuatro']) : ''; ?>
+                                                <?= !empty($selectedPaymentMethod['brand']) ? htmlspecialchars($selectedPaymentMethod['brand']) . ' ' : ''; ?><?= !empty($selectedPaymentMethod['ultimo_cuatro']) ? '**** ' . htmlspecialchars($selectedPaymentMethod['ultimo_cuatro']) : ''; ?>
                                             </p>
                                         <?php endif; ?>
                                     </div>
@@ -150,7 +154,7 @@ $step = $step ?? 1;
                                 <?php endforeach; ?>
 
                                 <div class="d-flex justify-content-between mt-4 mb-2"><span>Subtotal</span><strong>$<?= number_format($total ?? 0, 2); ?></strong></div>
-                                <div class="d-flex justify-content-between mb-3"><span>Envío</span><strong class="text-success">Gratis</strong></div>
+                                <div class="d-flex justify-content-between mb-3"><span>Envio</span><strong class="text-success">Gratis</strong></div>
                                 <hr>
                                 <div class="d-flex justify-content-between fs-4 fw-bold"><span>Total a pagar</span><span>$<?= number_format($total ?? 0, 2); ?></span></div>
 
@@ -166,14 +170,19 @@ $step = $step ?? 1;
 
                                             <div class="section-card p-4 mb-4 border rounded-4">
                                                 <h5 class="mb-3">Datos de la tarjeta</h5>
-                                                <p class="text-muted small mb-4">Las tarjetas Visa y Mastercard se procesarán con Mercado Pago.</p>
+                                                <p class="text-muted small mb-3">Las tarjetas Visa y Mastercard se procesaran con Mercado Pago dentro de esta compra.</p>
+                                                <div class="d-flex flex-wrap gap-2 mb-4">
+                                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">Tokenizacion segura</span>
+                                                    <span class="badge bg-light text-dark border">Sin salir del checkout</span>
+                                                    <span class="badge bg-light text-dark border">Cargo en MXN</span>
+                                                </div>
                                                 <div class="row g-3">
                                                     <div class="col-12">
                                                         <label for="cardholderName" class="form-label small fw-bold">Nombre del titular</label>
                                                         <input type="text" id="cardholderName" name="cardholder_name" class="form-control rounded-4" required maxlength="80" placeholder="Nombre tal como aparece en la tarjeta">
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label for="cardNumber" class="form-label small fw-bold">Número de tarjeta</label>
+                                                        <label for="cardNumber" class="form-label small fw-bold">Numero de tarjeta</label>
                                                         <input type="text" id="cardNumber" name="card_number" data-checkout="cardNumber" class="form-control rounded-4" required maxlength="19" placeholder="0000 0000 0000 0000">
                                                     </div>
                                                     <div class="col-md-3">
@@ -181,7 +190,7 @@ $step = $step ?? 1;
                                                         <input type="text" id="cardExpirationMonth" name="card_expiration_month" data-checkout="cardExpirationMonth" class="form-control rounded-4" required maxlength="2" placeholder="MM">
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <label for="cardExpirationYear" class="form-label small fw-bold">Año</label>
+                                                        <label for="cardExpirationYear" class="form-label small fw-bold">Ano</label>
                                                         <input type="text" id="cardExpirationYear" name="card_expiration_year" data-checkout="cardExpirationYear" class="form-control rounded-4" required maxlength="2" placeholder="AA">
                                                     </div>
                                                     <div class="col-md-6">
@@ -198,7 +207,7 @@ $step = $step ?? 1;
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label for="docNumber" class="form-label small fw-bold">Documento</label>
-                                                        <input type="text" id="docNumber" name="doc_number" data-checkout="docNumber" class="form-control rounded-4" required value="<?= htmlspecialchars(preg_replace('/\D+/', '', $user['telefono'] ?? '')); ?>" placeholder="Número de documento">
+                                                        <input type="text" id="docNumber" name="doc_number" data-checkout="docNumber" class="form-control rounded-4" required value="<?= htmlspecialchars(preg_replace('/\D+/', '', $user['telefono'] ?? '')); ?>" placeholder="Numero de documento">
                                                     </div>
                                                     <div class="col-12">
                                                         <div id="mp-card-error" class="alert alert-danger d-none"></div>
@@ -219,7 +228,7 @@ $step = $step ?? 1;
                             <h5 class="mb-3">Resumen del pedido</h5>
                             <?php foreach ($cartItems as $item): ?>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <div class="small"><?= htmlspecialchars($item['product']['nombre'] ?? ''); ?><span class="text-muted"> ×<?= $item['quantity']; ?></span></div>
+                                    <div class="small"><?= htmlspecialchars($item['product']['nombre'] ?? ''); ?><span class="text-muted"> x<?= $item['quantity']; ?></span></div>
                                     <strong class="small">$<?= number_format($item['subtotal'], 2); ?></strong>
                                 </div>
                             <?php endforeach; ?>
@@ -265,6 +274,8 @@ $step = $step ?? 1;
             }
 
             event.preventDefault();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Procesando pago...';
             cardError.classList.add('d-none');
             cardError.textContent = '';
 
@@ -277,10 +288,13 @@ $step = $step ?? 1;
                     return;
                 }
 
-                let message = 'Error al generar el token de pago. Revisa los datos de tu tarjeta e inténtalo de nuevo.';
+                let message = 'Error al generar el token de pago. Revisa los datos de tu tarjeta e intentalo de nuevo.';
                 if (response && response.cause && response.cause.length > 0) {
                     message = response.cause.map(function (error) { return error.description; }).join(', ');
                 }
+
+                submitButton.disabled = false;
+                submitButton.textContent = 'Confirmar y pagar';
                 cardError.textContent = message;
                 cardError.classList.remove('d-none');
             });

@@ -43,7 +43,8 @@ class AssistantController extends Controller
         $service = new GeminiChatService();
 
         try {
-            $reply = $service->generateReply($message, $products, $history);
+            $result = $service->generateChatResult($message, $products, $history);
+            $reply = $result['reply'];
 
             $history[] = ['role' => 'user', 'text' => $message];
             $history[] = ['role' => 'assistant', 'text' => $reply];
@@ -64,6 +65,7 @@ class AssistantController extends Controller
                         'url' => site_url('producto/' . ($product['slug'] ?? '')),
                     ];
                 }, $products),
+                'suggestions' => $result['suggestions'] ?? [],
                 'configured' => $service->isConfigured(),
             ], JSON_UNESCAPED_UNICODE);
         } catch (Throwable $e) {

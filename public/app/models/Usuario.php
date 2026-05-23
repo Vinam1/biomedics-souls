@@ -45,10 +45,29 @@ class Usuario
         ]);
     }
 
-    public static function adminClientList(): array
+    public static function countAdminClientList(array $filters = []): int
     {
         $db = Database::getInstance();
-        $stmt = $db->query(
+        $where = self::buildAdminClientListWhere($filters, $params);
+        $stmt = $db->prepare(
+            'SELECT COUNT(*)
+             FROM usuarios u
+             WHERE u.role = "cliente"
+               AND u.deleted_at IS NULL'
+            . $where
+        );
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public static function adminClientList(array $filters = [], int $page = 1, int $perPage = 10): array
+    {
+        $db = Database::getInstance();
+        $where = self::buildAdminClientListWhere($filters, $params);
+        $offset = max(0, ($page - 1) * $perPage);
+
+        $stmt = $db->prepare(
             'SELECT u.id, u.nombre, u.apellidos, u.email, u.telefono, u.created_at,
                     COALESCE(
                         (
@@ -85,8 +104,16 @@ class Usuario
              FROM usuarios u
              WHERE u.role = "cliente"
                AND u.deleted_at IS NULL
-             ORDER BY u.created_at DESC, u.id DESC'
+             ' . $where . '
+             ORDER BY u.created_at DESC, u.id DESC
+             LIMIT :limit OFFSET :offset'
         );
+        foreach ($params as $key => $value) {
+            $stmt->bindValue(':' . $key, $value);
+        }
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
 
         return $stmt->fetchAll();
     }
@@ -134,5 +161,42 @@ class Usuario
         $stmt->execute(['id' => $id]);
 
         return $stmt->fetch() ?: null;
+    }
+
+    private static function buildAdminClientListWhere(array $filters, array &$params): string
+    {
+        $params = [];
+        $conditions = [];
+
+        $query = trim((string) ($filters['q'] ?? ''));
+        if ($query !== '') {
+            $params['search'] = '%' . $query . '%';
+            $conditions[] = '(u.nombre LIKE :search OR u.apellidos LIKE :search OR u.email LIKE :search OR u.telefono LIKE :search)';
+        }
+
+        $status = trim((string) ($filters['status'] ?? ''));
+        $allowedStatuses = ['pendiente', 'pagado', 'en_preparacion', 'enviado', 'entregado', 'cancelado', 'sin_pedidos'];
+        if (in_array($status, $allowedStatuses, true)) {
+            if ($status === 'sin_pedidos') {
+                $conditions[] = '(
+                    SELECT COUNT(*)
+                    FROM pedidos p
+                    WHERE p.cliente_id = u.id
+                      AND p.deleted_at IS NULL
+                ) = 0';
+            } else {
+                $params['status'] = $status;
+                $conditions[] = '(
+                    SELECT p.estado_pedido
+                    FROM pedidos p
+                    WHERE p.cliente_id = u.id
+                      AND p.deleted_at IS NULL
+                    ORDER BY p.created_at DESC, p.id DESC
+                    LIMIT 1
+                ) = :status';
+            }
+        }
+
+        return empty($conditions) ? '' : ' AND ' . implode(' AND ', $conditions);
     }
 }

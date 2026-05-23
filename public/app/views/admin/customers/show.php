@@ -1,5 +1,8 @@
 <?php
 $fullName = trim(($client['nombre'] ?? '') . ' ' . ($client['apellidos'] ?? ''));
+$flashSuccess = $_SESSION['success'] ?? null;
+$flashError = $_SESSION['error'] ?? null;
+unset($_SESSION['success'], $_SESSION['error']);
 ?>
 
 <div class="container-fluid admin-panel py-5">
@@ -17,6 +20,13 @@ $fullName = trim(($client['nombre'] ?? '') . ' ' . ($client['apellidos'] ?? ''))
                     <a href="<?= site_url('admin/clientes'); ?>" class="btn btn-outline-primary btn-lg">Volver a clientes</a>
                 </div>
             </div>
+
+            <?php if (!empty($flashSuccess)): ?>
+                <div class="alert alert-success rounded-4"><?= htmlspecialchars($flashSuccess); ?></div>
+            <?php endif; ?>
+            <?php if (!empty($flashError)): ?>
+                <div class="alert alert-danger rounded-4"><?= htmlspecialchars($flashError); ?></div>
+            <?php endif; ?>
 
             <div class="row g-4 mb-4">
                 <div class="col-lg-4">
@@ -130,6 +140,24 @@ $fullName = trim(($client['nombre'] ?? '') . ' ' . ($client['apellidos'] ?? ''))
                                         </div>
                                     </div>
                                 </div>
+
+                                <form method="post" action="<?= site_url('admin/pedido-estatus/' . (int) $order['id']); ?>" class="row g-2 align-items-end mb-3">
+                                    <?= csrf_input(); ?>
+                                    <input type="hidden" name="redirect_to" value="cliente">
+                                    <div class="col-md-8 col-lg-6">
+                                        <label class="form-label small text-uppercase text-muted fw-bold">Cambiar estatus</label>
+                                        <select name="estado_pedido" class="form-select rounded-4">
+                                            <?php foreach (Pedido::STATUS_OPTIONS as $statusOption): ?>
+                                                <option value="<?= htmlspecialchars($statusOption); ?>" <?= ($order['estado_pedido'] ?? '') === $statusOption ? 'selected' : ''; ?>>
+                                                    <?= htmlspecialchars(ucfirst(str_replace('_', ' ', $statusOption))); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-lg-3">
+                                        <button type="submit" class="btn btn-primary rounded-pill w-100">Actualizar</button>
+                                    </div>
+                                </form>
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-lg-6">

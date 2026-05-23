@@ -91,19 +91,19 @@ class ProductController extends Controller
 
         if ($rating < 1 || $rating > 5) {
             $_SESSION['error'] = 'La calificación debe estar entre 1 y 5.';
-            header('Location: ' . site_url('producto/' . $slug));
+            header('Location: ' . site_url('producto/' . $slug) . '#escribir-resena');
             exit;
         }
 
         if (Resena::userHasReviewed($user['id'], $product['id'])) {
             $_SESSION['error'] = 'Ya has reseñado este producto.';
-            header('Location: ' . site_url('producto/' . $slug));
+            header('Location: ' . site_url('producto/' . $slug) . '#escribir-resena');
             exit;
         }
 
         if (!Resena::canReview($user['id'], $product['id'])) {
             $_SESSION['error'] = 'Debes haber recibido el producto para poder reseñarlo.';
-            header('Location: ' . site_url('producto/' . $slug));
+            header('Location: ' . site_url('producto/' . $slug) . '#escribir-resena');
             exit;
         }
 
@@ -121,7 +121,7 @@ class ProductController extends Controller
             $_SESSION['error'] = 'Error al guardar la reseña.';
         }
 
-        header('Location: ' . site_url('producto/' . $slug));
+        header('Location: ' . site_url('producto/' . $slug) . '#resenas');
         exit;
     }
 }

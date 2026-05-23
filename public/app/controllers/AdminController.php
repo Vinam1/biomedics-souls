@@ -42,11 +42,35 @@ class AdminController extends Controller
         ]);
     }
 
+    public function resenas(): void
+    {
+        $this->view('admin/reviews/index', [
+            'title' => 'Reseñas - Admin',
+            'reviews' => Resena::allForAdmin(),
+        ]);
+    }
+
     public function clientes(): void
     {
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+        ];
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = 10;
+        $totalClients = Usuario::countAdminClientList($filters);
+        $totalPages = max(1, (int) ceil($totalClients / $perPage));
+        $page = min($page, $totalPages);
+
         $this->view('admin/customers/index', [
             'title' => 'Clientes - Admin',
-            'clients' => Usuario::adminClientList(),
+            'clients' => Usuario::adminClientList($filters, $page, $perPage),
+            'filters' => $filters,
+            'page' => $page,
+            'perPage' => $perPage,
+            'totalClients' => $totalClients,
+            'totalPages' => $totalPages,
+            'statusOptions' => array_merge(['' => 'Todos', 'sin_pedidos' => 'Sin pedidos'], array_combine(Pedido::STATUS_OPTIONS, Pedido::STATUS_OPTIONS)),
         ]);
     }
 
@@ -111,6 +135,64 @@ class AdminController extends Controller
         header('Content-Disposition: inline; filename="ticket-' . $order['numero_pedido'] . '.pdf"');
         header('Content-Length: ' . strlen($pdf));
         echo $pdf;
+        exit;
+    }
+
+    public function pedidoEstatus(string $id): void
+    {
+        $this->requirePost();
+        $this->verifyCsrfOrAbort();
+
+        $order = Pedido::findById((int) $id);
+        if (!$order) {
+            http_response_code(404);
+            $this->view('errors/404', ['title' => 'Pedido no encontrado']);
+            return;
+        }
+
+        $status = trim((string) ($_POST['estado_pedido'] ?? ''));
+        $currentUser = $this->getCurrentUser();
+
+        if (!Pedido::updateStatus((int) $id, $status, isset($currentUser['id']) ? (int) $currentUser['id'] : null)) {
+            $_SESSION['error'] = 'No se pudo actualizar el estatus del pedido.';
+        } else {
+            $_SESSION['success'] = 'El estatus del pedido se actualizó correctamente.';
+        }
+
+        $redirectTo = trim((string) ($_POST['redirect_to'] ?? ''));
+        if ($redirectTo === 'cliente' && !empty($order['cliente_id'])) {
+            header('Location: ' . site_url('admin/cliente-detalle/' . (int) $order['cliente_id']));
+            exit;
+        }
+
+        header('Location: ' . site_url('admin/pedido-detalle/' . (int) $id));
+        exit;
+    }
+
+    public function resenaEstatus(string $id): void
+    {
+        $this->requirePost();
+        $this->verifyCsrfOrAbort();
+
+        $review = Resena::findById((int) $id);
+        if (!$review) {
+            http_response_code(404);
+            $this->view('errors/404', ['title' => 'Reseña no encontrada']);
+            return;
+        }
+
+        $status = trim((string) ($_POST['estatus'] ?? ''));
+        if (!Resena::updateStatus((int) $id, $status)) {
+            $_SESSION['error'] = 'No se pudo actualizar el estatus de la reseña.';
+            header('Location: ' . site_url('admin/resenas'));
+            exit;
+        }
+
+        $_SESSION['success'] = $status === 'publicada'
+            ? 'La reseña fue publicada nuevamente.'
+            : 'La reseña fue ocultada del catálogo.';
+
+        header('Location: ' . site_url('admin/resenas'));
         exit;
     }
 

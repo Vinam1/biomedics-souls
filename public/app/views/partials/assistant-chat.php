@@ -4,6 +4,7 @@
     data-chat-endpoint="<?= htmlspecialchars(site_url('assistant/chat')); ?>"
     data-reset-endpoint="<?= htmlspecialchars(site_url('assistant/reset')); ?>"
     data-csrf-token="<?= htmlspecialchars($csrfToken ?? csrf_token()); ?>"
+    data-storage-key="biomedics-assistant-chat"
 >
     <button type="button" class="assistant-toggle" data-assistant-toggle aria-label="Abrir chat inteligente">
         <span class="assistant-toggle-icon"><i class="bi bi-stars"></i></span>
@@ -36,6 +37,10 @@
                     Hola, soy tu asistente. Puedes preguntarme cosas como "¿qué producto recomiendas para energía?" o "¿qué opciones tienen para enfoque?".
                 </div>
             </article>
+        </div>
+
+        <div class="assistant-typing" data-assistant-typing hidden>
+            <span></span><span></span><span></span>
         </div>
 
         <div class="assistant-suggestions" data-assistant-suggestions>
