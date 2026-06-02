@@ -48,6 +48,7 @@ class Usuario
     public static function countAdminClientList(array $filters = []): int
     {
         $db = Database::getInstance();
+        $params = [];
         $where = self::buildAdminClientListWhere($filters, $params);
         $stmt = $db->prepare(
             'SELECT COUNT(*)
@@ -64,6 +65,7 @@ class Usuario
     public static function adminClientList(array $filters = [], int $page = 1, int $perPage = 10): array
     {
         $db = Database::getInstance();
+        $params = [];
         $where = self::buildAdminClientListWhere($filters, $params);
         $offset = max(0, ($page - 1) * $perPage);
 

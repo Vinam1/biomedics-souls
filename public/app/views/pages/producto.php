@@ -123,6 +123,7 @@ $categoryValue = trim((string) ($product['category'] ?? 'Herbales'));
                         <?php else: ?>
                             <form action="<?= site_url('carrito/agregar/' . (int) ($product['id'] ?? 0)); ?>" method="post">
                                 <?= csrf_input(); ?>
+                                <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI'] ?? site_url('producto/' . ($product['slug'] ?? ''))); ?>">
                                 <div class="qty-selector product-qty-row mb-3">
                                     <label for="quantity" class="fw-bold small mb-2">Cantidad</label>
                                     <input type="number" id="quantity" name="quantity" min="1" value="1" class="form-control rounded-4 product-qty-input">

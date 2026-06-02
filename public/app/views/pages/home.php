@@ -206,6 +206,7 @@ $bodyClass = 'home-page';
                                             <form action="<?= site_url('carrito/agregar/' . $product['id']); ?>" method="post" class="d-inline">
                                                 <?= csrf_input(); ?>
                                                 <input type="hidden" name="quantity" value="1">
+                                                <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI'] ?? site_url()); ?>">
                                                 <button type="submit" class="btn btn-cart btn-brand btn-sm" aria-label="Agregar al carrito">
                                                     <i class="bi bi-cart3"></i>
                                                 </button>

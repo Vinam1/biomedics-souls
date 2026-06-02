@@ -23,7 +23,7 @@ class CartController extends Controller
     public function add(string $productId): void
     {
         $this->requirePost();
-        $this->verifyCsrfOrAbort();
+        $this->verifyCsrfOrAbort($this->wantsJson());
 
         $quantity = (int) ($_POST['quantity'] ?? 1);
         if ($quantity < 1) {
@@ -32,28 +32,61 @@ class CartController extends Controller
 
         $product = Producto::findById((int) $productId);
         if (!$product) {
+            if ($this->wantsJson()) {
+                http_response_code(404);
+                header('Content-Type: application/json; charset=UTF-8');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'El producto no existe o ya no está disponible.',
+                ]);
+                exit;
+            }
+
             header('Location: ' . site_url('carrito'));
             exit;
         }
 
         if (Producto::isOutOfStockStatus($product['estatus'] ?? null)) {
+            $message = 'Este producto esta agotado y no se puede agregar al carrito.';
+
+            if ($this->wantsJson()) {
+                header('Content-Type: application/json; charset=UTF-8');
+                echo json_encode([
+                    'success' => false,
+                    'message' => $message,
+                ]);
+                exit;
+            }
+
             $_SESSION['cart_feedback'] = [
                 'type' => 'error',
-                'message' => 'Este producto esta agotado y no se puede agregar al carrito.',
+                'message' => $message,
             ];
-            header('Location: ' . $this->getRedirectBackUrl(site_url('producto/' . $product['slug'])));
+            header('Location: ' . $this->getRedirectTarget(site_url('producto/' . $product['slug'])));
             exit;
         }
 
         Cart::add((int) $productId, $quantity);
         $productName = trim((string) ($product['nombre'] ?? $product['name'] ?? 'Producto'));
+        $message = $quantity > 1
+            ? $productName . ' agregado al carrito (' . $quantity . ' unidades).'
+            : $productName . ' agregado al carrito.';
+
+        if ($this->wantsJson()) {
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode([
+                'success' => true,
+                'message' => $message,
+                'cartCount' => Cart::getCount(),
+            ]);
+            exit;
+        }
+
         $_SESSION['cart_feedback'] = [
             'type' => 'success',
-            'message' => $quantity > 1
-                ? $productName . ' agregado al carrito (' . $quantity . ' unidades).'
-                : $productName . ' agregado al carrito.',
+            'message' => $message,
         ];
-        header('Location: ' . $this->getRedirectBackUrl(site_url('carrito')));
+        header('Location: ' . $this->getRedirectTarget(site_url('carrito')));
         exit;
     }
 
@@ -219,17 +252,53 @@ class CartController extends Controller
         ]);
     }
 
-    private function getRedirectBackUrl(string $fallback): string
+    private function wantsJson(): bool
     {
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        $requestedWith = $_SERVER['HTTP_X_REQUESTED_WITH'] ?? '';
+
+        return (is_string($accept) && stripos($accept, 'application/json') !== false)
+            || $requestedWith === 'XMLHttpRequest';
+    }
+
+    private function getRedirectTarget(string $fallback): string
+    {
+        $redirectTo = trim((string) ($_POST['redirect_to'] ?? ''));
+        if ($this->isSafeInternalRedirect($redirectTo)) {
+            return $redirectTo;
+        }
+
         $referer = $_SERVER['HTTP_REFERER'] ?? '';
-        if (!is_string($referer) || $referer === '') {
-            return $fallback;
+        if (is_string($referer) && $referer !== '' && $this->isSafeInternalRedirect($referer)) {
+            return $referer;
         }
 
-        if (!str_starts_with($referer, site_url())) {
-            return $fallback;
+        return $fallback;
+    }
+
+    private function isSafeInternalRedirect(string $url): bool
+    {
+        if ($url === '') {
+            return false;
         }
 
-        return $referer;
+        $parts = parse_url($url);
+        if ($parts === false) {
+            return false;
+        }
+
+        $host = $parts['host'] ?? '';
+        $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+        if ($host !== '' && strcasecmp($host, $currentHost) !== 0) {
+            return false;
+        }
+
+        $path = $parts['path'] ?? '';
+        if ($path === '') {
+            $path = '/';
+        }
+
+        $appPath = parse_url(site_url(), PHP_URL_PATH) ?? '';
+        return str_starts_with($path, $appPath);
     }
 }

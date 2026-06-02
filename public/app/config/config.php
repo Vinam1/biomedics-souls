@@ -11,8 +11,8 @@ if (file_exists(__DIR__ . '/../../../.env')) {
 
 // ==================== CONFIGURACION DE BASE DE DATOS ====================
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'amiptcnl_biomedics_souls');
-define('DB_USER', getenv('DB_USER') ?: 'amiptcnl_biomedics');
+define('DB_NAME', getenv('DB_NAME') ?: 'flmejzdy_biomedics_souls');
+define('DB_USER', getenv('DB_USER') ?: 'flmejzdy_biomedics');
 define('DB_PASS', getenv('DB_PASS') ?: 'biomedics123456');
 define('GEMINI_API_KEY', 'AIzaSyBnLbOy56mgIpjnF9-CgUOUbtpwanfQJrQ');
 define('GEMINI_MODEL', 'gemini-2.5-flash');

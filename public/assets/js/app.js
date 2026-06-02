@@ -1,3 +1,150 @@
+function ensureCartToastContainer() {
+    let container = document.querySelector('.toast-container[data-cart-toast-container="true"]');
+
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1085';
+        container.style.marginTop = '5.5rem';
+        container.dataset.cartToastContainer = 'true';
+        document.body.appendChild(container);
+    }
+
+    return container;
+}
+
+function showCartToast(message, type) {
+    const toastType = type === 'error' ? 'error' : 'success';
+    const container = ensureCartToastContainer();
+    const toastElement = document.createElement('div');
+    toastElement.className = 'toast align-items-center border-0 shadow-lg';
+    toastElement.setAttribute('role', 'alert');
+    toastElement.setAttribute('aria-live', 'assertive');
+    toastElement.setAttribute('aria-atomic', 'true');
+    toastElement.dataset.cartToast = 'true';
+    toastElement.dataset.bsDelay = '3200';
+
+    const toastBody = document.createElement('div');
+    toastBody.className = 'd-flex';
+
+    const bodyContent = document.createElement('div');
+    bodyContent.className = 'toast-body';
+
+    const title = document.createElement('strong');
+    title.className = toastType === 'error' ? 'text-danger' : 'text-success';
+    title.textContent = toastType === 'error' ? 'No se pudo agregar' : 'Agregado al carrito';
+
+    const description = document.createElement('div');
+    description.className = 'small text-muted mt-1';
+    description.textContent = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn-close me-2 m-auto';
+    closeButton.setAttribute('data-bs-dismiss', 'toast');
+    closeButton.setAttribute('aria-label', 'Cerrar');
+
+    bodyContent.appendChild(title);
+    bodyContent.appendChild(description);
+    toastBody.appendChild(bodyContent);
+    toastBody.appendChild(closeButton);
+    toastElement.appendChild(toastBody);
+    container.appendChild(toastElement);
+
+    const toast = window.bootstrap && typeof window.bootstrap.Toast === 'function'
+        ? window.bootstrap.Toast.getOrCreateInstance(toastElement)
+        : null;
+
+    if (toast) {
+        toast.show();
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    } else {
+        toastElement.remove();
+    }
+}
+
+async function handleCartAddSubmit(event) {
+    const form = event.target.closest('form');
+    if (!form) {
+        return;
+    }
+
+    const action = form.getAttribute('action') || '';
+    if (!/\/carrito\/agregar\//.test(action)) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalLabel = submitButton ? submitButton.innerHTML : '';
+    const csrfToken = form.querySelector('input[name="csrf_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Agregando...';
+    }
+
+    try {
+        const response = await fetch(action, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-Token': csrfToken,
+            },
+            body: new URLSearchParams(new FormData(form)),
+            credentials: 'same-origin'
+        });
+
+        let payload = null;
+        try {
+            payload = await response.json();
+        } catch (error) {
+            payload = null;
+        }
+
+        if (!response.ok || !payload || payload.success !== true) {
+            const message = payload && typeof payload.message === 'string' && payload.message !== ''
+                ? payload.message
+                : 'No se pudo agregar el producto al carrito.';
+            showCartToast(message, 'error');
+            return;
+        }
+
+        const cartCountElement = document.getElementById('cartCount');
+        if (cartCountElement) {
+            const nextCount = Number(payload.cartCount);
+            if (Number.isFinite(nextCount)) {
+                cartCountElement.textContent = String(nextCount);
+            }
+        }
+
+        showCartToast(payload.message || 'Producto agregado al carrito.', 'success');
+    } catch (error) {
+        showCartToast('No se pudo agregar el producto al carrito.', 'error');
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalLabel;
+        }
+    }
+}
+
+function initCartAddForms() {
+    const forms = document.querySelectorAll('form[action*="/carrito/agregar/"]');
+
+    forms.forEach(function (form) {
+        if (form.dataset.cartAddBound === '1') {
+            return;
+        }
+
+        form.dataset.cartAddBound = '1';
+        form.addEventListener('submit', handleCartAddSubmit);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const navbar = document.querySelector('.site-navbar');
@@ -338,6 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     initAnimations(document);
     initClickableProductCards(document);
+    initCartAddForms();
     initAssistantWidget();
 
     if (prefersReducedMotion) {
