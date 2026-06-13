@@ -29,14 +29,7 @@
                     </a>
                 </div>
 
-                <!-- Logo Hecho en México -->
-                <div class="mt-4" data-animate="fade-up" data-animate-delay="180">
-                    <img
-                        src="<?= asset_url('img/deco/Hecho_En_Mexico_2025.jpg'); ?>"
-                        alt="Hecho en México"
-                        class="img-fluid logo-hecho-mexico"
-                    >
-                </div>
+                
 
             </div>
 
@@ -58,29 +51,24 @@
                 </ul>
             </div>
 
-            <div class="col-md-4 col-lg-4" data-animate="fade-up" data-animate-delay="240">
-                <h6 class="footer-title mb-4">Prueba Nuestra App</h6>
+            <div class="footer-app-card text-center mx-auto" style="max-width: 280px;">
+    
+    <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+        <div class="footer-qr-frame shadow">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://play.google.com/store/apps/details?id=com.biomedics.souls"
+                 alt="QR Code App"
+                 class="img-fluid footer-qr-image"
+                 style="max-width: 82px;"> </div>
 
-                <p class="footer-copy small mb-4">
-                    Descarga nuestra aplicaci&oacute;n m&oacute;vil y accede a protocolos, seguimiento y ofertas exclusivas.
-                </p>
-
-                <div class="footer-app-card text-center mx-auto" style="max-width: 220px;">
-                    <div class="footer-qr-frame mb-3 shadow">
-                        <img
-                            src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://play.google.com/store/apps/details?id=com.biomedics.souls"
-                            alt="QR Code App"
-                            class="img-fluid footer-qr-image"
-                            style="max-width: 130px;"
-                        >
-                    </div>
-
-                    <p class="text-white-50 small fw-medium mb-0">
-                        Escanea para descargar en Play Store
-                    </p>
-                </div>
-            </div>
+        <div class="footer-logo-frame shadow">
+            <img src="<?= asset_url('img/deco/Hecho_En_Mexico_2025.jpg'); ?>" alt="Hecho en México">
         </div>
+    </div>
+
+    <p class="text-white-50 small fw-medium mb-0">
+        Escanea para descargar en Play Store
+    </p>
+</div>
 
         <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-3 mt-5 pt-4">
             <small class="text-white-50">

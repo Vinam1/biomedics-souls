@@ -2,7 +2,10 @@
     <nav class="navbar navbar-expand-xl navbar-light site-navbar py-3 fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="<?= site_url(); ?>">
-                <span class="brand-mark">
+                <span class="hecho-mexico">
+                <img src="<?= asset_url('img/deco/Hecho_En_Mexico_2025.jpg'); ?>" alt="Hecho en México" height="40">
+                </span>
+            <span class="brand-mark">
                     <img src="<?= asset_url('img/deco/logo.jpeg'); ?>" alt="Biomedics Souls Logo" height="48" width="48">
                 </span>
                 <span class="brand-copy">

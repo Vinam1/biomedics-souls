@@ -1551,21 +1551,43 @@ body:not(.home-page) .site-main {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.logo-hecho-mexico {
-    max-width: 70px;
-    height: 70px;
-    margin-top: 10px;
-}
-
 .card-modern {
     border: none;
     border-radius: 2rem;
     box-shadow: var(--shadow-soft);
 }
-
-.card-modern .card-body {
-    padding: 1.8rem;
+/* El logo de México en el footer */
+/* Nuevo estilo para el logo pequeño en el footer */
+.footer-logo-small {
+    width: 45px; /* Tamaño pequeño */
+    height: auto;
+    margin-left: 10px; /* Espacio entre el QR y el logo */
+    opacity: 0.8;      /* Un toque sutil */
+    transition: opacity 0.3s ease;
 }
+
+.footer-logo-small:hover {
+    opacity: 1;
+}
+
+/* Estilo para el contenedor del logo Hecho en México */
+.footer-logo-frame {
+    display: inline-flex;
+    padding: 0.9rem;
+    border-radius: 1.25rem;
+    background: #ffffff;
+    align-items: center;
+    justify-content: center;
+    width: 100px; /* Igualamos el ancho al del QR */
+    height: 100px;
+    box-shadow: var(--shadow-soft); /* O usa shadow si prefieres más fuerza */
+}
+
+.footer-logo-frame img {
+    max-width: 100%;
+    height: auto;
+}
+/**/
 
 .product-badge {
     position: absolute;
