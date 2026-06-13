@@ -58,7 +58,7 @@ $bodyClass = 'home-page';
 
         <div class="row g-4">
             <div class="col-md-4">
-                <article class="soft-card h-100" data-animate="fade-up">
+                <article class="soft-card h-100" data-animate="fade-up" data-animate-delay="60">
                     <div class="icon-chip text-purple"><i class="fas fa-shield-alt"></i></div>
                     <h3>Pureza Garantizada</h3>
                     <p>Ingredientes de la m&aacute;s alta calidad, testeados para asegurar cero contaminantes y m&aacute;xima seguridad.</p>
@@ -127,38 +127,38 @@ $bodyClass = 'home-page';
         <div class="row g-4">
             <div class="col-md-4">
                 <article class="testimonial-card h-100" data-animate="fade-up">
-                    <div class="testimonial-avatar">ER</div>
+                    <div class="testimonial-avatar">NZ</div>
                     <div class="testimonial-stars" aria-label="5 estrellas">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
                     <i class="bi bi-quote testimonial-quote-mark" aria-hidden="true"></i>
-                    <p class="testimonial-quote">&ldquo;Como profesional, busco pureza y evidencia. Las f&oacute;rmulas de Biomedics Soul son las &uacute;nicas que recomiendo a mis pacientes por su alta biodisponibilidad.&rdquo;</p>
-                    <h3>Dra. Elena Rodr&iacute;guez</h3>
-                    <span>Nutri&oacute;loga Cl&iacute;nica</span>
+                    <p class="testimonial-quote">&ldquo;Los productos que yo ocupo eran para quitar mi ansiedad y no había encontrado un producto tan bueno como el suyo 100% recomendado ya que cuentan con muy buenos prodcutos.&rdquo;</p>
+                    <h3>Nikolai Z.</h3>
+                    <span>Maratonista</span>
                 </article>
             </div>
             <div class="col-md-4">
                 <article class="testimonial-card h-100" data-animate="fade-up" data-animate-delay="120">
-                    <div class="testimonial-avatar">CM</div>
+                    <div class="testimonial-avatar">NF</div>
                     <div class="testimonial-stars" aria-label="5 estrellas">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
                     <i class="bi bi-quote testimonial-quote-mark" aria-hidden="true"></i>
-                    <p class="testimonial-quote">&ldquo;El enfoque y la recuperaci&oacute;n que he logrado con Ashwagandha y Magnesio de esta marca han marcado un antes y un despu&eacute;s en mi entrenamiento.&rdquo;</p>
-                    <h3>Carlos M&eacute;ndez</h3>
-                    <span>Atleta de Alto Rendimiento</span>
+                    <p class="testimonial-quote">&ldquo;desde hace algunos meses he incorporado a mi rutina suplementos alimenticios como Astaxantina, Citrato de Magnesio y NAD. Durante este tiempo he observado cambios positivos en mi bienestar general. Uno de los beneficios que más he notado es una disminución en la caída del cabello, además de sentirme con mayor energía para realizar mis actividades diarias. También he percibido mejoras en la apariencia y cuidado de mi piel. Mi experiencia ha sido muy satisfactoria y considero que estos suplementos han contribuido a complementar mis hábitos de bienestar. Por ello, los recomiendo ampliamente como parte de un estilo de vida saludable.&rdquo;</p>
+                    <h3>Dra. Nancy F.</h3>
+                    <span>Profesora en el área de TICS</span>
                 </article>
             </div>
             <div class="col-md-4">
                 <article class="testimonial-card h-100" data-animate="fade-up" data-animate-delay="240">
-                    <div class="testimonial-avatar">SV</div>
+                    <div class="testimonial-avatar">JD</div>
                     <div class="testimonial-stars" aria-label="5 estrellas">
                         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                     </div>
                     <i class="bi bi-quote testimonial-quote-mark" aria-hidden="true"></i>
-                    <p class="testimonial-quote">&ldquo;Buscaba algo para el estr&eacute;s y la claridad mental. El servicio al cliente me gui&oacute; perfectamente y los resultados fueron casi inmediatos.&rdquo;</p>
-                    <h3>Sof&iacute;a Valenzuela</h3>
-                    <span>Emprendedora</span>
+                    <p class="testimonial-quote">&ldquo;La Astaxantina Me ayudo a recuperar el brillo en mi piel y como abtioxidante articular.&rdquo;</p>
+                    <h3>Jessica D.</h3>
+                    <span>Ingeniera biomedica y maestra en dirección de empresas de manufactura y gestión de calidad</span>
                 </article>
             </div>
         </div>

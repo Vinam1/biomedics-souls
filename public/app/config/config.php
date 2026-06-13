@@ -14,7 +14,7 @@ define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_NAME', getenv('DB_NAME') ?: 'flmejzdy_biomedics_souls');
 define('DB_USER', getenv('DB_USER') ?: 'flmejzdy_biomedics');
 define('DB_PASS', getenv('DB_PASS') ?: 'biomedics123456');
-define('GEMINI_API_KEY', 'AIzaSyBnLbOy56mgIpjnF9-CgUOUbtpwanfQJrQ');
+define('GEMINI_API_KEY', 'AIzaSyAD1W7NzoePe5gjcXf1Z3Mj1Vx2DfBp-xY');
 define('GEMINI_MODEL', 'gemini-2.5-flash');
 define('MP_ACCESS_TOKEN', getenv('MP_ACCESS_TOKEN') ?: '');
 define('MP_PUBLIC_KEY', getenv('MP_PUBLIC_KEY') ?: '');

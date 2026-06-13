@@ -1,3 +1,4 @@
+```php
 <footer class="site-footer text-white pt-16 pb-12">
     <div class="container">
         <div class="row g-5">
@@ -8,15 +9,35 @@
                     </span>
                     <h5 class="fw-bold mb-0 text-white">Biomedics Souls</h5>
                 </div>
+
                 <p class="footer-copy mb-5">
                     Suplementos de grado cient&iacute;fico dise&ntilde;ados para optimizar tu cuerpo y mente.
                 </p>
+
                 <div class="d-flex gap-3" data-animate="fade-up" data-animate-delay="120">
-                    <a href="https://www.facebook.com/share/1LbQax1gDe/" class="footer-social" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="footer-social" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="footer-social" aria-label="Chat"><i class="bi bi-chat-dots"></i></a>
-                    <a href="#" class="footer-social" aria-label="Correo"><i class="bi bi-envelope"></i></a>
+                    <a href="https://www.facebook.com/share/1LbQax1gDe/" class="footer-social" aria-label="Facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="footer-social" aria-label="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="#" class="footer-social" aria-label="Chat">
+                        <i class="bi bi-chat-dots"></i>
+                    </a>
+                    <a href="#" class="footer-social" aria-label="Correo">
+                        <i class="bi bi-envelope"></i>
+                    </a>
                 </div>
+
+                <!-- Logo Hecho en México -->
+                <div class="mt-4" data-animate="fade-up" data-animate-delay="180">
+                    <img
+                        src="<?= asset_url('img/deco/Hecho_En_Mexico_2025.jpg'); ?>"
+                        alt="Hecho en México"
+                        class="img-fluid logo-hecho-mexico"
+                    >
+                </div>
+
             </div>
 
             <div class="col-md-3 col-lg-2" data-animate="fade-up" data-animate-delay="80">
@@ -39,6 +60,7 @@
 
             <div class="col-md-4 col-lg-4" data-animate="fade-up" data-animate-delay="240">
                 <h6 class="footer-title mb-4">Prueba Nuestra App</h6>
+
                 <p class="footer-copy small mb-4">
                     Descarga nuestra aplicaci&oacute;n m&oacute;vil y accede a protocolos, seguimiento y ofertas exclusivas.
                 </p>
@@ -52,6 +74,7 @@
                             style="max-width: 130px;"
                         >
                     </div>
+
                     <p class="text-white-50 small fw-medium mb-0">
                         Escanea para descargar en Play Store
                     </p>
@@ -60,9 +83,14 @@
         </div>
 
         <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-3 mt-5 pt-4">
-            <small class="text-white-50">&copy; <?= date('Y'); ?> Biomedics Souls. Todos los derechos reservados.</small>
+            <small class="text-white-50">
+                &copy; <?= date('Y'); ?> Biomedics Souls. Todos los derechos reservados.
+            </small>
+
             <div class="d-flex gap-3">
-                <a href="<?= site_url('privacidad'); ?>" class="text-white-50 text-decoration-none">Privacidad</a>
+                <a href="<?= site_url('privacidad'); ?>" class="text-white-50 text-decoration-none">
+                    Privacidad
+                </a>
             </div>
         </div>
     </div>

@@ -224,6 +224,22 @@ class Producto
             $params['categoria_id'] = $filters['categoria_id'];
         }
 
+        if (!empty($filters['product_ids']) && is_array($filters['product_ids'])) {
+            $productIds = array_values(array_unique(array_filter(array_map('intval', $filters['product_ids']), static function (int $id): bool {
+                return $id > 0;
+            })));
+
+            if (!empty($productIds)) {
+                $placeholders = [];
+                foreach ($productIds as $index => $productId) {
+                    $paramName = 'recommended_id_' . $index;
+                    $placeholders[] = ':' . $paramName;
+                    $params[$paramName] = $productId;
+                }
+                $sql .= ' AND p.id IN (' . implode(', ', $placeholders) . ')';
+            }
+        }
+
         if (!empty($filters['estatus'])) {
             $sql .= ' AND p.estatus LIKE :estatus';
             $params['estatus'] = '%' . $filters['estatus'] . '%';

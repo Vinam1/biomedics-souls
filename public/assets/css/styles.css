@@ -470,12 +470,15 @@ body:not(.home-page) .site-main {
 }
 
 .hero-title span,
-.about-title span,
-.text-purple {
+.about-title span {
     background: linear-gradient(135deg, #7c3aed, #7ab8ff);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+}
+
+.text-purple {
+    color: var(--primary);
 }
 
 .hero-text,
@@ -1546,6 +1549,12 @@ body:not(.home-page) .site-main {
 
 .footer-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-hecho-mexico {
+    max-width: 70px;
+    height: 70px;
+    margin-top: 10px;
 }
 
 .card-modern {

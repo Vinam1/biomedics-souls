@@ -3,6 +3,8 @@ $title              = 'Catálogo de Suplementos | Biomedics Souls - Sensea';
 $filters            = $filters ?? [];
 $searchValue        = (string) ($filters['query'] ?? '');
 $selectedCategoryId = (int) ($filters['categoria_id'] ?? ($currentCategory['id'] ?? 0));
+$recommendedIds     = array_values(array_filter(array_map('intval', $filters['product_ids'] ?? [])));
+$recommendedParam   = implode(',', $recommendedIds);
 
 $sortInput = (string) ($filters['sort'] ?? 'updated_at_desc');
 
@@ -36,6 +38,12 @@ $ajaxEndpoint = site_url('catalogo');
         </div>
 
         <div class="section-card filter-panel p-4 mb-5" data-animate="fade-up" data-animate-delay="80">
+            <?php if (!empty($recommendedIds)): ?>
+                <div id="recommendedNotice" class="alert alert-primary border-0 rounded-4 mb-4">
+                    <i class="bi bi-stars me-2"></i>
+                    Mostrando productos recomendados seg&uacute;n tu quiz.
+                </div>
+            <?php endif; ?>
             <div class="row g-3 align-items-center">
                 <div class="col-lg-5">
                     <label for="searchInput" class="form-label small fw-bold text-uppercase text-muted mb-2">Buscar</label>
@@ -81,7 +89,13 @@ $ajaxEndpoint = site_url('catalogo');
             </div>
         </div>
 
-        <div id="catalogResults" data-endpoint="<?= htmlspecialchars($ajaxEndpoint); ?>" data-animate="fade-up" data-animate-delay="140">
+        <div
+            id="catalogResults"
+            data-endpoint="<?= htmlspecialchars($ajaxEndpoint); ?>"
+            data-recommended="<?= htmlspecialchars($recommendedParam); ?>"
+            data-animate="fade-up"
+            data-animate-delay="140"
+        >
             <?php require APPROOT . '/views/pages/partials/catalog-product-grid.php'; ?>
         </div>
     </div>
@@ -94,10 +108,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const sortFilter = document.getElementById('sortFilter');
     const clearBtn = document.getElementById('clearFilters');
     const results = document.getElementById('catalogResults');
+    const recommendedNotice = document.getElementById('recommendedNotice');
 
     if (!results) return;
 
     const rawEndpoint = results.dataset.endpoint;
+    let recommendedIds = results.dataset.recommended || '';
     const endpointUrl = new URL(rawEndpoint, window.location.origin);
     let debounceTimer = null;
 
@@ -111,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (query) url.searchParams.set('q', query);
         if (category) url.searchParams.set('categoria', category);
+        if (recommendedIds) url.searchParams.set('recommended', recommendedIds);
         if (sort && sort !== 'recent') url.searchParams.set('sort', sort);
 
         return url.toString();
@@ -154,6 +171,8 @@ document.addEventListener('DOMContentLoaded', function () {
     sortFilter.addEventListener('change', queueFetch);
 
     clearBtn.addEventListener('click', function () {
+        recommendedIds = '';
+        if (recommendedNotice) recommendedNotice.classList.add('d-none');
         searchInput.value = '';
         categoryFilter.value = '';
         sortFilter.value = 'recent';

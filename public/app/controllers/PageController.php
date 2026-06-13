@@ -170,6 +170,9 @@ class PageController extends Controller
         $query      = trim((string) ($_GET['q'] ?? ''));
         $categoryId = (int) ($_GET['categoria'] ?? 0);
         $sortInput  = (string) ($_GET['sort'] ?? 'recent');
+        $recommendedIds = array_values(array_unique(array_filter(array_map('intval', explode(',', (string) ($_GET['recommended'] ?? ''))), static function (int $id): bool {
+            return $id > 0;
+        })));
 
         $sortMap = [
             'recent'     => 'updated_at_desc',
@@ -182,6 +185,7 @@ class PageController extends Controller
         return [
             'query'        => $query,
             'categoria_id' => $categoryId > 0 ? $categoryId : null,
+            'product_ids'  => $recommendedIds,
             'sort'         => $sortMap[$sortInput] ?? 'updated_at_desc',
         ];
     }
