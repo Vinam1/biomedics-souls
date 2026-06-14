@@ -12,11 +12,12 @@ class AdminProductController extends Controller
 
     public function index(): void
     {
+        $this->requireAdmin();
+        
         $search = trim($_GET['q'] ?? '');
         $categoryId = intval($_GET['categoria'] ?? 0);
         $status = trim($_GET['estatus'] ?? '');
         $sort = trim($_GET['orden'] ?? 'updated_at_desc');
-        $isAjax = intval($_GET['ajax'] ?? 0) === 1;
 
         $products = Producto::search([
             'query' => $search,
@@ -24,15 +25,6 @@ class AdminProductController extends Controller
             'estatus' => $status ?: null,
             'sort' => $sort,
         ]);
-
-        if ($isAjax) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'products' => $products,
-                'hasResults' => !empty($products),
-            ]);
-            exit;
-        }
 
         $categories = Categoria::all();
 
@@ -45,6 +37,27 @@ class AdminProductController extends Controller
             'selectedStatus' => $status,
             'selectedSort' => $sort,
         ]);
+    }
+
+    public function filter(): void
+    {
+        $this->requireAdmin();
+        
+        $search = trim($_GET['q'] ?? '');
+        $categoryId = intval($_GET['categoria'] ?? 0);
+        $status = trim($_GET['estatus'] ?? '');
+        $sort = trim($_GET['orden'] ?? 'updated_at_desc');
+
+        $products = Producto::search([
+            'query' => $search,
+            'categoria_id' => $categoryId ?: null,
+            'estatus' => $status ?: null,
+            'sort' => $sort,
+        ]);
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['products' => $products], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
     public function form(?string $id = null): void

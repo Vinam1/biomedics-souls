@@ -1,4 +1,3 @@
-```php
 <footer class="site-footer text-white pt-16 pb-12">
     <div class="container">
         <div class="row g-5">

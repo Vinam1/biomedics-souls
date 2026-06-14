@@ -18,16 +18,16 @@ $title = 'Productos - Admin | Biomedics Souls';
                 <a href="<?= site_url('admin/producto-form'); ?>" class="btn btn-primary btn-lg">+ Nuevo producto</a>
             </div>
 
-            <!-- === FORMULARIO CON AJAX === -->
-            <div id="filters-form" class="row g-3 mb-4 align-items-end">
+            <!-- === FORMULARIO CON AJAX SIMPLE === -->
+            <div class="row g-3 mb-4 align-items-end">
                 <div class="col-md-5">
                     <label class="form-label">Buscar</label>
-                    <input type="text" id="search-input" class="form-control rounded-4" 
+                    <input type="text" id="search" class="form-control rounded-4" 
                            placeholder="Nombre, slug o SKU" value="<?= htmlspecialchars($search ?? ''); ?>">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Categoría</label>
-                    <select id="categoria-select" class="form-select rounded-4">
+                    <select id="categoria" class="form-select rounded-4">
                         <option value="">Todas las categorías</option>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?= $cat['id'] ?>" <?= ($selectedCategory ?? 0) == $cat['id'] ? 'selected' : '' ?>>
@@ -38,7 +38,7 @@ $title = 'Productos - Admin | Biomedics Souls';
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Estatus</label>
-                    <select id="estatus-select" class="form-select rounded-4">
+                    <select id="estatus" class="form-select rounded-4">
                         <option value="">Todos</option>
                         <option value="activo" <?= ($selectedStatus ?? '') === 'activo' ? 'selected' : '' ?>>Activo</option>
                         <option value="inactivo" <?= ($selectedStatus ?? '') === 'inactivo' ? 'selected' : '' ?>>Inactivo</option>
@@ -47,7 +47,7 @@ $title = 'Productos - Admin | Biomedics Souls';
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Ordenar por</label>
-                    <select id="orden-select" class="form-select rounded-4">
+                    <select id="orden" class="form-select rounded-4">
                         <option value="updated_at_desc" <?= ($selectedSort ?? '') === 'updated_at_desc' ? 'selected' : '' ?>>Más recientes</option>
                         <option value="updated_at_asc" <?= ($selectedSort ?? '') === 'updated_at_asc' ? 'selected' : '' ?>>Más antiguos</option>
                         <option value="nombre_asc" <?= ($selectedSort ?? '') === 'nombre_asc' ? 'selected' : '' ?>>Nombre (A-Z)</option>
@@ -56,106 +56,111 @@ $title = 'Productos - Admin | Biomedics Souls';
                         <option value="precio_desc" <?= ($selectedSort ?? '') === 'precio_desc' ? 'selected' : '' ?>>Precio (alto-bajo)</option>
                     </select>
                 </div>
+                <div class="col-md-auto">
+                    <button type="button" id="btnLimpiar" class="btn btn-outline-secondary btn-lg">Limpiar</button>
+                </div>
             </div>
 
-            <!-- Resto de la tabla (igual que antes) -->
-            <?php if (!empty($products)): ?>
-                <div class="table-responsive shadow-sm rounded-4 bg-white p-3">
-                    <table class="table mb-0 align-middle">
-                        <thead class="text-muted">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Categoría</th>
-                                <th>SKU</th>
-                                <th>Precio</th>
-                                <th>Estatus</th>
-                                <th>Actualizado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($products as $product): ?>
+            <!-- Tabla de productos -->
+            <div id="productosContainer">
+                <?php if (!empty($products)): ?>
+                    <div class="table-responsive shadow-sm rounded-4 bg-white p-3">
+                        <table class="table mb-0 align-middle">
+                            <thead class="text-muted">
                                 <tr>
-                                    <td><?= intval($product['id']); ?></td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <?php if (!empty($product['imagen_principal'])): ?>
-                                                <img src="<?= asset_url('img/products/' . $product['imagen_principal']); ?>" alt="" class="rounded-2" style="width:48px;height:48px;object-fit:cover;">
-                                            <?php else: ?>
-                                                <div class="bg-light rounded-2 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
-                                                    <i class="bi bi-image"></i>
-                                                </div>
-                                            <?php endif; ?>
-                                            <div>
-                                                <strong><?= htmlspecialchars($product['nombre']); ?></strong>
-                                                <div class="text-muted small"><?= htmlspecialchars($product['slug']); ?></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><?= htmlspecialchars($product['categoria_nombre'] ?? '—'); ?></td>
-                                    <td><?= htmlspecialchars($product['sku']); ?></td>
-                                    <td>$<?= number_format($product['precio_descuento'] ?? $product['precio'], 2); ?></td>
-                                    <td><span class="badge bg-<?= $product['estatus'] === 'agotado' ? 'danger' : 'success' ?>"><?= ucfirst($product['estatus'] ?? 'activo'); ?></span></td>
-                                    <td><?= $product['updated_at'] ?? ''; ?></td>
-                                    <td>
-                                        <a href="<?= site_url('admin/producto-form/' . $product['id']); ?>" class="btn btn-sm btn-outline-primary">Editar</a>
-                                        <a href="<?= site_url('admin/producto-eliminar/' . $product['id']); ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar?')">Borrar</a>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>SKU</th>
+                                    <th>Precio</th>
+                                    <th>Estatus</th>
+                                    <th>Actualizado</th>
+                                    <th></th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <div class="alert alert-info">No se encontraron productos con esos filtros.</div>
-            <?php endif; ?>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($products as $product): ?>
+                                    <tr>
+                                        <td><?= intval($product['id']); ?></td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <?php if (!empty($product['imagen_principal'])): ?>
+                                                    <img src="<?= asset_url('img/products/' . $product['imagen_principal']); ?>" alt="" class="rounded-2" style="width:48px;height:48px;object-fit:cover;">
+                                                <?php else: ?>
+                                                    <div class="bg-light rounded-2 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                                                        <i class="bi bi-image"></i>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <div>
+                                                    <strong><?= htmlspecialchars($product['nombre']); ?></strong>
+                                                    <div class="text-muted small"><?= htmlspecialchars($product['slug']); ?></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><?= htmlspecialchars($product['categoria_nombre'] ?? '—'); ?></td>
+                                        <td><?= htmlspecialchars($product['sku']); ?></td>
+                                        <td>$<?= number_format($product['precio_descuento'] ?? $product['precio'], 2); ?></td>
+                                        <td><span class="badge bg-<?= $product['estatus'] === 'agotado' ? 'danger' : 'success' ?>"><?= ucfirst($product['estatus'] ?? 'activo'); ?></span></td>
+                                        <td><?= $product['updated_at'] ?? ''; ?></td>
+                                        <td>
+                                            <a href="<?= site_url('admin/producto-form/' . $product['id']); ?>" class="btn btn-sm btn-outline-primary">Editar</a>
+                                            <a href="<?= site_url('admin/producto-eliminar/' . $product['id']); ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar?')">Borrar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-info">No se encontraron productos con esos filtros.</div>
+                <?php endif; ?>
+            </div>
 
-</div>
+        </div>
+    </div>
 </div>
 
 <script>
-let filterTimeout;
+const baseUrl = '<?= site_url("admin/productos-filter"); ?>';
+const assetUrl = '<?= asset_url("img/products/"); ?>';
+let timeoutId;
 
-function applyFiltersAjax() {
-    clearTimeout(filterTimeout);
-    filterTimeout = setTimeout(() => {
-        const q = document.getElementById('search-input').value;
-        const categoria = document.getElementById('categoria-select').value;
-        const estatus = document.getElementById('estatus-select').value;
-        const orden = document.getElementById('orden-select').value;
-        
-        const params = new URLSearchParams();
-        if (q) params.append('q', q);
-        if (categoria) params.append('categoria', categoria);
-        if (estatus) params.append('estatus', estatus);
-        if (orden) params.append('orden', orden);
-        params.append('ajax', '1');
-        
-        const url = '<?= site_url("admin/productos"); ?>' + (params.toString() ? '?' + params.toString() : '');
-        
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                updateProductsTable(data.products, data.hasResults);
-            })
-            .catch(error => console.error('Error:', error));
-    }, 300);
+function buildUrl() {
+    const q = document.getElementById('search').value;
+    const categoria = document.getElementById('categoria').value;
+    const estatus = document.getElementById('estatus').value;
+    const orden = document.getElementById('orden').value;
+    
+    const params = new URLSearchParams();
+    if (q) params.append('q', q);
+    if (categoria) params.append('categoria', categoria);
+    if (estatus) params.append('estatus', estatus);
+    params.append('orden', orden);
+    
+    return baseUrl + (params.toString() ? '?' + params.toString() : '');
 }
 
-function updateProductsTable(products, hasResults) {
-    const container = document.querySelector('.col-xl-9');
-    let html = '';
+function loadProducts() {
+    const url = buildUrl();
     
-    if (!hasResults || products.length === 0) {
-        html = '<div class="alert alert-info">No se encontraron productos con esos filtros.</div>';
-        container.querySelector('.table-responsive, .alert-info') && 
-            (container.querySelector('.table-responsive') || container.querySelector('.alert-info')).remove();
-        container.insertAdjacentHTML('beforeend', html);
+    fetch(url)
+        .then(res => res.json())
+        .then(data => renderProducts(data.products))
+        .catch(err => {
+            console.error('Error:', err);
+            document.getElementById('productosContainer').innerHTML = '<div class="alert alert-danger">Error al cargar productos</div>';
+        });
+}
+
+function renderProducts(products) {
+    const container = document.getElementById('productosContainer');
+    
+    if (!products || products.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No se encontraron productos con esos filtros.</div>';
         return;
     }
     
-    html = '<div class="table-responsive shadow-sm rounded-4 bg-white p-3">' +
+    let html = '<div class="table-responsive shadow-sm rounded-4 bg-white p-3">' +
         '<table class="table mb-0 align-middle">' +
         '<thead class="text-muted">' +
         '<tr>' +
@@ -174,12 +179,11 @@ function updateProductsTable(products, hasResults) {
     products.forEach(product => {
         const precio = product.precio_descuento || product.precio;
         const statusBadge = product.estatus === 'agotado' ? 'danger' : 'success';
-        const imagen = product.imagen_principal 
-            ? '<?= asset_url("img/products/"); ?>' + product.imagen_principal
-            : null;
+        const statusText = (product.estatus || 'activo').charAt(0).toUpperCase() + (product.estatus || 'activo').slice(1);
+        const imagen = product.imagen_principal ? assetUrl + product.imagen_principal : null;
         
         html += '<tr>' +
-            '<td>' + product.id + '</td>' +
+            '<td>' + parseInt(product.id) + '</td>' +
             '<td>' +
             '<div class="d-flex align-items-center gap-3">';
         
@@ -190,15 +194,15 @@ function updateProductsTable(products, hasResults) {
         }
         
         html += '<div>' +
-            '<strong>' + product.nombre + '</strong>' +
-            '<div class="text-muted small">' + product.slug + '</div>' +
+            '<strong>' + escapeHtml(product.nombre) + '</strong>' +
+            '<div class="text-muted small">' + escapeHtml(product.slug) + '</div>' +
             '</div>' +
             '</div>' +
             '</td>' +
-            '<td>' + (product.categoria_nombre || '—') + '</td>' +
-            '<td>' + product.sku + '</td>' +
+            '<td>' + escapeHtml(product.categoria_nombre || '—') + '</td>' +
+            '<td>' + escapeHtml(product.sku) + '</td>' +
             '<td>$' + parseFloat(precio).toFixed(2) + '</td>' +
-            '<td><span class="badge bg-' + statusBadge + '">' + (product.estatus || 'activo').charAt(0).toUpperCase() + (product.estatus || 'activo').slice(1) + '</span></td>' +
+            '<td><span class="badge bg-' + statusBadge + '">' + statusText + '</span></td>' +
             '<td>' + (product.updated_at || '') + '</td>' +
             '<td>' +
             '<a href="<?= site_url("admin/producto-form/"); ?>' + product.id + '" class="btn btn-sm btn-outline-primary">Editar</a> ' +
@@ -208,16 +212,38 @@ function updateProductsTable(products, hasResults) {
     });
     
     html += '</tbody></table></div>';
-    
-    const existingTable = container.querySelector('.table-responsive, .alert-info');
-    if (existingTable) {
-        existingTable.remove();
-    }
-    container.insertAdjacentHTML('beforeend', html);
+    container.innerHTML = html;
 }
 
-document.getElementById('search-input').addEventListener('input', applyFiltersAjax);
-document.getElementById('categoria-select').addEventListener('change', applyFiltersAjax);
-document.getElementById('estatus-select').addEventListener('change', applyFiltersAjax);
-document.getElementById('orden-select').addEventListener('change', applyFiltersAjax);
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function onFilterChange() {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(loadProducts, 300);
+}
+
+function clearFilters() {
+    document.getElementById('search').value = '';
+    document.getElementById('categoria').value = '';
+    document.getElementById('estatus').value = '';
+    document.getElementById('orden').value = 'updated_at_desc';
+    loadProducts();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('search').addEventListener('input', onFilterChange);
+    document.getElementById('categoria').addEventListener('change', onFilterChange);
+    document.getElementById('estatus').addEventListener('change', onFilterChange);
+    document.getElementById('orden').addEventListener('change', onFilterChange);
+    document.getElementById('btnLimpiar').addEventListener('click', clearFilters);
+});
 </script>

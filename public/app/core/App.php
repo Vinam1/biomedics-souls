@@ -154,6 +154,11 @@ class App
                 return;
             }
 
+            if ($url[1] === 'productos-filter') {
+                $this->callController('AdminProductController', 'filter');
+                return;
+            }
+
             if ($url[1] === 'producto-form') {
                 $this->callController('AdminProductController', 'form', [$url[2] ?? null]);
                 return;
