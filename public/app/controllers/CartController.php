@@ -248,7 +248,8 @@ class CartController extends Controller
             'paymentMethods' => $paymentMethods,
             'selectedAddress' => $selectedAddress,
             'selectedPaymentMethod' => $selectedPaymentMethod,
-            'mpPublicKey' => MP_PUBLIC_KEY,
+            'openpayPublicKey' => OPENPAY_API_KEY,
+            'openpayMerchantId' => OPENPAY_MERCHANT_ID,
         ]);
     }
 

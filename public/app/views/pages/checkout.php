@@ -66,7 +66,7 @@ $step = $step ?? 1;
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
                                     <div>
                                         <h3 class="mb-1">Selecciona un metodo de pago</h3>
-                                        <p class="text-muted mb-0">Usa una tarjeta guardada o paga con una tarjeta nueva dentro de Mercado Pago.</p>
+                                        <p class="text-muted mb-0">Usa una tarjeta guardada o paga con una tarjeta nueva dentro de OpenPay.</p>
                                     </div>
                                     <a href="<?= site_url('cuenta/pagos'); ?>" class="btn btn-outline-primary">Administrar pagos</a>
                                 </div>
@@ -98,7 +98,7 @@ $step = $step ?? 1;
                                             <div>
                                                 <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
                                                     <strong>Tarjeta nueva</strong>
-                                                    <span class="badge bg-success">Mercado Pago</span>
+                                                    <span class="badge bg-success">OpenPay</span>
                                                     <span class="badge bg-light text-dark border">Visa</span>
                                                     <span class="badge bg-light text-dark border">Mastercard</span>
                                                 </div>
@@ -170,7 +170,7 @@ $step = $step ?? 1;
 
                                             <div class="section-card p-4 mb-4 border rounded-4">
                                                 <h5 class="mb-3">Datos de la tarjeta</h5>
-                                                <p class="text-muted small mb-3">Las tarjetas Visa y Mastercard se procesaran con Mercado Pago dentro de esta compra.</p>
+                                                <p class="text-muted small mb-3">Las tarjetas Visa y Mastercard se procesaran con OpenPay dentro de esta compra.</p>
                                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                                     <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">Tokenizacion segura</span>
                                                     <span class="badge bg-light text-dark border">Sin salir del checkout</span>
@@ -242,21 +242,21 @@ $step = $step ?? 1;
     </div>
 </section>
 
-<?php if (!empty($mpPublicKey)): ?>
-<script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
+<?php if (!empty($openpayPublicKey) && !empty($openpayMerchantId)): ?>
+<script src="https://openpay.s3.amazonaws.com/openpay.v1.0.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        if (typeof Mercadopago === 'undefined') {
+        if (typeof Openpay === 'undefined') {
             return;
         }
 
-        Mercadopago.setPublishableKey('<?= htmlspecialchars($mpPublicKey); ?>');
+        Openpay.setId('<?= htmlspecialchars($openpayMerchantId); ?>');
+        Openpay.setApiKey('<?= htmlspecialchars($openpayPublicKey); ?>');
 
         const form = document.getElementById('order-confirm-form');
         const submitButton = document.getElementById('checkout-submit');
         const cardTokenInput = document.getElementById('card_token');
         const cardBrandInput = document.getElementById('card_brand');
-        const paymentMethodIdInput = document.getElementById('payment_method_id');
         const cardError = document.getElementById('mp-card-error');
 
         if (!form || !submitButton || !cardTokenInput) {
@@ -279,18 +279,22 @@ $step = $step ?? 1;
             cardError.classList.add('d-none');
             cardError.textContent = '';
 
-            Mercadopago.createToken(form, function (status, response) {
-                if (status === 200 || status === 201) {
-                    cardTokenInput.value = response.id || '';
-                    cardBrandInput.value = (response.card && response.card.brand) ? response.card.brand : '';
-                    paymentMethodIdInput.value = response.payment_method_id || '';
-                    form.submit();
-                    return;
-                }
+            const cardData = {
+                card_number: document.querySelector('[name="card_number"]').value.replace(/\s/g, ''),
+                holder_name: document.querySelector('[name="cardholder_name"]').value,
+                expiration_month: document.querySelector('[name="expiration_month"]').value,
+                expiration_year: document.querySelector('[name="expiration_year"]').value,
+                cvv2: document.querySelector('[name="cvv"]').value,
+            };
 
+            Openpay.token.create(cardData, function (response) {
+                cardTokenInput.value = response.data.id || '';
+                cardBrandInput.value = response.data.brand || '';
+                form.submit();
+            }, function (response) {
                 let message = 'Error al generar el token de pago. Revisa los datos de tu tarjeta e intentalo de nuevo.';
-                if (response && response.cause && response.cause.length > 0) {
-                    message = response.cause.map(function (error) { return error.description; }).join(', ');
+                if (response && response.data && response.data.error_description) {
+                    message = response.data.error_description;
                 }
 
                 submitButton.disabled = false;

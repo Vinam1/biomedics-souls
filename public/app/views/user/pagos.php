@@ -2,7 +2,7 @@
 $editingPayment = $editingPayment ?? null;
 $paymentTypes = [
     'tarjeta' => 'Tarjeta',
-    'mercado_pago' => 'Mercado Pago',
+    'openpay' => 'OpenPay',
     'spei' => 'SPEI',
     'oxxo' => 'OXXO',
     'transferencia' => 'Transferencia',

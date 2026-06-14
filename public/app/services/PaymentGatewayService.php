@@ -6,8 +6,8 @@ class PaymentGatewayService
     {
         $type = $paymentMethod['tipo'] ?? 'otro';
 
-        if ($type === 'mercado_pago' || ($type === 'tarjeta' && !empty($extra['card_token']))) {
-            return MercadoPagoService::processPayment($paymentMethod, $amount, $orderNumber, $extra);
+        if ($type === 'openpay' || ($type === 'tarjeta' && !empty($extra['card_token']))) {
+            return OpenPayService::processPayment($paymentMethod, $amount, $orderNumber, $extra);
         }
 
         $gateway = self::resolveGateway($type);
@@ -24,9 +24,9 @@ class PaymentGatewayService
             'preference_id' => null,
         ];
 
-        if ($type === 'mercado_pago') {
-            $result['preference_id'] = 'pref_' . bin2hex(random_bytes(5));
-            $result['detail'] = 'Transaccion procesada por Mercado Pago.';
+        if ($type === 'openpay') {
+            $result['preference_id'] = 'op_' . bin2hex(random_bytes(5));
+            $result['detail'] = 'Transaccion procesada por OpenPay.';
         }
 
         if (in_array($type, ['spei', 'oxxo', 'transferencia', 'otro'], true)) {
@@ -40,7 +40,7 @@ class PaymentGatewayService
     private static function resolveGateway(string $type): string
     {
         return match ($type) {
-            'mercado_pago' => 'mercado_pago',
+            'openpay' => 'openpay',
             'tarjeta' => 'card_gateway',
             'spei' => 'spei_gateway',
             'oxxo' => 'oxxo_gateway',

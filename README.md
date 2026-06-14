@@ -5,8 +5,8 @@ Proyecto de tienda en línea construido con PHP, MySQL, Bootstrap y JavaScript u
 ## Características principales
 
 - Carrito de compras con resumen de pedido
-- Checkout con pago por Mercado Pago para tarjetas Visa/Mastercard
-- Tokenización de tarjeta en el cliente usando el SDK de Mercado Pago
+- Checkout con pago por OpenPay para tarjetas Visa/Mastercard
+- Tokenización de tarjeta en el cliente usando el SDK de OpenPay
 - Almacenamiento de resultados de pago y transacciones en la base de datos
 - Reseñas y valoraciones de productos en la página de detalle
 - Panel de administración para productos, pedidos y clientes
@@ -25,9 +25,9 @@ Variables clave compatibles:
 - `DB_NAME`
 - `DB_USER`
 - `DB_PASS`
-- `MP_ACCESS_TOKEN`
-- `MP_PUBLIC_KEY`
-- `MP_BASE_URL` (opcional, por defecto `https://api.mercadopago.com`)
+- `OPENPAY_API_KEY`
+- `OPENPAY_MERCHANT_ID`
+- `OPENPAY_BASE_URL` (opcional, por defecto `https://api.openpay.mx/v1`)
 
 ## Dependencias
 
@@ -48,7 +48,7 @@ Variables clave compatibles:
 - `public/app/core/` - Núcleo MVC: `App`, `Controller`, `Database`.
 - `public/app/controllers/` - Controladores del sitio.
 - `public/app/models/` - Modelos para la base de datos.
-- `public/app/services/` - Servicios reutilizables, incluida la integración con Mercado Pago.
+- `public/app/services/` - Servicios reutilizables, incluida la integración con OpenPay.
 - `public/app/views/` - Plantillas de presentación.
 
 ## Rutas principales
@@ -57,7 +57,7 @@ Variables clave compatibles:
 - `/catalogo` - Catálogo de productos.
 - `/producto/{slug}` - Detalle de producto y reseñas.
 - `/carrito` - Vista del carrito.
-- `/checkout` - Checkout y pago con Mercado Pago.
+- `/checkout` - Checkout y pago con OpenPay.
 - `/auth/login` - Iniciar sesión.
 - `/auth/register` - Registro de usuario.
 - `/pedido/exito` - Confirmación de pedido.
@@ -67,16 +67,16 @@ Variables clave compatibles:
 
 ## Notas de implementación
 
-- El checkout carga el SDK de Mercado Pago desde `https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js`.
-- El backend procesa pagos con `public/app/services/MercadoPagoService.php`.
+- El checkout carga el SDK de OpenPay desde `https://openpay.s3.amazonaws.com/openpay.v1.0.min.js`.
+- El backend procesa pagos con `public/app/services/OpenPayService.php`.
 - Los métodos de pago guardados pueden reutilizarse, y el flujo de tarjeta nueva usa tokenización segura.
 - Las reseñas de producto se muestran en cada página de producto y se almacenan con validación de texto.
 
 ## Consideraciones
 
 - Si usas un host virtual, ajusta la ruta base en `public/.htaccess`.
-- Revisa que la clave pública de Mercado Pago (`MP_PUBLIC_KEY`) esté disponible para tokenizar la tarjeta en cliente.
-- Verifica que la clave de acceso (`MP_ACCESS_TOKEN`) funcione para el ambiente elegido.
+- Revisa que la clave API de OpenPay (`OPENPAY_API_KEY`) esté disponible para tokenizar la tarjeta en cliente.
+- Verifica que el ID de comerciante (`OPENPAY_MERCHANT_ID`) sea válido para el ambiente elegido.
 
 ## Próximos pasos
 

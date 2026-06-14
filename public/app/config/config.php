@@ -16,9 +16,9 @@ define('DB_USER', getenv('DB_USER') ?: 'flmejzdy_biomedics');
 define('DB_PASS', getenv('DB_PASS') ?: 'biomedics123456');
 define('GEMINI_API_KEY', 'AIzaSyAD1W7NzoePe5gjcXf1Z3Mj1Vx2DfBp-xY');
 define('GEMINI_MODEL', 'gemini-2.5-flash');
-define('MP_ACCESS_TOKEN', getenv('MP_ACCESS_TOKEN') ?: '');
-define('MP_PUBLIC_KEY', getenv('MP_PUBLIC_KEY') ?: '');
-define('MP_BASE_URL', getenv('MP_BASE_URL') ?: 'https://api.mercadopago.com');
+define('OPENPAY_API_KEY', getenv('OPENPAY_API_KEY') ?: '');
+define('OPENPAY_MERCHANT_ID', getenv('OPENPAY_MERCHANT_ID') ?: '');
+define('OPENPAY_BASE_URL', getenv('OPENPAY_BASE_URL') ?: 'https://api.openpay.mx/v1');
 // ==================== CONSTANTES DE LA APLICACION ====================
 define('APPROOT', dirname(__DIR__));
 define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024);

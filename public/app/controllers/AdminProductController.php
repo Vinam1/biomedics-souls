@@ -16,6 +16,7 @@ class AdminProductController extends Controller
         $categoryId = intval($_GET['categoria'] ?? 0);
         $status = trim($_GET['estatus'] ?? '');
         $sort = trim($_GET['orden'] ?? 'updated_at_desc');
+        $isAjax = intval($_GET['ajax'] ?? 0) === 1;
 
         $products = Producto::search([
             'query' => $search,
@@ -23,6 +24,15 @@ class AdminProductController extends Controller
             'estatus' => $status ?: null,
             'sort' => $sort,
         ]);
+
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'products' => $products,
+                'hasResults' => !empty($products),
+            ]);
+            exit;
+        }
 
         $categories = Categoria::all();
 
