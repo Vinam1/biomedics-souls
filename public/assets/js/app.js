@@ -289,7 +289,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const productList = document.createElement('div');
                 productList.className = 'assistant-product-list';
 
-                products.slice(0, 3).forEach(function (product) {
+                const maxProducts = Math.min(products.length, 5);
+                products.slice(0, maxProducts).forEach(function (product) {
                     const card = document.createElement('a');
                     card.className = 'assistant-product-card';
                     card.href = product.url || '#';

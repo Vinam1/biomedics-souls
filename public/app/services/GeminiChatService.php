@@ -22,9 +22,20 @@ class GeminiChatService
 
     public function generateChatResult(string $message, array $products, array $history = []): array
     {
+        $reply = $this->generateReply($message, $products, $history);
+        $recommendedIndices = $this->selectBestProducts($message, $products);
+        $recommendedProducts = [];
+        
+        foreach ($recommendedIndices as $index) {
+            if (isset($products[$index])) {
+                $recommendedProducts[] = $products[$index];
+            }
+        }
+        
         return [
-            'reply' => $this->generateReply($message, $products, $history),
+            'reply' => $reply,
             'suggestions' => $this->buildFollowUpSuggestions($message, $products),
+            'recommendedProducts' => $recommendedProducts,
         ];
     }
 
@@ -173,6 +184,99 @@ PROMPT;
 
         $suggestions = array_values(array_unique(array_filter(array_map('trim', $suggestions))));
         return array_slice($suggestions, 0, 4);
+    }
+
+    private function selectBestProducts(string $message, array $products): array
+    {
+        if (empty($products)) {
+            return [];
+        }
+
+        $messageLower = function_exists('mb_strtolower')
+            ? mb_strtolower($message, 'UTF-8')
+            : strtolower($message);
+
+        $scores = [];
+        foreach ($products as $index => $product) {
+            $score = 0;
+
+            $nombre = function_exists('mb_strtolower')
+                ? mb_strtolower((string) ($product['nombre'] ?? ''), 'UTF-8')
+                : strtolower((string) ($product['nombre'] ?? ''));
+            $categoria = function_exists('mb_strtolower')
+                ? mb_strtolower((string) ($product['categoria_nombre'] ?? ''), 'UTF-8')
+                : strtolower((string) ($product['categoria_nombre'] ?? ''));
+            $beneficios = function_exists('mb_strtolower')
+                ? mb_strtolower((string) ($product['beneficios'] ?? ''), 'UTF-8')
+                : strtolower((string) ($product['beneficios'] ?? ''));
+            $usos = function_exists('mb_strtolower')
+                ? mb_strtolower((string) ($product['usos'] ?? ''), 'UTF-8')
+                : strtolower((string) ($product['usos'] ?? ''));
+            $descripcion = function_exists('mb_strtolower')
+                ? mb_strtolower((string) ($product['descripcion_corta'] ?? ''), 'UTF-8')
+                : strtolower((string) ($product['descripcion_corta'] ?? ''));
+
+            if (str_contains($nombre, substr($messageLower, 0, 3))) {
+                $score += 100;
+            }
+            if (str_contains($nombre, $messageLower)) {
+                $score += 50;
+            }
+            if (str_contains($beneficios, $messageLower)) {
+                $score += 40;
+            }
+            if (str_contains($usos, $messageLower)) {
+                $score += 35;
+            }
+            if (str_contains($categoria, $messageLower)) {
+                $score += 30;
+            }
+            if (str_contains($descripcion, $messageLower)) {
+                $score += 20;
+            }
+
+            $status = (string) ($product['estatus'] ?? '');
+            if ($status !== 'agotado') {
+                $score += 15;
+            }
+
+            if ((int) ($product['destacado'] ?? 0) > 0) {
+                $score += 10;
+            }
+
+            $scores[$index] = $score;
+        }
+
+        arsort($scores);
+
+        $selectedIndices = [];
+        $totalProducts = count($products);
+
+        if ($totalProducts <= 3) {
+            $selectedIndices = array_keys($scores);
+        } elseif ($totalProducts <= 5) {
+            $selectedIndices = array_slice(array_keys($scores), 0, 4);
+        } else {
+            $topScore = reset($scores);
+            $avgScore = array_sum($scores) / count($scores);
+
+            foreach ($scores as $index => $score) {
+                if (count($selectedIndices) >= 5) {
+                    break;
+                }
+
+                if ($score >= ($topScore * 0.5) || $score >= ($avgScore * 0.8)) {
+                    $selectedIndices[] = $index;
+                }
+            }
+
+            if (count($selectedIndices) < 2 && !empty($products)) {
+                $selectedIndices = array_slice(array_keys($scores), 0, 3);
+            }
+        }
+
+        sort($selectedIndices);
+        return $selectedIndices;
     }
 
     private function postJson(array $payload): array

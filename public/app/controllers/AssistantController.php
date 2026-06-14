@@ -45,6 +45,7 @@ class AssistantController extends Controller
         try {
             $result = $service->generateChatResult($message, $products, $history);
             $reply = $result['reply'];
+            $recommendedProducts = $result['recommendedProducts'] ?? $products;
 
             $history[] = ['role' => 'user', 'text' => $message];
             $history[] = ['role' => 'assistant', 'text' => $reply];
@@ -64,7 +65,7 @@ class AssistantController extends Controller
                             : null,
                         'url' => site_url('producto/' . ($product['slug'] ?? '')),
                     ];
-                }, $products),
+                }, $recommendedProducts),
                 'suggestions' => $result['suggestions'] ?? [],
                 'configured' => $service->isConfigured(),
             ], JSON_UNESCAPED_UNICODE);

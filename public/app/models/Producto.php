@@ -148,29 +148,43 @@ class Producto
     {
         $db = Database::getInstance();
         $limit = max(1, min($limit, 12));
-        $term = '%' . trim($query) . '%';
+        $cleanQuery = trim($query);
+        $term = '%' . $cleanQuery . '%';
 
         $sql = 'SELECT p.id, p.nombre, p.slug, p.sku, p.precio, p.precio_descuento, p.descripcion_corta, p.descripcion_larga,
                        p.modo_empleo, p.usos, p.beneficios, p.contenido_neto, p.cantidad_envase, p.estatus,
                        c.nombre AS categoria_nombre,
-                       pi.url_imagen AS imagen_principal
+                       pi.url_imagen AS imagen_principal,
+                       CASE
+                         WHEN p.nombre LIKE :exact_name THEN 100
+                         WHEN p.nombre LIKE :query1 THEN 80
+                         WHEN p.beneficios LIKE :query2 THEN 70
+                         WHEN p.usos LIKE :query3 THEN 70
+                         WHEN p.descripcion_corta LIKE :query4 THEN 50
+                         WHEN p.descripcion_larga LIKE :query5 THEN 40
+                         WHEN c.nombre LIKE :query6 THEN 60
+                         WHEN p.sku LIKE :query7 THEN 30
+                         ELSE 10
+                       END AS relevance_score
                 FROM productos p
                 LEFT JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN productos_imagenes pi ON pi.producto_id = p.id AND pi.es_principal = 1 AND pi.deleted_at IS NULL
                 WHERE p.deleted_at IS NULL
                   AND (
                     p.nombre LIKE :query1
-                    OR p.descripcion_corta LIKE :query2
-                    OR p.descripcion_larga LIKE :query3
-                    OR p.usos LIKE :query4
-                    OR p.beneficios LIKE :query5
+                    OR p.descripcion_corta LIKE :query4
+                    OR p.descripcion_larga LIKE :query5
+                    OR p.usos LIKE :query3
+                    OR p.beneficios LIKE :query2
                     OR c.nombre LIKE :query6
                     OR p.sku LIKE :query7
                   )
-                ORDER BY p.destacado DESC, p.updated_at DESC
+                ORDER BY p.estatus DESC, relevance_score DESC, p.destacado DESC, p.updated_at DESC
                 LIMIT :limit';
 
         $stmt = $db->prepare($sql);
+        $exactTerm = $cleanQuery;
+        $stmt->bindValue(':exact_name', $exactTerm, PDO::PARAM_STR);
         $stmt->bindValue(':query1', $term, PDO::PARAM_STR);
         $stmt->bindValue(':query2', $term, PDO::PARAM_STR);
         $stmt->bindValue(':query3', $term, PDO::PARAM_STR);
@@ -183,6 +197,7 @@ class Producto
 
         $products = $stmt->fetchAll();
         if (!empty($products)) {
+            shuffle($products);
             return $products;
         }
 
